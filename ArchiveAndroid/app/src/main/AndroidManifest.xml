@@ -13,36 +13,37 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ArchiveAndroid">
-
+        android:theme="@style/Theme.ArchiveAndroid"
+        android:usesCleartextTraffic="true">
         <activity
-            android:name=".intro.view.IntroActivity"
+            android:name=".feature.home.HomeActivity"
+            android:exported="false"
+            android:label="@string/title_activity_home"
+            android:theme="@style/Theme.ArchiveAndroid" />
+        <activity
+            android:name=".feature.intro.view.IntroActivity"
             android:exported="true"
             android:label="@string/title_activity_intro"
-            android:theme="@style/Theme.ArchiveAndroid" >
+            android:theme="@style/Theme.ArchiveAndroid">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.ArchiveAndroid">
-        </activity>
-
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true"
             android:launchMode="singleTask"
-            android:taskAffinity="kakao.sdk"
-            android:exported="true">
+            android:taskAffinity="kakao.sdk">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:host="oauth"
+
+                <data
+                    android:host="oauth"
                     android:scheme="kakao${kakaoNaitiveAppKey}" />
             </intent-filter>
         </activity>

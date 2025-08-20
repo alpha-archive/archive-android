@@ -1,9 +1,11 @@
-package com.example.archiveandroid.intro.viewmodel
+package com.example.archiveandroid.feature.intro.view
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.archiveandroid.intro.model.IntroRepository
+import com.example.archiveandroid.core.storage.TokenStore
+import com.example.archiveandroid.feature.intro.data.repository.AuthRepository
+import com.example.archiveandroid.feature.intro.data.repository.IntroRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,12 +27,17 @@ import javax.inject.Inject
  */
 
 @HiltViewModel
-class IntroViewModel @Inject constructor(private val introRepository: IntroRepository) : ViewModel() {
+class IntroViewModel @Inject constructor(
+    private val introRepository: IntroRepository,
+    private val authRepository: AuthRepository,
+    private val tokenStore: TokenStore
+) : ViewModel() {
 
     sealed interface UiState {
         data object Loading : UiState
         data object NeedLogin : UiState
         data object LoggedIn : UiState
+        data class Success(val temp: String) : UiState
         data class Error(val msg: String) : UiState
     }
 
@@ -50,6 +57,20 @@ class IntroViewModel @Inject constructor(private val introRepository: IntroRepos
             val r = introRepository.kakaoLogin(context)
             _uiState.value = if (r.isSuccess) UiState.LoggedIn
             else UiState.Error(r.exceptionOrNull()?.message ?: "Login failed")
+        }
+    }
+
+    fun onKakaoLoginSuccess(kakaoAccessToken: String) {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            authRepository.loginWithKakao(kakaoAccessToken)
+                .onSuccess { response ->
+                    tokenStore.save(response.accessToken, response.refreshToken)
+                    _uiState.value = UiState.Success(response.accessToken)
+                }
+                .onFailure { exception ->
+                    _uiState.value = UiState.Error(exception.message ?: "로그인 실패")
+                }
         }
     }
 }

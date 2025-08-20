@@ -1,18 +1,21 @@
-package com.example.archiveandroid.intro.view
+package com.example.archiveandroid.feature.intro.view
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.archiveandroid.intro.view.ui.theme.ArchiveAndroidTheme
-import com.example.archiveandroid.intro.viewmodel.IntroViewModel
+import com.example.archiveandroid.feature.home.HomeActivity
+import com.example.archiveandroid.feature.intro.view.ui.theme.ArchiveAndroidTheme
+import com.kakao.sdk.auth.TokenManagerProvider
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -37,7 +40,6 @@ class IntroActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         viewModel.tryKakaoAutoLogin()
 
-        enableEdgeToEdge()
         setContent {
             ArchiveAndroidTheme {
                 val ui = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -46,7 +48,9 @@ class IntroActivity : ComponentActivity() {
                     IntroViewModel.UiState.NeedLogin -> LoginScreen(
                         onClickKakao = { viewModel.kakaoLogin(this) }
                     )
-                    IntroViewModel.UiState.LoggedIn -> NavigateToHomeAndFinish()
+                    IntroViewModel.UiState.LoggedIn ->
+                        viewModel.onKakaoLoginSuccess(TokenManagerProvider.instance.manager.getToken()?.accessToken!!)
+                    is IntroViewModel.UiState.Success -> NavigateToHomeAndFinish()
                     is IntroViewModel.UiState.Error -> LoginScreen(
                         error = ui.msg, onClickKakao = { viewModel.kakaoLogin(this) }
                     )
@@ -59,7 +63,6 @@ class IntroActivity : ComponentActivity() {
 @Composable
 fun SplashScreen() {
     // 로딩 인디케이터 등
-    Log.e("IntroActivity", "Intro")
 }
 
 @Composable
@@ -72,6 +75,11 @@ fun LoginScreen(error: String? = null, onClickKakao: () -> Unit) {
 
 @Composable
 fun NavigateToHomeAndFinish() {
-    // NavController 이용해 Home로 이동 후 Intro 종료
-    Log.e("IntroAvtivity", "kakaoLoginSuccess")
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        context.startActivity(Intent(context, HomeActivity::class.java))
+        if (context is Activity) {
+            context.finish()
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package com.example.archiveandroid.intro.view.ui.theme
+package com.example.archiveandroid.feature.home.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

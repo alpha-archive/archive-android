@@ -1,4 +1,4 @@
-package com.example.archiveandroid.intro.model
+package com.example.archiveandroid.feature.intro.data.repository
 
 import android.content.Context
 import com.kakao.sdk.auth.AuthApiClient
@@ -23,10 +23,10 @@ import kotlin.coroutines.resume
 
 class IntroRepository @Inject constructor() {
     suspend fun autoKakaoLogin(): Boolean = suspendCancellableCoroutine { cont ->
-        if (!AuthApiClient.instance.hasToken()) {
+        if (!AuthApiClient.Companion.instance.hasToken()) {
             cont.resume(false, null); return@suspendCancellableCoroutine
         }
-        UserApiClient.instance.accessTokenInfo { _, error ->
+        UserApiClient.Companion.instance.accessTokenInfo { _, error ->
             cont.resume(error == null, null)
         }
     }
@@ -39,11 +39,12 @@ class IntroRepository @Inject constructor() {
             }
         }
 
-        val isKakaoTalkAvailable = UserApiClient.instance.isKakaoTalkLoginAvailable(context)
+        val isKakaoTalkAvailable =
+            UserApiClient.Companion.instance.isKakaoTalkLoginAvailable(context)
         if (isKakaoTalkAvailable) {
-            UserApiClient.instance.loginWithKakaoTalk(context, callback = callback)
+            UserApiClient.Companion.instance.loginWithKakaoTalk(context, callback = callback)
         } else {
-            UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
+            UserApiClient.Companion.instance.loginWithKakaoAccount(context, callback = callback)
         }
     }
 }

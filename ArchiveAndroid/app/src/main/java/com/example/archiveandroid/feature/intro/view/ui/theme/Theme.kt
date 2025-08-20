@@ -1,4 +1,4 @@
-package com.example.archiveandroid.intro.view.ui.theme
+package com.example.archiveandroid.feature.intro.view.ui.theme
 
 import android.app.Activity
 import android.os.Build

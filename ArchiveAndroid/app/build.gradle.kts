@@ -8,6 +8,15 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    id("com.google.dagger.hilt.android")
+    kotlin("kapt")
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("com.squareup:javapoet:1.13.0")
+    }
 }
 
 android {
@@ -25,6 +34,12 @@ android {
 
         val serverUrl = properties.getProperty("serverUrl") ?: throw GradleException("Missing 'serverUrl' in local.properties")
         buildConfigField("String", "serverUrl", "\"$serverUrl\"")
+
+
+        manifestPlaceholders["kakaoNaitiveAppKey"] = properties.getProperty("kakaoNaitiveAppKey", "www")
+        buildConfigField("String", "kakaoNativeStringAppKey", properties.getProperty("kakaoNaitiveStringAppKey", "www"))
+
+        buildConfigField("String", "kakaoAppKey", properties.getProperty("kakaoAppKeyBuildConfig", "\"\""))
     }
 
     buildTypes {
@@ -70,7 +85,7 @@ dependencies {
     // AndroidX Lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.2")
-    
+
     // Retrofit 최신 버전 (3.0.0)
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
@@ -78,4 +93,15 @@ dependencies {
 
     // Gson
     implementation("com.google.code.gson:gson:2.11.0")
+
+    // 카카오 로그인
+    implementation("com.kakao.sdk:v2-user:2.20.6")
+
+    // hilt
+    implementation("com.google.dagger:hilt-android:2.57")
+    kapt("com.google.dagger:hilt-compiler:2.57")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    // poet버전 강제 통일
+    implementation("com.squareup:javapoet:1.13.0")
 }

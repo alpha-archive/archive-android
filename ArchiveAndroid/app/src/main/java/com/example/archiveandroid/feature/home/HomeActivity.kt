@@ -1,4 +1,4 @@
-package com.example.archiveandroid
+package com.example.archiveandroid.feature.home
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,9 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.archiveandroid.ui.theme.ArchiveAndroidTheme
+import com.example.archiveandroid.core.ui.theme.ArchiveAndroidTheme
 
-class MainActivity : ComponentActivity() {
+class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             ArchiveAndroidTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "Home",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

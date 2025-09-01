@@ -1,7 +1,6 @@
 package com.example.archiveandroid.core.network
 
 import com.example.archiveandroid.BuildConfig
-import com.example.archiveandroid.feature.intro.data.remote.AuthApi
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -18,7 +17,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RetrofitClient {
     private val gson = GsonBuilder()
-        .setLenient()
         .create()
 
     @Provides
@@ -48,9 +46,4 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
-
-    @Provides
-    @Singleton
-    fun provideAuthApi(retrofit: Retrofit): AuthApi =
-        retrofit.create(AuthApi::class.java)
 }

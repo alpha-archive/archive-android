@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 
 interface AuthRepository {
     suspend fun loginWithKakao(kakaoToken: String): Result<AppTokenResponse>
+    suspend fun refreshToken(refreshToken: String): Result<AppTokenResponse>
 }
 
 @Module

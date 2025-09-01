@@ -1,6 +1,7 @@
 package com.example.archiveandroid.feature.intro.view
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.archiveandroid.core.storage.TokenStore
@@ -41,7 +42,7 @@ class IntroViewModel @Inject constructor(
         data class Error(val msg: String) : UiState
     }
 
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    private val _uiState = MutableStateFlow<UiState>(UiState.NeedLogin)
     val uiState: StateFlow<UiState> = _uiState
 
     fun tryKakaoAutoLogin() {
@@ -66,6 +67,7 @@ class IntroViewModel @Inject constructor(
             authRepository.loginWithKakao(kakaoAccessToken)
                 .onSuccess { response ->
                     tokenStore.save(response.accessToken, response.refreshToken)
+                    Log.e("TOKEN", kakaoAccessToken)
                     _uiState.value = UiState.Success(response.accessToken)
                 }
                 .onFailure { exception ->

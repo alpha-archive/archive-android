@@ -7,6 +7,7 @@ import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * IntroRepository
@@ -21,6 +22,7 @@ import kotlin.coroutines.resume
  * 3. 서버 응답(AuthResponse)을 ViewModel에 반환
  */
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class IntroRepository @Inject constructor() {
     suspend fun autoKakaoLogin(): Boolean = suspendCancellableCoroutine { cont ->
         if (!AuthApiClient.Companion.instance.hasToken()) {

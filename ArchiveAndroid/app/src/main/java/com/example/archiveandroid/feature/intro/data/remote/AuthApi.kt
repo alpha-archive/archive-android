@@ -12,4 +12,9 @@ interface AuthApi {
     suspend fun loginWithKakao(
         @Body body: KakaoLoginRequest
     ): Response<ApiResponse<AppTokenResponse>>
+    
+    @POST("/api/auth/refresh")
+    suspend fun refreshToken(
+        @Body body: RefreshTokenRequest
+    ): Response<ApiResponse<AppTokenResponse>>
 }

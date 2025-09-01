@@ -1,4 +1,4 @@
-package com.example.archiveandroid.feature.intro.view.ui.theme
+package com.example.archiveandroid.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

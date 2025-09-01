@@ -67,7 +67,6 @@ class IntroViewModel @Inject constructor(
             authRepository.loginWithKakao(kakaoAccessToken)
                 .onSuccess { response ->
                     tokenStore.save(response.accessToken, response.refreshToken)
-                    Log.e("TOKEN", kakaoAccessToken)
                     _uiState.value = UiState.Success(response.accessToken)
                 }
                 .onFailure { exception ->

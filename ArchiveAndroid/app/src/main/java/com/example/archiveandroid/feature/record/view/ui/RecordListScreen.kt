@@ -11,7 +11,7 @@ import androidx.compose.material3.Scaffold
 fun RecordListScreen() {
     Scaffold { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            Text("RecordListScreen")
+            Text("나의 활동 기록")
         }
     }
 }

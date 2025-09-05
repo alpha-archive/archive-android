@@ -52,8 +52,10 @@ class AuthInterceptor @Inject constructor(
                     .build()
                 return chain.proceed(retryReq)
             } else {
-                // 토큰 갱신 실패 시 원래 401 응답 반환
-                return response
+                // 토큰 갱신 실패 시 토큰 삭제
+                kotlinx.coroutines.runBlocking { 
+                    tokenStore.clear() 
+                }
             }
         }
         

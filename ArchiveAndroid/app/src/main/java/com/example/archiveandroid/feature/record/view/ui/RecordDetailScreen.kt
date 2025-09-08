@@ -33,6 +33,53 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@Composable
+private fun RowInfo(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 50.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal, fontSize = 18.sp)
+        )
+        Text(
+            text = value,
+            style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal)
+        )
+    }
+}
+
+@Composable
+private fun MemoSection(
+    label: String = "메모",
+    memo: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 50.dp)
+    ) {
+        Text(
+            text = label,
+            style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal, fontSize = 18.sp)
+        )
+        Text(
+            text = memo,
+            style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal),
+            modifier = Modifier.padding(top = 8.dp)
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordDetailScreen(
@@ -78,139 +125,29 @@ fun RecordDetailScreen(
 
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 50.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "카테고리",
-                            style = TextStyle(
-                                fontFamily = Pretendard,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 18.sp
-                            )
-                        )
-                        Text(
-                            text = "여행",
-                            style = TextStyle(
-                                fontFamily = Pretendard,
-                                fontWeight = FontWeight.Normal,
-                            )
-                        )
-                    }
-                    Divider(
-                        color = Color(0xffD9D9D9),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp)
-                            .padding(top = 10.dp, bottom = 20.dp)
-                    )
+
+                    RowInfo(label = "카테고리", value = "여행")
+                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp, vertical = 10.dp))
+
+                    RowInfo(label = "활동명", value = "KOSS 여름 LT")
+                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp, vertical = 10.dp))
+
+                    RowInfo(label = "날짜 / 시간", value = "2025/7/31 16:22")
+                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp, vertical = 10.dp))
+
+                    RowInfo(label = "위치", value = "강원도 양양군 정암해변")
+                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp, vertical = 10.dp))
+
+                    MemoSection(memo = "아 집가고 싶다")
                 }
-
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 50.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "활동명",
-                            style = TextStyle(
-                                fontFamily = Pretendard,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 18.sp
-                            )
-                        )
-                        Text(
-                            text = "KOSS 여름 LT",
-                            style = TextStyle(
-                                fontFamily = Pretendard,
-                                fontWeight = FontWeight.Normal,
-                            )
-                        )
-                    }
-                    Divider(
-                        color = Color(0xffD9D9D9),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp)
-                            .padding(top = 10.dp, bottom = 20.dp)
-                    )
-                }
-
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 50.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "날짜 / 시간",
-                            style = TextStyle(
-                                fontFamily = Pretendard,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 18.sp
-                            )
-                        )
-                        Text(
-                            text = "2025/7/31 16:22",
-                            style = TextStyle(
-                                fontFamily = Pretendard,
-                                fontWeight = FontWeight.Normal,
-                            )
-                        )
-                    }
-                    Divider(
-                        color = Color(0xffD9D9D9),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp)
-                            .padding(top = 10.dp, bottom = 20.dp)
-                    )
-                }
-
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 50.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "위치",
-                            style = TextStyle(
-                                fontFamily = Pretendard,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 18.sp
-                            )
-                        )
-                        Text(
-                            text = "강원도 양양군 정암해변",
-                            style = TextStyle(
-                                fontFamily = Pretendard,
-                                fontWeight = FontWeight.Normal,
-                            )
-                        )
-                    }
-                    Divider(
-                        color = Color(0xffD9D9D9),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 30.dp)
-                            .padding(top = 10.dp, bottom = 20.dp)
-                    )
-                }
-
-
-
             }
         }
     }

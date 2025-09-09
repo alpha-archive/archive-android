@@ -25,15 +25,16 @@ enum class HomeRoute(val route: String) {
 data class HomeDestination(
     val route: HomeRoute,
     val label: String,
-    val icon: ImageVector
+    val icon: ImageVector,
+    val assetIconPath: String
 )
 
 val homeDestinations = listOf(
-    HomeDestination(HomeRoute.Recommend, "추천", Icons.Filled.Home),
-    HomeDestination(HomeRoute.Record, "기록", Icons.Filled.History),
-    HomeDestination(HomeRoute.Chatbot, "챗봇", Icons.Filled.Chat),
-    HomeDestination(HomeRoute.Stats, "통계", Icons.Filled.AutoGraph),
-    HomeDestination(HomeRoute.User, "사용자", Icons.Filled.Person)
+    HomeDestination(HomeRoute.Recommend, "추천", Icons.Filled.Home, "icons/recommend.png"),
+    HomeDestination(HomeRoute.Record, "기록", Icons.Filled.History, "icons/history.png"),
+    HomeDestination(HomeRoute.Chatbot, "챗봇", Icons.Filled.Chat, "icons/chat.png"),
+    HomeDestination(HomeRoute.Stats, "통계", Icons.Filled.AutoGraph, "icons/graph.png"),
+    HomeDestination(HomeRoute.User, "사용자", Icons.Filled.Person, "icons/user.png")
 )
 
 fun NavHostController.navigateSingleTopTo(route: String) {

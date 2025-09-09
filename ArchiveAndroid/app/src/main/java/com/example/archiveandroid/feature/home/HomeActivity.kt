@@ -7,10 +7,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.archiveandroid.feature.home.ui.HomeBottomBar
+import com.example.archiveandroid.feature.home.ui.HomeNavHost
 import com.example.archiveandroid.core.ui.theme.ArchiveAndroidTheme
 
 class HomeActivity : ComponentActivity() {
@@ -19,9 +21,13 @@ class HomeActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ArchiveAndroidTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Home",
+                val navController = rememberNavController()
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = { HomeBottomBar(navController) }
+                ) { innerPadding ->
+                    HomeNavHost(
+                        navController = navController,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -30,18 +36,16 @@ class HomeActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     ArchiveAndroidTheme {
-        Greeting("Android")
+        val navController = rememberNavController()
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            bottomBar = { HomeBottomBar(navController) }
+        ) { innerPadding ->
+            HomeNavHost(navController, modifier = Modifier.padding(innerPadding))
+        }
     }
 }

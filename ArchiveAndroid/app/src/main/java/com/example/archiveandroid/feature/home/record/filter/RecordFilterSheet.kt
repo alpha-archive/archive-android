@@ -60,7 +60,8 @@ fun RecordFilterSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
+        sheetState = sheetState,
+        containerColor = Color.White
     ) {
         Column(modifier = Modifier.padding(bottom = 16.dp).heightIn(max = maxSheetHeight)) {
             // Header: centered title (clickable to dismiss) and right-aligned Done
@@ -70,7 +71,7 @@ fun RecordFilterSheet(
                 // Done aligned to end
                 Text(
                     text = "완료",
-                    color = MaterialTheme.colorScheme.primary,
+                    color = Color(0xFF2196F3),
                     modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp).clickable { onDone?.invoke() ?: onDismiss() }
                 )
                 // Title centered, single line

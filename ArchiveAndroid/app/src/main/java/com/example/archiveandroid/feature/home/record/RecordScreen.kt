@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.archiveandroid.feature.home.record.filter.RecordFilterSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,10 +50,10 @@ fun RecordScreen(
     onFilterClick: () -> Unit = {},
     onAddClick: () -> Unit = {}
 ) {
-    // Simple scroll state to drive FAB visibility (will work with placeholder content too)
     val scrollState = rememberScrollState()
     var lastScroll by remember { mutableIntStateOf(0) }
     var fabVisible by remember { mutableStateOf(true) }
+    var showFilter by remember { mutableStateOf(false) }
 
     LaunchedEffect(scrollState.value) {
         val delta = scrollState.value - lastScroll
@@ -76,7 +77,7 @@ fun RecordScreen(
                     )
                 },
                 actions = {
-                    IconButton(onClick = onFilterClick) {
+                    IconButton(onClick = { showFilter = true }) {
                         Icon(
                             painter = rememberAssetIconPainter("icons/filter.png"),
                             contentDescription = "필터",
@@ -123,6 +124,10 @@ fun RecordScreen(
         ) {
             Text(text = "기록", style = MaterialTheme.typography.titleLarge)
         }
+    }
+
+    if (showFilter) {
+        RecordFilterSheet(onDismiss = { showFilter = false })
     }
 }
 

@@ -13,6 +13,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.archiveandroid.feature.home.record.RecordScreen
 
 enum class HomeRoute(val route: String) {
     Recommend("recommend"),

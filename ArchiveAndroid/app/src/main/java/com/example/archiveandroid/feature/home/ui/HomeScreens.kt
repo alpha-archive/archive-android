@@ -20,7 +20,6 @@ fun CenterLabel(text: String) {
 }
 
 @Composable fun RecommendScreen() { CenterLabel("추천") }
-@Composable fun RecordScreen() { CenterLabel("기록") }
 @Composable fun ChatbotScreen() { CenterLabel("챗봇") }
 @Composable fun StatsScreen() { CenterLabel("통계") }
 @Composable fun UserScreen() { CenterLabel("사용자") }

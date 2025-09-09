@@ -4,7 +4,7 @@ import com.example.archiveandroid.feature.intro.data.remote.AuthApi
 import com.example.archiveandroid.feature.intro.data.remote.dto.AppTokenResponse
 import com.example.archiveandroid.feature.intro.data.remote.dto.KakaoLoginRequest
 import com.example.archiveandroid.feature.intro.data.remote.dto.RefreshTokenRequest
-import jakarta.inject.Inject
+import javax.inject.Inject
 import retrofit2.HttpException
 
 class AuthRepositoryImpl @Inject constructor(

@@ -1,18 +1,25 @@
 package com.example.archiveandroid.feature.intro.view.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import com.example.archiveandroid.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -23,9 +30,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.example.yourapp.ui.components.AppBarMenuItem
-import com.example.yourapp.ui.components.AppTopBar
+import com.example.yourapp.ui.components.TopAppBar
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.*
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -33,11 +39,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+/* 카테고리 버튼 */
+@Composable
+private fun CategoryButton(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color(0xFFA0A6FF))
+            .padding(horizontal = 10.dp, vertical = 6.dp)
+    ) {
+        Text(
+            text = text,
+            style = TextStyle(
+                fontFamily = Pretendard,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp
+            )
+        )
+    }
+}
+
 @Composable
 private fun RowInfo(
     label: String,
-    value: String,
-    modifier: Modifier = Modifier
+    value: String? = null,
+    modifier: Modifier = Modifier,
+    valueContent: (@Composable () -> Unit)? = null // 컴포저블 슬롯(CategoryButton)
 ) {
     Row(
         modifier = modifier
@@ -50,10 +80,14 @@ private fun RowInfo(
             text = label,
             style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal, fontSize = 18.sp)
         )
-        Text(
-            text = value,
-            style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal)
-        )
+        if (valueContent != null) {
+            valueContent()
+        } else {
+            Text(
+                text = value.orEmpty(),
+                style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal)
+            )
+        }
     }
 }
 
@@ -80,6 +114,49 @@ private fun MemoSection(
     }
 }
 
+@Composable
+fun NextButton(
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        FloatingActionButton(
+            onClick = onClick,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = Color(0xFF646464),
+            shape = CircleShape,
+            elevation = FloatingActionButtonDefaults.elevation( // 그림자 제거
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                focusedElevation = 0.dp,
+                hoveredElevation = 0.dp
+            )
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_next_arrow),
+                    contentDescription = "다음",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(35.dp)
+                )
+                Text(
+                    text = "다음",
+                    color = Color.White,
+                    fontSize = 9.sp,
+                    style = TextStyle(fontFamily = Pretendard)
+                )
+            }
+        }
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordDetailScreen(
@@ -90,7 +167,7 @@ fun RecordDetailScreen(
 
     Scaffold(
         topBar = {
-            AppTopBar(
+            TopAppBar(
                 title = "나의 활동 기록",
                 showBack = true,
                 onBackClick = onBack,
@@ -126,7 +203,9 @@ fun RecordDetailScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
 
-                    RowInfo(label = "카테고리", value = "여행")
+                    RowInfo(label = "카테고리") {
+                        CategoryButton(text = "여행")
+                    }
                     Divider(color = Color(0xffD9D9D9), modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 30.dp, vertical = 10.dp))
@@ -150,6 +229,8 @@ fun RecordDetailScreen(
                 }
             }
         }
+
+        NextButton { /* 다음 기록으로 넘어가기 */ }
     }
 }
 

@@ -16,7 +16,7 @@ data class AppBarMenuItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppTopBar(
+fun TopAppBar(
     title: String,
     showBack: Boolean = true,
     onBackClick: (() -> Unit)? = null,

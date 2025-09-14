@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import com.example.archiveandroid.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -56,7 +58,7 @@ private fun CategoryButton(
             style = TextStyle(
                 fontFamily = Pretendard,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp
+                fontSize = 15.sp
             )
         )
     }
@@ -190,13 +192,13 @@ fun RecordDetailScreen(
             item {
                 Image(
                     painter = painterResource(id = R.drawable.detail_dummy_image),
-                    contentDescription = "샘플 이미지",
+                    contentDescription = null,
                     modifier = Modifier
                         .width(330.dp)
-                        .height(250.dp)
+                        .aspectRatio(4f / 3f)
+                        .padding(bottom = 30.dp)
                         .clip(RoundedCornerShape(10.dp)),
-                    contentScale = ContentScale.Fit,
-                    alignment = Alignment.TopCenter
+                    contentScale = ContentScale.Crop
                 )
             }
 

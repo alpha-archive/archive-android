@@ -8,18 +8,12 @@ import com.example.archiveandroid.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -113,52 +107,9 @@ private fun MemoSection(
     }
 }
 
-@Composable
-fun NextButton(
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        FloatingActionButton(
-            onClick = onClick,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            containerColor = Color(0xFF646464),
-            shape = CircleShape,
-            elevation = FloatingActionButtonDefaults.elevation( // 그림자 제거
-                defaultElevation = 0.dp,
-                pressedElevation = 0.dp,
-                focusedElevation = 0.dp,
-                hoveredElevation = 0.dp
-            )
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_next_arrow),
-                    contentDescription = "다음",
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(35.dp)
-                )
-                Text(
-                    text = "다음",
-                    color = Color.White,
-                    fontSize = 9.sp,
-                    style = TextStyle(fontFamily = Pretendard)
-                )
-            }
-        }
-    }
-}
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecordDetailScreen(
+fun RecordInputScreen(
     onBack: () -> Unit = {},
     onMore: () -> Unit = {},
 ) {
@@ -228,7 +179,5 @@ fun RecordDetailScreen(
                 }
             }
         }
-
-        NextButton { /* 다음 기록으로 넘어가기 */ }
     }
 }

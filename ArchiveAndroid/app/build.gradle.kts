@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -110,4 +111,7 @@ dependencies {
 
     // poet버전 강제 통일
     implementation("com.squareup:javapoet:1.13.0")
+
+    // 이미지 로딩
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }

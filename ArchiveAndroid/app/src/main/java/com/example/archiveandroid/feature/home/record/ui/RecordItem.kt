@@ -1,4 +1,4 @@
-package com.example.archiveandroid.feature.home.record
+package com.example.archiveandroid.feature.home.record.ui
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image

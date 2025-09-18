@@ -46,6 +46,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.archiveandroid.feature.home.record.filter.RecordFilterSheet
+import com.example.archiveandroid.feature.home.record.ui.RecordItem
+import com.example.archiveandroid.feature.home.record.ui.RecordListItem
+import com.example.archiveandroid.feature.home.record.ui.RecordItemMapper
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
 
 private fun sampleRecords(): List<RecordItem> = listOf(
     RecordItem(
@@ -86,13 +91,14 @@ private fun sampleRecords(): List<RecordItem> = listOf(
 @Composable
 fun RecordScreen(
     onFilterClick: () -> Unit = {},
-    onAddClick: () -> Unit = {}
+    onAddClick: () -> Unit = {},
+    viewModel: RecordViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
     var lastScroll by remember { mutableIntStateOf(0) }
     var fabVisible by remember { mutableStateOf(true) }
     var showFilter by remember { mutableStateOf(false) }
-    val records = remember { sampleRecords() }
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(scrollState.value) {
         val delta = scrollState.value - lastScroll
@@ -159,25 +165,44 @@ fun RecordScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            if (records.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "아직 기록이 없어요", style = MaterialTheme.typography.titleLarge)
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    items(records, key = { it.id }) { item ->
-                        RecordListItem(
-                            item = item,
-                            onClick = { /* TODO: 상세보기 또는 편집 */ },
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "로딩 중...", style = MaterialTheme.typography.titleLarge)
                     }
-                    item { Spacer(modifier = Modifier.height(72.dp)) }
+                }
+                uiState.error != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "오류: ${uiState.error}", style = MaterialTheme.typography.titleLarge)
+                    }
+                }
+                uiState.records.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "아직 기록이 없어요", style = MaterialTheme.typography.titleLarge)
+                    }
+                }
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        items(uiState.records, key = { it.id }) { item ->
+                            RecordListItem(
+                                item = item,
+                                onClick = { /* TODO: 상세보기 또는 편집 */ },
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                        item { Spacer(modifier = Modifier.height(72.dp)) }
+                    }
                 }
             }
         }

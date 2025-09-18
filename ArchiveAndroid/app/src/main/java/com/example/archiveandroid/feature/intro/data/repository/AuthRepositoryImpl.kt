@@ -1,39 +1,25 @@
 package com.example.archiveandroid.feature.intro.data.repository
 
+import com.example.archiveandroid.core.repository.BaseRepository
 import com.example.archiveandroid.feature.intro.data.remote.AuthApi
 import com.example.archiveandroid.feature.intro.data.remote.dto.AppTokenResponse
 import com.example.archiveandroid.feature.intro.data.remote.dto.KakaoLoginRequest
 import com.example.archiveandroid.feature.intro.data.remote.dto.RefreshTokenRequest
 import javax.inject.Inject
-import retrofit2.HttpException
 
 class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi
-) : AuthRepository {
+) : BaseRepository(), AuthRepository {
 
-    override suspend fun loginWithKakao(kakaoAccessToken: String): Result<AppTokenResponse> = runCatching {
-        val req = KakaoLoginRequest(kakaoAccessToken)
-
-        val res = api.loginWithKakao(req)
-        if (res.isSuccessful) {
-            val body = res.body() ?: throw IllegalStateException("Empty body")
-            if (body.success && body.data != null) body.data
-            else throw IllegalStateException(body.message.ifBlank { "Request failed" })
-        } else {
-            throw HttpException(res)
+    override suspend fun loginWithKakao(kakaoAccessToken: String): Result<AppTokenResponse> {
+        return handleApiCall {
+            api.loginWithKakao(KakaoLoginRequest(kakaoAccessToken))
         }
     }
     
-    override suspend fun refreshToken(refreshToken: String): Result<AppTokenResponse> = runCatching {
-        val req = RefreshTokenRequest(refreshToken)
-        
-        val res = api.refreshToken(req)
-        if (res.isSuccessful) {
-            val body = res.body() ?: throw IllegalStateException("Empty body")
-            if (body.success && body.data != null) body.data
-            else throw IllegalStateException(body.message.ifBlank { "Token refresh failed" })
-        } else {
-            throw HttpException(res)
+    override suspend fun refreshToken(refreshToken: String): Result<AppTokenResponse> {
+        return handleApiCall {
+            api.refreshToken(RefreshTokenRequest(refreshToken))
         }
     }
 }

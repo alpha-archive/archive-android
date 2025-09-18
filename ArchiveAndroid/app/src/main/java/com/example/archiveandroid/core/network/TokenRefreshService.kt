@@ -2,7 +2,7 @@ package com.example.archiveandroid.core.network
 
 import com.example.archiveandroid.core.storage.TokenStore
 import com.example.archiveandroid.BuildConfig
-import com.example.archiveandroid.feature.intro.data.remote.dto.ApiResponse
+import com.example.archiveandroid.core.network.dto.ApiResponse
 import com.example.archiveandroid.feature.intro.data.remote.dto.AppTokenResponse
 import com.example.archiveandroid.feature.intro.data.remote.dto.RefreshTokenRequest
 import com.google.gson.GsonBuilder

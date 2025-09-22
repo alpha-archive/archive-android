@@ -2,7 +2,7 @@ package com.example.archiveandroid.feature.record.view
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.archiveandroid.feature.intro.view.ui.RecordDraft
+import com.example.archiveandroid.feature.record.data.remote.dto.ActivityCreateRequest
 import com.example.archiveandroid.feature.record.data.repository.RecordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,7 @@ class RecordViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UiState>(UiState.Editing())
     val uiState: StateFlow<UiState> = _uiState
 
-    fun onSaveClicked(req: RecordDraft) {
+    fun onSaveClicked(req: ActivityCreateRequest) {
         val cur = _uiState.value
         if (cur is UiState.Editing && cur.submitting) return
 
@@ -44,10 +44,10 @@ class RecordViewModel @Inject constructor(
         viewModelScope.launch {
             repository.createActivity(req)
                 .onSuccess { _uiState.value = UiState.Success }
-                .onFailure { e ->
+                .onFailure { exception ->
                     _uiState.value = UiState.Editing(
                         submitting = false,
-                        errorMessage = e.message ?: "저장에 실패했어요"
+                        errorMessage = exception.message ?: "저장 실패"
                     )
                 }
         }

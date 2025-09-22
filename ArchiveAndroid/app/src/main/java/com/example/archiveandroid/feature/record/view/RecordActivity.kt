@@ -32,19 +32,7 @@ class RecordActivity : ComponentActivity() {
                         RecordInputScreen(
                             ui = ui,
                             onBack = { finish() },
-                            onSave = { draft ->
-                                val req = ActivityCreateRequest(
-                                    title = draft.title,
-                                    category = draft.category,
-                                    location = draft.location,
-                                    activityDate = draft.activityDate,
-                                    rating = draft.rating,
-                                    memo = draft.memo,
-                                    imageIds = draft.imageIds,
-                                    publicEventId = draft.publicEventId
-                                )
-                                viewModel.onSaveClicked(req)
-                            },
+                            onSave = { req -> viewModel.onSaveClicked(req) },
                             isSubmitting = ui.submitting,
                             error = ui.errorMessage
                         )

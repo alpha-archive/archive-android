@@ -65,6 +65,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.archiveandroid.feature.record.data.remote.dto.ActivityCreateRequest
 import com.example.archiveandroid.feature.record.view.RecordViewModel
 
 data class RecordDraft(
@@ -277,7 +278,7 @@ private fun RowInfoInput(
 fun RecordInputScreen(
     ui: RecordViewModel.UiState.Editing,
     onBack: () -> Unit,
-    onSave: (RecordDraft) -> Unit,
+    onSave: (ActivityCreateRequest) -> Unit,
     isSubmitting: Boolean,
     error: String?
 ) {
@@ -312,28 +313,22 @@ fun RecordInputScreen(
         },
         bottomBar = {
             Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp),
-                onClick = { onSave(draft) },
-                enabled = !(ui is RecordViewModel.UiState.Editing && ui.submitting),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD9D9D9)),
-                shape = RectangleShape
+                onClick = {
+                    val req = ActivityCreateRequest(
+                        title = draft.title,
+                        category = draft.category,
+                        location = draft.location,
+                        activityDate = draft.activityDate,
+                        rating = draft.rating,
+                        memo = draft.memo,
+                        imageIds = draft.imageIds,
+                        publicEventId = draft.publicEventId
+                    )
+                    onSave(req)
+                },
+                enabled = !isSubmitting
             ) {
-                if (ui is RecordViewModel.UiState.Editing && ui.submitting) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(22.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        "저장",
-                        fontFamily = Pretendard,
-                        color = Color(0xFF000000),
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 24.sp
-                    )
-                }
+                Text("저장")
             }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }

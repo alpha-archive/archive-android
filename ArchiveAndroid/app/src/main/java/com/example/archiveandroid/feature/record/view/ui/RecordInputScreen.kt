@@ -1,4 +1,4 @@
-package com.example.archiveandroid.feature.intro.view.ui
+package com.example.archiveandroid.feature.record.view.ui
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,8 +42,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TextFieldDefaults.colors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -61,19 +60,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.archiveandroid.core.ui.theme.Pretendard
 import coil.compose.rememberAsyncImagePainter
-import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.archiveandroid.feature.record.view.RecordViewModel
 
 data class RecordDraft(
     val imageUri: Uri? = null,
     val category: String = "",
     val title: String = "",
-    val memo: String = ""
+    val memo: String = "",
+    val location: String? = null,
+    val activityDate: String? = null,
+    val rating: Int? = null,
+    val imageIds: List<String> = emptyList(),
+    val publicEventId: String? = null
 )
 
 @Composable
@@ -272,8 +275,11 @@ private fun RowInfoInput(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordInputScreen(
-    onBack: () -> Unit = {},
-    onSave: (RecordDraft) -> Unit = {}
+    ui: RecordViewModel.UiState.Editing,
+    onBack: () -> Unit,
+    onSave: (RecordDraft) -> Unit,
+    isSubmitting: Boolean,
+    error: String?
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -309,24 +315,25 @@ fun RecordInputScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp),
-                onClick = {
-                    when {
-                        draft.title.isBlank() ->
-                            scope.launch { snackbarHostState.showSnackbar("활동명을 입력해주세요!") }
-                        draft.category.isBlank() ->
-                            scope.launch { snackbarHostState.showSnackbar("카테고리를 선택해주세요!") }
-                        else -> onSave(draft)
-                    }
-                },
+                onClick = { onSave(draft) },
+                enabled = !(ui is RecordViewModel.UiState.Editing && ui.submitting),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD9D9D9)),
                 shape = RectangleShape
             ) {
-                Text("저장",
-                    fontFamily = Pretendard,
-                    color = Color(0xFF000000),
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 24.sp
-                )
+                if (ui is RecordViewModel.UiState.Editing && ui.submitting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(22.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        "저장",
+                        fontFamily = Pretendard,
+                        color = Color(0xFF000000),
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 24.sp
+                    )
+                }
             }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }

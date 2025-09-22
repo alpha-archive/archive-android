@@ -1,4 +1,4 @@
-package com.example.archiveandroid.feature.intro.view.ui
+package com.example.archiveandroid.feature.record.view.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

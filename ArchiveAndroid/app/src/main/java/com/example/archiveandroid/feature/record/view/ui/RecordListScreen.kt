@@ -37,6 +37,34 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.archiveandroid.core.ui.theme.Pretendard
 
+
+@Composable
+fun RecordListScreen(
+    onSectionAction: () -> Unit = {},
+    onItemClick: (RecordItem) -> Unit = {}
+) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        SectionHeader(
+            title = "나의 활동 기록",
+            onActionClick = onSectionAction
+        )
+
+        val item = RecordItem(
+            id = 1L,
+            category = "여행",
+            title = "KOSS 여름 LT",
+            dateText = "강원도 양양군 정암해변",
+            imageRes = R.drawable.detail_dummy_image
+        )
+
+        RecordCard(item = item, onClick = onItemClick)
+    }
+}
+
 @Composable
 fun SectionHeader(
     title: String,
@@ -162,33 +190,5 @@ fun RecordCard(
                 )
             }
         }
-    }
-}
-
-
-@Composable
-fun RecordListScreen(
-    onSectionAction: () -> Unit = {},
-    onItemClick: (RecordItem) -> Unit = {}
-) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        SectionHeader(
-            title = "나의 활동 기록",
-            onActionClick = onSectionAction
-        )
-
-        val item = RecordItem(
-            id = 1L,
-            category = "여행",
-            title = "KOSS 여름 LT",
-            dateText = "강원도 양양군 정암해변",
-            imageRes = R.drawable.detail_dummy_image
-        )
-
-        RecordCard(item = item, onClick = onItemClick)
     }
 }

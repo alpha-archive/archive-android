@@ -38,6 +38,85 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.archiveandroid.core.ui.theme.Pretendard
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RecordDetailScreen(
+    onBack: () -> Unit = {},
+    onMore: () -> Unit = {},
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = "나의 활동 기록",
+                showBack = true,
+                onBackClick = onBack,
+                menuItems = listOf(
+                    AppBarMenuItem("more", "수정", onMore),
+                    AppBarMenuItem("more", "삭제", onMore),
+                ),
+                scrollBehavior = scrollBehavior,
+                actions = {}
+            )
+        }
+    ) { innerPadding ->
+        androidx.compose.foundation.lazy.LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(innerPadding)
+                .padding(top = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                Image(
+                    painter = painterResource(id = R.drawable.detail_dummy_image),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(330.dp)
+                        .aspectRatio(4f / 3f)
+                        .padding(bottom = 30.dp)
+                        .clip(RoundedCornerShape(10.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+
+                    RowInfo(label = "카테고리") {
+                        CategoryButton(text = "여행")
+                    }
+                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp, vertical = 10.dp))
+
+                    RowInfo(label = "활동명", value = "KOSS 여름 LT")
+                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp, vertical = 10.dp))
+
+                    RowInfo(label = "날짜 / 시간", value = "2025/7/31 16:22")
+                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp, vertical = 10.dp))
+
+                    RowInfo(label = "위치", value = "강원도 양양군 정암해변")
+                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp, vertical = 10.dp))
+
+                    MemoSection(memo = "아 집가고 싶다")
+                }
+            }
+        }
+
+        NextButton { /* 다음 기록으로 넘어가기 */ }
+    }
+}
+
+
 /* 카테고리 버튼 */
 @Composable
 private fun CategoryButton(
@@ -152,83 +231,5 @@ fun NextButton(
                 )
             }
         }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun RecordDetailScreen(
-    onBack: () -> Unit = {},
-    onMore: () -> Unit = {},
-) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = "나의 활동 기록",
-                showBack = true,
-                onBackClick = onBack,
-                menuItems = listOf(
-                    AppBarMenuItem("more", "수정", onMore),
-                    AppBarMenuItem("more", "삭제", onMore),
-                ),
-                scrollBehavior = scrollBehavior,
-                actions = {}
-            )
-        }
-    ) { innerPadding ->
-        androidx.compose.foundation.lazy.LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding)
-                .padding(top = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item {
-                Image(
-                    painter = painterResource(id = R.drawable.detail_dummy_image),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .width(330.dp)
-                        .aspectRatio(4f / 3f)
-                        .padding(bottom = 30.dp)
-                        .clip(RoundedCornerShape(10.dp)),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-
-                    RowInfo(label = "카테고리") {
-                        CategoryButton(text = "여행")
-                    }
-                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp, vertical = 10.dp))
-
-                    RowInfo(label = "활동명", value = "KOSS 여름 LT")
-                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp, vertical = 10.dp))
-
-                    RowInfo(label = "날짜 / 시간", value = "2025/7/31 16:22")
-                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp, vertical = 10.dp))
-
-                    RowInfo(label = "위치", value = "강원도 양양군 정암해변")
-                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp, vertical = 10.dp))
-
-                    MemoSection(memo = "아 집가고 싶다")
-                }
-            }
-        }
-
-        NextButton { /* 다음 기록으로 넘어가기 */ }
     }
 }

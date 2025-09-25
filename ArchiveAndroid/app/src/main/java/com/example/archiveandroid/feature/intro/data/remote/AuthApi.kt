@@ -1,6 +1,6 @@
 package com.example.archiveandroid.feature.intro.data.remote
 
-import com.example.archiveandroid.core.network.dto.ApiResponse
+import com.example.archiveandroid.feature.intro.data.remote.dto.ApiResponse
 import com.example.archiveandroid.feature.intro.data.remote.dto.AppTokenResponse
 import com.example.archiveandroid.feature.intro.data.remote.dto.KakaoLoginRequest
 import com.example.archiveandroid.feature.intro.data.remote.dto.RefreshTokenRequest

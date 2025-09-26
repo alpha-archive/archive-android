@@ -34,6 +34,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -94,11 +96,17 @@ fun RecordScreen(
     onAddClick: () -> Unit = {},
     viewModel: RecordViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
     var lastScroll by remember { mutableIntStateOf(0) }
     var fabVisible by remember { mutableStateOf(true) }
     var showFilter by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsState()
+    
+    fun startRecordInputActivity() {
+        val intent = Intent(context, RecordInputActivity::class.java)
+        context.startActivity(intent)
+    }
 
     LaunchedEffect(scrollState.value) {
         val delta = scrollState.value - lastScroll
@@ -140,7 +148,7 @@ fun RecordScreen(
                 exit = slideOutVertically { it } + fadeOut()
             ) {
                 FloatingActionButton(
-                    onClick = onAddClick,
+                    onClick = { startRecordInputActivity() },
                     modifier = Modifier
                         .size(56.dp)
                         .clip(CircleShape),

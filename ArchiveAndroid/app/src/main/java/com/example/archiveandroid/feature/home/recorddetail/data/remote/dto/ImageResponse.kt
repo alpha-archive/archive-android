@@ -1,4 +1,4 @@
-package com.example.archiveandroid.feature.record.data.remote.dto
+package com.example.archiveandroid.feature.home.recorddetail.data.remote.dto
 
 // 업로드 응답
 data class ImageUploadResponse(

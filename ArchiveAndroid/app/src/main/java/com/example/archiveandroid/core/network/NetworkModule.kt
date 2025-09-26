@@ -1,7 +1,8 @@
 package com.example.archiveandroid.core.network
 
-import com.example.archiveandroid.feature.intro.data.remote.AuthApi
 import com.example.archiveandroid.feature.home.record.data.remote.ActivityApi
+import com.example.archiveandroid.feature.home.recorddetail.data.remote.ImageApi
+import com.example.archiveandroid.feature.home.recorddetail.data.remote.RecordDetailApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,17 +16,25 @@ object NetworkModule {
     
     @Provides
     @Singleton
-    fun provideAuthApi(
-        retrofit: Retrofit
-    ): AuthApi {
-        return retrofit.create(AuthApi::class.java)
-    }
-    
-    @Provides
-    @Singleton
     fun provideActivityApi(
         retrofit: Retrofit
     ): ActivityApi {
         return retrofit.create(ActivityApi::class.java)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideImageApi(
+        retrofit: Retrofit
+    ): ImageApi {
+        return retrofit.create(ImageApi::class.java)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideRecordDetailApi(
+        retrofit: Retrofit
+    ): RecordDetailApi {
+        return retrofit.create(RecordDetailApi::class.java)
     }
 }

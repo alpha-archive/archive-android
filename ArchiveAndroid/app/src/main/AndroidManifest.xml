@@ -31,8 +31,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".feature.record.view.RecordActivity"
+        <activity android:name=".feature.home.recorddetail.view.RecordDetailActivity"
             android:exported="true" />
+        <activity android:name=".feature.home.record.RecordInputActivity"
+            android:exported="false" />
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true"

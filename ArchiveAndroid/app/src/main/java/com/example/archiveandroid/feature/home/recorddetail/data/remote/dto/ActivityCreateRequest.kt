@@ -1,4 +1,4 @@
-package com.example.archiveandroid.feature.record.data.remote.dto
+package com.example.archiveandroid.feature.home.recorddetail.data.remote.dto
 
 data class ActivityCreateRequest(
     val title: String,

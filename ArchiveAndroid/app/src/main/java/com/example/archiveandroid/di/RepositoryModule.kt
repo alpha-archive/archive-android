@@ -1,9 +1,9 @@
 package com.example.archiveandroid.di
 
-import com.example.archiveandroid.feature.record.data.repository.ImageRepository
-import com.example.archiveandroid.feature.record.data.repository.ImageRepositoryImpl
-import com.example.archiveandroid.feature.record.data.repository.RecordRepository
-import com.example.archiveandroid.feature.record.data.repository.RecordRepositoryImpl
+import com.example.archiveandroid.feature.home.recorddetail.data.repository.ImageRepository
+import com.example.archiveandroid.feature.home.recorddetail.data.repository.ImageRepositoryImpl
+import com.example.archiveandroid.feature.home.recorddetail.data.repository.RecordDetailRepository
+import com.example.archiveandroid.feature.home.recorddetail.data.repository.RecordDetailRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -26,6 +26,6 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindRecordRepository(
-        impl: RecordRepositoryImpl
-    ): RecordRepository
+        impl: RecordDetailRepositoryImpl
+    ): RecordDetailRepository
 }

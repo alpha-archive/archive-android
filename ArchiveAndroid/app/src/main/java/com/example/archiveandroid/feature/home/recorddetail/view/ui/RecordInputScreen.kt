@@ -1,4 +1,4 @@
-package com.example.archiveandroid.feature.record.view.ui
+package com.example.archiveandroid.feature.home.recorddetail.view.ui
 
 import android.content.Context
 import android.net.Uri
@@ -44,41 +44,42 @@ import androidx.compose.material3.TextFieldDefaults.colors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import com.example.yourapp.ui.components.TopAppBar
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.archiveandroid.core.ui.theme.Pretendard
-import coil.compose.rememberAsyncImagePainter
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.archiveandroid.feature.record.data.remote.dto.ActivityCreateRequest
-import com.example.archiveandroid.feature.record.view.ImageViewModel
-import com.example.archiveandroid.feature.record.view.RecordViewModel
+import coil.compose.rememberAsyncImagePainter
+import com.example.archiveandroid.core.ui.theme.Pretendard
+import com.example.archiveandroid.feature.home.recorddetail.data.remote.dto.ActivityCreateRequest
+import com.example.archiveandroid.feature.home.recorddetail.view.ImageViewModel
+import com.example.archiveandroid.feature.home.recorddetail.view.RecordDetailUiState
+import com.example.archiveandroid.feature.home.recorddetail.view.RecordDetailViewModel
+import com.example.yourapp.ui.components.TopAppBar
 import java.io.File
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordInputScreen(
-    ui: RecordViewModel.UiState.Editing,
+    ui: RecordDetailUiState,
     onBack: () -> Unit,
     onSave: (ActivityCreateRequest) -> Unit,
     isSubmitting: Boolean,
     error: String?,
-    viewModel: RecordViewModel = hiltViewModel(),
+    viewModel: RecordDetailViewModel = hiltViewModel(),
     imageViewModel: ImageViewModel = hiltViewModel()
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -86,7 +87,7 @@ fun RecordInputScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val uploadState by imageViewModel.uploadState.collectAsState()
+    val imageUiState by imageViewModel.uiState.collectAsState()
 
     var draft by remember { mutableStateOf(RecordDraft()) }
 
@@ -153,12 +154,8 @@ fun RecordInputScreen(
                 }
             )
             // 업로드 상태 확인
-            uploadState?.let { response ->
-                if (response.success) {
-                    Text("이미지 업로드 성공: ${response.url}")
-                } else {
-                    Text("이미지 업로드 실패: ${response.message}")
-                }
+            imageUiState.uploadState?.let { imageData ->
+                Text("이미지 업로드 성공: ${imageData.imageUrl}")
             }
 
             RowInfoInput(label = "카테고리") {

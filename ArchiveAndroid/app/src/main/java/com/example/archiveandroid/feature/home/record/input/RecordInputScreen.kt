@@ -1,4 +1,4 @@
-package com.example.archiveandroid.feature.home.recorddetail.view.ui
+package com.example.archiveandroid.feature.home.record.input
 
 import android.content.Context
 import android.net.Uri
@@ -65,8 +65,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.archiveandroid.core.ui.theme.Pretendard
 import com.example.archiveandroid.feature.home.recorddetail.data.remote.dto.ActivityCreateRequest
 import com.example.archiveandroid.feature.home.recorddetail.view.ImageViewModel
-import com.example.archiveandroid.feature.home.record.view.RecordInputUiState
-import com.example.archiveandroid.feature.home.record.view.RecordInputViewModel
+import com.example.archiveandroid.feature.home.record.input.RecordInputUiState
+import com.example.archiveandroid.feature.home.record.input.RecordInputViewModel
 import com.example.yourapp.ui.components.TopAppBar
 import java.io.File
 

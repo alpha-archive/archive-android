@@ -1,4 +1,4 @@
-package com.example.archiveandroid.feature.home.record
+package com.example.archiveandroid.feature.home.record.input
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,8 +14,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.LaunchedEffect
 import com.example.archiveandroid.core.ui.theme.ArchiveAndroidTheme
-import com.example.archiveandroid.feature.home.recorddetail.view.ui.RecordInputScreen
-import com.example.archiveandroid.feature.home.recorddetail.view.RecordDetailViewModel
+import com.example.archiveandroid.feature.home.record.input.RecordInputScreen
+import com.example.archiveandroid.feature.home.record.input.RecordInputViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,7 +25,7 @@ class RecordInputActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ArchiveAndroidTheme {
-                val viewModel: RecordDetailViewModel = hiltViewModel()
+                val viewModel: RecordInputViewModel = hiltViewModel()
                 val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
                 
                 LaunchedEffect(uiState.isSuccess) {

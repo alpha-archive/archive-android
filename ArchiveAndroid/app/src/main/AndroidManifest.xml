@@ -33,7 +33,7 @@
         </activity>
         <activity android:name=".feature.home.recorddetail.view.RecordDetailActivity"
             android:exported="true" />
-        <activity android:name=".feature.home.record.RecordInputActivity"
+        <activity android:name=".feature.home.record.input.RecordInputActivity"
             android:exported="false" />
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"

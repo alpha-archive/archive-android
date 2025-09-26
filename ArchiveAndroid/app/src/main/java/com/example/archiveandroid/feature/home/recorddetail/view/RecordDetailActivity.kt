@@ -6,10 +6,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.archiveandroid.core.ui.theme.ArchiveAndroidTheme
-import com.example.archiveandroid.feature.home.recorddetail.view.ui.RecordInputScreen
+import com.example.archiveandroid.feature.home.recorddetail.view.ui.RecordDetailScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,23 +19,20 @@ class RecordDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val recordId = intent.getStringExtra("record_id")
+
         setContent {
             ArchiveAndroidTheme {
-                val ui = viewModel.uiState.collectAsStateWithLifecycle().value
+                val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-                LaunchedEffect(ui.isSuccess) {
-                    if (ui.isSuccess) {
-                        setResult(Activity.RESULT_OK, Intent())
-                        finish()
-                    }
+                // recordId가 있으면 해당 기록 로드
+                if (recordId != null) {
+                    viewModel.loadRecordDetail(recordId)
                 }
 
-                RecordInputScreen(
-                    ui = ui,
+                RecordDetailScreen(
                     onBack = { finish() },
-                    onSave = { req -> viewModel.onSaveClicked(req) },
-                    isSubmitting = ui.submitting,
-                    error = ui.errorMessage
+                    onMore = { /* TODO: 더보기 메뉴 */ }
                 )
             }
         }

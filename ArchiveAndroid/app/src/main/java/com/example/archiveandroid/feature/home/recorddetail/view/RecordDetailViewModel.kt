@@ -2,7 +2,6 @@ package com.example.archiveandroid.feature.home.recorddetail.view
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.archiveandroid.feature.home.recorddetail.data.remote.dto.ActivityCreateRequest
 import com.example.archiveandroid.feature.home.recorddetail.data.repository.RecordDetailRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,9 +11,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class RecordDetailUiState(
-    val submitting: Boolean = false,
-    val errorMessage: String? = null,
-    val isSuccess: Boolean = false
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val recordData: Any? = null // TODO: 실제 Record 데이터 타입으로 변경
 )
 
 @HiltViewModel
@@ -25,41 +24,30 @@ class RecordDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(RecordDetailUiState())
     val uiState: StateFlow<RecordDetailUiState> = _uiState.asStateFlow()
 
-    fun onSaveClicked(req: ActivityCreateRequest) {
-        val currentState = _uiState.value
-        if (currentState.submitting) return
-
-        if (req.title.isBlank()) {
-            _uiState.value = currentState.copy(
-                submitting = false,
-                errorMessage = "활동명을 입력해주세요!"
-            )
-            return
-        }
-        if (req.category.isBlank()) {
-            _uiState.value = currentState.copy(
-                submitting = false,
-                errorMessage = "카테고리를 선택해주세요!"
-            )
-            return
-        }
-
-        _uiState.value = currentState.copy(submitting = true, errorMessage = null)
-
+    fun loadRecordDetail(recordId: String) {
         viewModelScope.launch {
-            repository.createActivity(req)
-                .onSuccess { 
-                    _uiState.value = currentState.copy(
-                        submitting = false,
-                        isSuccess = true
-                    )
-                }
-                .onFailure { exception ->
-                    _uiState.value = currentState.copy(
-                        submitting = false,
-                        errorMessage = exception.message ?: "저장 실패"
-                    )
-                }
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            
+            // TODO: 실제 API 호출로 변경
+            // repository.getRecordDetail(recordId)
+            //     .onSuccess { record ->
+            //         _uiState.value = _uiState.value.copy(
+            //             isLoading = false,
+            //             recordData = record
+            //         )
+            //     }
+            //     .onFailure { exception ->
+            //         _uiState.value = _uiState.value.copy(
+            //             isLoading = false,
+            //             error = exception.message ?: "로드 실패"
+            //         )
+            //     }
+            
+            // 임시 더미 데이터
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                recordData = "Dummy record data for ID: $recordId"
+            )
         }
     }
 }

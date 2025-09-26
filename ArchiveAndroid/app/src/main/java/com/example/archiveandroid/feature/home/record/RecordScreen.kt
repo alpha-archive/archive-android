@@ -53,6 +53,8 @@ import com.example.archiveandroid.feature.home.record.ui.RecordListItem
 import com.example.archiveandroid.feature.home.record.ui.RecordItemMapper
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
+import com.example.archiveandroid.feature.home.recorddetail.view.RecordDetailActivity
+import com.example.archiveandroid.feature.home.record.input.RecordInputActivity
 
 private fun sampleRecords(): List<RecordItem> = listOf(
     RecordItem(
@@ -105,6 +107,13 @@ fun RecordScreen(
     
     fun startRecordInputActivity() {
         val intent = Intent(context, RecordInputActivity::class.java)
+        context.startActivity(intent)
+    }
+
+    fun startRecordDetailActivity(recordId: String) {
+        val intent = Intent(context, RecordDetailActivity::class.java).apply {
+            putExtra("record_id", recordId)
+        }
         context.startActivity(intent)
     }
 
@@ -205,7 +214,7 @@ fun RecordScreen(
                         items(uiState.records, key = { it.id }) { item ->
                             RecordListItem(
                                 item = item,
-                                onClick = { /* TODO: 상세보기 또는 편집 */ },
+                                onClick = { startRecordDetailActivity(item.id) },
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                             )
                         }

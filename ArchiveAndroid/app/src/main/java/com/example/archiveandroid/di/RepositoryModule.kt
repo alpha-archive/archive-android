@@ -1,9 +1,9 @@
 package com.example.archiveandroid.di
 
-import com.example.archiveandroid.feature.home.recorddetail.data.repository.RecordDetailRepository
-import com.example.archiveandroid.feature.home.recorddetail.data.repository.RecordDetailRepositoryImpl
 import com.example.archiveandroid.feature.home.record.input.data.repository.RecordInputRepository
 import com.example.archiveandroid.feature.home.record.input.data.repository.RecordInputRepositoryImpl
+import com.example.archiveandroid.feature.home.recorddetail.data.repository.RecordDetailRepository
+import com.example.archiveandroid.feature.home.recorddetail.data.repository.RecordDetailRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -7,6 +7,9 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.archiveandroid.core.ui.theme.ArchiveAndroidTheme
+import com.example.archiveandroid.feature.home.record.input.RecordInputScreen
+import com.example.archiveandroid.feature.home.record.input.RecordInputViewModel
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,7 +33,7 @@ class RecordInputActivity : ComponentActivity() {
                 RecordInputScreen(
                     ui = uiState,
                     onBack = { finish() },
-                    onSave = { request -> viewModel.onSaveClicked(request) },
+                    onSave = { request: RecordInputRequest -> viewModel.onSaveClicked(request) },
                     onImageUpload = { file -> viewModel.uploadImage(file) },
                     onImageRemove = { imageId -> viewModel.removeImage(imageId) }
                 )

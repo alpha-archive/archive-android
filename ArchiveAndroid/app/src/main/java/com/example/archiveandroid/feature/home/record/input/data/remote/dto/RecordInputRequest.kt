@@ -1,6 +1,6 @@
-package com.example.archiveandroid.feature.home.recorddetail.data.remote.dto
+package com.example.archiveandroid.feature.home.record.input.data.remote.dto
 
-data class ActivityCreateRequest(
+data class RecordInputRequest(
     val title: String,
     val category: String,
     val location: String?,
@@ -8,5 +8,5 @@ data class ActivityCreateRequest(
     val rating: Int?,
     val memo: String?,
     val imageIds: List<String> = emptyList(),
-    val publicEventId: String?
+    val publicEventId: String? = null
 )

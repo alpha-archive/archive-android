@@ -62,8 +62,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.archiveandroid.core.ui.theme.Pretendard
-import com.example.archiveandroid.feature.home.recorddetail.data.remote.dto.ActivityCreateRequest
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.example.yourapp.ui.components.TopAppBar
 import java.io.File
 
@@ -73,7 +72,7 @@ import java.io.File
 fun RecordInputScreen(
     ui: RecordInputUiState,
     onBack: () -> Unit,
-    onSave: (ActivityCreateRequest) -> Unit,
+    onSave: (RecordInputRequest) -> Unit,
     onImageUpload: (File) -> Unit,
     onImageRemove: (String) -> Unit
 ) {
@@ -116,7 +115,7 @@ fun RecordInputScreen(
             ) {
                 Button(
                     onClick = {
-                           val req = ActivityCreateRequest(
+                           val req = RecordInputRequest(
                                title = draft.title,
                                category = draft.category,
                                location = draft.location,

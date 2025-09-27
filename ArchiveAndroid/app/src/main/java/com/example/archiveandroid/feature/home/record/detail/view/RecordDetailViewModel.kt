@@ -28,8 +28,8 @@ class RecordDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
-            // TODO: 실제 API 호출로 변경
-            // repository.getRecordDetail(recordId)
+            // TODO: 서버 완성 후 실제 API 호출로 변경
+            // repository.getActivityDetail(recordId)
             //     .onSuccess { record ->
             //         _uiState.value = _uiState.value.copy(
             //             isLoading = false,
@@ -43,7 +43,7 @@ class RecordDetailViewModel @Inject constructor(
             //         )
             //     }
             
-            // 임시 더미 데이터
+            // 임시 더미 데이터 (서버 완성 전까지 사용)
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
                 recordData = "Dummy record data for ID: $recordId"

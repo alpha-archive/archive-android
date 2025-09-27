@@ -2,10 +2,9 @@ package com.example.archiveandroid.feature.home.record.input
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.archiveandroid.feature.home.recorddetail.data.remote.dto.ActivityCreateRequest
-import com.example.archiveandroid.feature.home.recorddetail.data.remote.dto.ImageData
-import com.example.archiveandroid.feature.home.recorddetail.data.repository.RecordDetailRepository
-import com.example.archiveandroid.feature.home.recorddetail.data.repository.ImageRepository
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
+import com.example.archiveandroid.feature.home.record.input.data.repository.RecordInputRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,14 +17,13 @@ data class RecordInputUiState(
     val submitting: Boolean = false,
     val errorMessage: String? = null,
     val isSuccess: Boolean = false,
-    val uploadedImages: List<ImageData> = emptyList(),
+    val uploadedImages: List<ImageUploadData> = emptyList(),
     val isUploadingImage: Boolean = false
 )
 
 @HiltViewModel
 class RecordInputViewModel @Inject constructor(
-    private val repository: RecordDetailRepository,
-    private val imageRepository: ImageRepository
+    private val repository: RecordInputRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecordInputUiState())
@@ -34,8 +32,8 @@ class RecordInputViewModel @Inject constructor(
     fun uploadImage(file: File) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isUploadingImage = true, errorMessage = null)
-            
-            imageRepository.uploadImage(file)
+
+            repository.uploadImage(file)
                 .onSuccess { imageData ->
                     val currentImages = _uiState.value.uploadedImages
                     _uiState.value = _uiState.value.copy(
@@ -59,7 +57,7 @@ class RecordInputViewModel @Inject constructor(
         )
     }
 
-    fun onSaveClicked(req: ActivityCreateRequest) {
+    fun onSaveClicked(req: RecordInputRequest) {
         val currentState = _uiState.value
         if (currentState.submitting) return
 
@@ -86,7 +84,7 @@ class RecordInputViewModel @Inject constructor(
                 imageIds = currentState.uploadedImages.map { it.id }
             )
             
-            repository.createActivity(requestWithImages)
+            repository.createRecord(requestWithImages)
                 .onSuccess { 
                     _uiState.value = currentState.copy(
                         submitting = false,

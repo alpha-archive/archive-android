@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import com.example.archiveandroid.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -28,15 +27,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import com.example.yourapp.ui.components.AppBarMenuItem
-import com.example.yourapp.ui.components.TopAppBar
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.archiveandroid.core.ui.theme.Pretendard
+import com.example.archiveandroid.R
+import com.example.yourapp.ui.components.AppBarMenuItem
+import com.example.yourapp.ui.components.TopAppBar
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -132,7 +131,6 @@ private fun CategoryButton(
         Text(
             text = text,
             style = TextStyle(
-                fontFamily = Pretendard,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 15.sp
             )
@@ -156,14 +154,14 @@ private fun RowInfo(
     ) {
         Text(
             text = label,
-            style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal, fontSize = 18.sp)
+            style = TextStyle( fontWeight = FontWeight.Normal, fontSize = 18.sp)
         )
         if (valueContent != null) {
             valueContent()
         } else {
             Text(
                 text = value.orEmpty(),
-                style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal)
+                style = TextStyle( fontWeight = FontWeight.Normal)
             )
         }
     }
@@ -182,11 +180,11 @@ private fun MemoSection(
     ) {
         Text(
             text = label,
-            style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal, fontSize = 18.sp)
+            style = TextStyle( fontWeight = FontWeight.Normal, fontSize = 18.sp)
         )
         Text(
             text = memo,
-            style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal),
+            style = TextStyle( fontWeight = FontWeight.Normal),
             modifier = Modifier.padding(top = 8.dp)
         )
     }
@@ -227,7 +225,7 @@ fun NextButton(
                     text = "다음",
                     color = Color.White,
                     fontSize = 9.sp,
-                    style = TextStyle(fontFamily = Pretendard)
+                    style = TextStyle()
                 )
             }
         }

@@ -79,7 +79,7 @@ fun SectionHeader(
     ) {
         Text(
             text = title,
-            style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+            style = TextStyle( fontWeight = FontWeight.Bold, fontSize = 24.sp)
         )
         Spacer(Modifier.weight(1f))
         IconButton(onClick = onActionClick) {
@@ -114,7 +114,6 @@ private fun CategoryButton(
         Text(
             text = text,
             style = TextStyle(
-                fontFamily = Pretendard,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp
             )
@@ -168,7 +167,6 @@ fun RecordCard(
                 Text(
                     text = item.title,
                     style = TextStyle(
-                        fontFamily = Pretendard,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 16.sp,
                         color = Color(0xFF111827)
@@ -180,7 +178,6 @@ fun RecordCard(
                 Text(
                     text = item.dateText,
                     style = TextStyle(
-                        fontFamily = Pretendard,
                         fontWeight = FontWeight.Normal,
                         fontSize = 13.sp,
                         color = Color(0xFF6B7280)

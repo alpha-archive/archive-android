@@ -16,8 +16,20 @@ class ImageRepositoryImpl @Inject constructor(
 ) : BaseRepository(), ImageRepository {
 
     override suspend fun uploadImage(file: File): Result<ImageData> {
-        val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
-        val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+        // 파일 확장자에 따른 MediaType 설정
+        val mediaType = when (file.extension.lowercase()) {
+            "jpg", "jpeg" -> "image/jpeg"
+            "png" -> "image/png"
+            "gif" -> "image/gif"
+            "webp" -> "image/webp"
+            else -> "image/jpeg" // 기본값
+        }
+        
+        val requestFile = RequestBody.create(mediaType.toMediaTypeOrNull(), file)
+        // 파일명을 안전하게 처리 (한글 파일명 대응)
+        val safeFileName = file.name.replace(" ", "_").replace("[^a-zA-Z0-9._-]".toRegex(), "_")
+        val body = MultipartBody.Part.createFormData("file", safeFileName, requestFile)
+        
         return handleApiCall {
             api.uploadImage(body)
         }

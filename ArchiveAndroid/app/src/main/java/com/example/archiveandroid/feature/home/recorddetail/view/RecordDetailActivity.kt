@@ -31,8 +31,7 @@ class RecordDetailActivity : ComponentActivity() {
                 }
 
                 RecordDetailScreen(
-                    onBack = { finish() },
-                    onMore = { /* TODO: 더보기 메뉴 */ }
+                    onBack = { finish() }
                 )
             }
         }

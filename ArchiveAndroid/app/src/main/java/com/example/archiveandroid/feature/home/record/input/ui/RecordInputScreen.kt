@@ -1,4 +1,4 @@
-package com.example.archiveandroid.feature.home.recorddetail.view.ui
+package com.example.archiveandroid.feature.home.record.input
 
 import android.content.Context
 import android.net.Uri
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -60,13 +61,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.archiveandroid.core.ui.theme.Pretendard
 import com.example.archiveandroid.feature.home.recorddetail.data.remote.dto.ActivityCreateRequest
-import com.example.archiveandroid.feature.home.recorddetail.view.ImageViewModel
-import com.example.archiveandroid.feature.home.record.view.RecordInputUiState
-import com.example.archiveandroid.feature.home.record.view.RecordInputViewModel
 import com.example.yourapp.ui.components.TopAppBar
 import java.io.File
 
@@ -77,17 +74,14 @@ fun RecordInputScreen(
     ui: RecordInputUiState,
     onBack: () -> Unit,
     onSave: (ActivityCreateRequest) -> Unit,
-    isSubmitting: Boolean,
-    error: String?,
-    viewModel: RecordInputViewModel = hiltViewModel(),
-    imageViewModel: ImageViewModel = hiltViewModel()
+    onImageUpload: (File) -> Unit,
+    onImageRemove: (String) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val imageUiState by imageViewModel.uiState.collectAsState()
 
     var draft by remember { mutableStateOf(RecordDraft()) }
 
@@ -115,26 +109,34 @@ fun RecordInputScreen(
             )
         },
         bottomBar = {
-            Button(
-                onClick = {
-                    val req = ActivityCreateRequest(
-                        title = draft.title,
-                        category = draft.category,
-                        location = draft.location,
-                        activityDate = draft.activityDate,
-                        rating = draft.rating,
-                        memo = draft.memo,
-                        imageIds = draft.imageIds,
-                        publicEventId = draft.publicEventId
-                    )
-                    onSave(req)
-                },
-                enabled = !isSubmitting
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 24.dp)
             ) {
-                Text("저장")
+                Button(
+                    onClick = {
+                           val req = ActivityCreateRequest(
+                               title = draft.title,
+                               category = draft.category,
+                               location = draft.location,
+                               activityDate = draft.activityDate,
+                               rating = draft.rating,
+                               memo = draft.memo,
+                               imageIds = ui.uploadedImages.map { it.id },
+                               publicEventId = draft.publicEventId
+                           )
+                           onSave(req)
+                    },
+                    enabled = !ui.submitting,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("저장")
+                }
             }
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -149,13 +151,18 @@ fun RecordInputScreen(
                     imageUri = uri
                     if (uri != null) {
                         val file = uriToFile(context, uri)
-                        imageViewModel.uploadImage(file)
+                        onImageUpload(file)
                     }
                 }
             )
-            // 업로드 상태 확인
-            imageUiState.uploadState?.let { imageData ->
-                Text("이미지 업로드 성공: ${imageData.imageUrl}")
+            // 업로드된 이미지 표시
+            if (ui.uploadedImages.isNotEmpty()) {
+                Text("업로드된 이미지: ${ui.uploadedImages.size}개")
+            }
+            
+            // 이미지 업로드 중 표시
+            if (ui.isUploadingImage) {
+                Text("이미지 업로드 중...")
             }
 
             RowInfoInput(label = "카테고리") {
@@ -196,7 +203,6 @@ fun RecordInputScreen(
             /* 사진에서 날짜/시간, 장소 정보 뽑아서 넣기 */
             RowInfoInput(label = "날짜 / 시간") {
                 Text("사진 업로드 시 자동 등록",
-                    fontFamily = Pretendard,
                     color = Color(0xFF898989),
                     fontWeight = FontWeight.Light,
                     fontSize = 14.sp
@@ -208,7 +214,6 @@ fun RecordInputScreen(
 
             RowInfoInput(label = "장소") {
                 Text("사진 업로드 시 자동 등록",
-                    fontFamily = Pretendard,
                     color = Color(0xFF898989),
                     fontWeight = FontWeight.Light,
                     fontSize = 14.sp
@@ -365,7 +370,7 @@ fun CategoryInput(
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth(),
-                placeholder = { Text("검색", fontFamily = Pretendard, fontSize = 15.sp) },
+                placeholder = { Text("검색",  fontSize = 15.sp) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -373,7 +378,7 @@ fun CategoryInput(
                     )
                 },
                 singleLine = true,
-                textStyle = TextStyle(fontFamily = Pretendard, fontSize = 15.sp),
+                textStyle = TextStyle( fontSize = 15.sp),
                 colors = colors(
                     focusedContainerColor = Color(0xFFD9D9D9),
                     unfocusedContainerColor = Color(0xFFD9D9D9),
@@ -394,7 +399,7 @@ fun CategoryInput(
             ) {
                 suggestions.forEach { item ->
                     DropdownMenuItem(
-                        text = { Text(item, fontFamily = Pretendard) },
+                        text = { Text(item) },
                         onClick = {
                             onSelect(item)
                             query = ""
@@ -405,7 +410,7 @@ fun CategoryInput(
                 if (suggestions.isEmpty() && query.isNotBlank()) {
                     Divider()
                     DropdownMenuItem(
-                        text = { Text("“$query” 새로 만들기", fontFamily = Pretendard) },
+                        text = { Text("“$query” 새로 만들기") },
                         onClick = {
                             onSelect(query)
                             query = ""
@@ -431,7 +436,7 @@ private fun RowInfoInput(
     ) {
         Text(
             text = label,
-            style = TextStyle(fontFamily = Pretendard, fontWeight = FontWeight.Normal, fontSize = 18.sp),
+            style = TextStyle( fontWeight = FontWeight.Normal, fontSize = 18.sp),
             modifier = Modifier.alignByBaseline()
         )
         Spacer(Modifier.width(16.dp))

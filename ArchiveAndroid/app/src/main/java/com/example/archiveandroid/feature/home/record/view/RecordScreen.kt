@@ -10,11 +10,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -30,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.archiveandroid.feature.home.record.filter.RecordFilterSheet
 import com.example.archiveandroid.feature.home.record.input.RecordInputActivity
 import com.example.archiveandroid.feature.home.record.ui.RecordItem
@@ -101,7 +101,9 @@ fun RecordScreen(
     var lastScroll by remember { mutableIntStateOf(0) }
     var fabVisible by remember { mutableStateOf(true) }
     var showFilter by remember { mutableStateOf(false) }
-    val uiState by viewModel.uiState.collectAsState()
+    
+    // Paging 3 사용
+    val activities = viewModel.activities.collectAsLazyPagingItems()
     
     fun startRecordInputActivity() {
         val intent = Intent(context, RecordInputActivity::class.java)
@@ -180,51 +182,68 @@ fun RecordScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            when {
-                uiState.isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "로딩 중...", style = MaterialTheme.typography.titleLarge)
-                    }
-                }
-                uiState.error != null -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "오류: ${uiState.error}", style = MaterialTheme.typography.titleLarge)
-                    }
-                }
-                uiState.records.isEmpty() -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "아직 기록이 없어요", style = MaterialTheme.typography.titleLarge)
-                    }
-                }
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        items(uiState.records, key = { it.id }) { item ->
-                            RecordListItem(
-                                item = item,
-                                onClick = { startRecordDetailActivity(item.id) },
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                items(
+                    count = activities.itemCount,
+                    key = { index -> activities[index]?.id ?: index }
+                ) { index ->
+                    val activity = activities[index]
+                    if (activity != null) {
+                        // ActivityDto를 RecordItem으로 변환
+                        val recordItem = RecordItem(
+                            id = activity.id,
+                            title = activity.title,
+                            location = activity.location,
+                            categoryLabel = activity.category,
+                            categoryBg = getCategoryColor(activity.category).first,
+                            categoryFg = getCategoryColor(activity.category).second
+                        )
+                        
+                        RecordListItem(
+                            item = recordItem,
+                            onClick = { startRecordDetailActivity(activity.id) },
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                    } else {
+                        // 로딩 상태 표시
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("로딩 중...", style = MaterialTheme.typography.bodyMedium)
                         }
-                        item { Spacer(modifier = Modifier.height(72.dp)) }
                     }
                 }
+                item { Spacer(modifier = Modifier.height(72.dp)) }
             }
         }
     }
 
     if (showFilter) {
         RecordFilterSheet(onDismiss = { showFilter = false })
+    }
+}
+
+/**
+ * 카테고리에 따른 색상 반환
+ */
+private fun getCategoryColor(category: String): Pair<Color, Color> {
+    return when (category) {
+        "여행" -> Pair(Color(0xFFE8F0FF), Color(0xFF335C99))
+        "전시" -> Pair(Color(0xFFFFF4E5), Color(0xFF9A6B1A))
+        "운동" -> Pair(Color(0xFFE7FFF2), Color(0xFF138A52))
+        "뮤지컬" -> Pair(Color(0xFFF4E9FF), Color(0xFF6B39A6))
+        "독서" -> Pair(Color(0xFFFFEFE6), Color(0xFFB04A17))
+        "스포츠" -> Pair(Color(0xFFEAF5FF), Color(0xFF2C5A8A))
+        "음악" -> Pair(Color(0xFFEFF9FF), Color(0xFF1F6E8C))
+        "봉사" -> Pair(Color(0xFFEFF7FF), Color(0xFF2D6AA3))
+        "작업" -> Pair(Color(0xFFF0F8FF), Color(0xFF4169E1))
+        "영화" -> Pair(Color(0xFFFFF0F5), Color(0xFFDC143C))
+        else -> Pair(Color(0xFFF5F5F5), Color(0xFF666666))
     }
 }
 

@@ -11,21 +11,18 @@ data class ActivityDto(
     val location: String,
     @SerializedName("category")
     val category: String,
-    @SerializedName("imageUrl")
-    val imageUrl: String?,
+    @SerializedName("activityDate")
+    val activityDate: String,
+    @SerializedName("rating")
+    val rating: Int,
+    @SerializedName("memo")
+    val memo: String,
+    @SerializedName("imageUrls")
+    val imageUrls: List<String>,
     @SerializedName("createdAt")
     val createdAt: String,
     @SerializedName("updatedAt")
     val updatedAt: String
-)
-
-data class ActivityListResponse(
-    @SerializedName("activities")
-    val activities: List<ActivityDto>,
-    @SerializedName("nextCursor")
-    val nextCursor: String?,
-    @SerializedName("hasMore")
-    val hasMore: Boolean
 )
 
 data class CreateActivityRequest(

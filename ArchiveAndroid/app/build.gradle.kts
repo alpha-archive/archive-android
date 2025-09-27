@@ -120,4 +120,8 @@ dependencies {
 
     // 이미지 로딩
     implementation("io.coil-kt:coil-compose:2.6.0")
+    
+    // Paging 3
+    implementation("androidx.paging:paging-runtime:3.2.1")
+    implementation("androidx.paging:paging-compose:3.2.1")
 }

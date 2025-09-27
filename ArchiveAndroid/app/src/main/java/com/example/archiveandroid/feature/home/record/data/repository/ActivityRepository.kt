@@ -1,5 +1,6 @@
 package com.example.archiveandroid.feature.home.record.data.repository
 
+import androidx.paging.PagingData
 import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityDto
 import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityListResponse
 import com.example.archiveandroid.feature.home.record.data.remote.dto.CreateActivityRequest
@@ -8,8 +9,11 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.Flow
 
 interface ActivityRepository {
+    fun getActivitiesPaging(): Flow<PagingData<ActivityDto>>
+    
     suspend fun getActivities(
         limit: Int = 20,
         cursor: String? = null,

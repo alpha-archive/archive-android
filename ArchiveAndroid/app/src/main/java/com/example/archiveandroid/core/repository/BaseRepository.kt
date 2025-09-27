@@ -6,7 +6,7 @@ import retrofit2.Response
 
 abstract class BaseRepository {
     
-    protected suspend inline fun <T> handleApiCall(
+    protected suspend fun <T> handleApiCall(
         apiCall: suspend () -> Response<ApiResponse<T>>
     ): Result<T> {
         return try {
@@ -17,7 +17,7 @@ abstract class BaseRepository {
         }
     }
     
-    protected suspend inline fun <T> handleApiCallWithTransform(
+    protected suspend fun <T> handleApiCallWithTransform(
         apiCall: suspend () -> Response<ApiResponse<T>>,
         transform: (T) -> T
     ): Result<T> {

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -31,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -155,6 +157,7 @@ fun RecordInputScreen(
         ) {
             PhotoInput(
                 imageUri = imageUri,
+                isUploading = ui.isUploadingImage,
                 onPick = { uri ->
                     imageUri = uri
                     if (uri != null) {
@@ -163,15 +166,6 @@ fun RecordInputScreen(
                     }
                 }
             )
-            // 업로드된 이미지 표시
-            if (ui.uploadedImages.isNotEmpty()) {
-                Text("업로드된 이미지: ${ui.uploadedImages.size}개")
-            }
-            
-            // 이미지 업로드 중 표시
-            if (ui.isUploadingImage) {
-                Text("이미지 업로드 중...")
-            }
 
             RowInfoInput(label = "카테고리") {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -268,6 +262,7 @@ data class RecordDraft(
 @Composable
 private fun PhotoInput(
     imageUri: Uri?,
+    isUploading: Boolean,
     onPick: (Uri?) -> Unit
 ) {
     val picker = rememberLauncherForActivityResult(
@@ -290,9 +285,11 @@ private fun PhotoInput(
                 .clip(RoundedCornerShape(10.dp))
                 .background(Color(0xFFD9D9D9))
                 .clickable {
-                    picker.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    )
+                    if (!isUploading) {
+                        picker.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    }
                 }
         ) {
             if (hasImage) {
@@ -306,6 +303,32 @@ private fun PhotoInput(
                         .clip(RoundedCornerShape(10.dp)),
                     contentScale = ContentScale.Crop
                 )
+                
+                // 업로드 중일 때 Progress 표시
+                if (isUploading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.5f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "업로드 중...",
+                                color = Color.White,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+                
             } else {
                 Box(
                     modifier = Modifier
@@ -320,9 +343,11 @@ private fun PhotoInput(
                             .clip(CircleShape)
                             .background(Color(0xFF646464))
                             .clickable {
-                                picker.launch(
-                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                )
+                                if (!isUploading) {
+                                    picker.launch(
+                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    )
+                                }
                             },
                         contentAlignment = Alignment.Center
                     ) {
@@ -332,7 +357,8 @@ private fun PhotoInput(
                             tint = Color.White,
                             modifier = Modifier.size(37.dp)
                         )
-                    }}
+                    }
+                }
             }
         }
     }

@@ -64,6 +64,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.example.archiveandroid.feature.home.record.input.view.ui.DateTimePicker
+import com.example.archiveandroid.feature.home.record.input.view.ui.LocationPicker
+import com.example.archiveandroid.feature.home.record.input.view.ui.Place
 import com.example.yourapp.ui.components.TopAppBar
 import java.io.File
 import java.text.SimpleDateFormat
@@ -87,6 +89,7 @@ fun RecordInputScreen(
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     var selectedDateTime by remember { mutableStateOf<Date?>(Date()) }
+    var selectedPlace by remember { mutableStateOf<Place?>(null) }
     var draft by remember { 
         mutableStateOf(
             RecordDraft(
@@ -214,11 +217,23 @@ fun RecordInputScreen(
                 .padding(horizontal = 30.dp, vertical = 10.dp))
 
             RowInfoInput(label = "장소") {
-                Text("사진 업로드 시 자동 등록",
-                    color = Color(0xFF898989),
-                    fontWeight = FontWeight.Light,
-                    fontSize = 14.sp
-                )
+                Column {
+                    LocationPicker(
+                        selectedPlace = selectedPlace,
+                        onPlaceSelected = { place ->
+                            selectedPlace = place
+                            draft = draft.copy(location = place.name)
+                        }
+                    )
+                    if (selectedPlace == null) {
+                        Text("사진 업로드 시 자동 등록",
+                            color = Color(0xFF898989),
+                            fontWeight = FontWeight.Light,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
             }
             Divider(color = Color(0xffD9D9D9), modifier = Modifier
                 .fillMaxWidth()

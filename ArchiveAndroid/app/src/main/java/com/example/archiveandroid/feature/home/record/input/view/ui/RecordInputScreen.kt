@@ -44,12 +44,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults.colors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,8 +61,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
+import com.example.archiveandroid.feature.home.record.input.view.ui.DateTimePicker
 import com.example.yourapp.ui.components.TopAppBar
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,7 +84,14 @@ fun RecordInputScreen(
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    var draft by remember { mutableStateOf(RecordDraft()) }
+    var selectedDateTime by remember { mutableStateOf<Date?>(Date()) }
+    var draft by remember { 
+        mutableStateOf(
+            RecordDraft(
+                activityDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            )
+        ) 
+    }
 
     val categories = listOf("여행", "공부", "운동", "전시", "뮤지컬")
 
@@ -166,27 +175,21 @@ fun RecordInputScreen(
 
             RowInfoInput(label = "카테고리") {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    categories.forEach { c ->
-                        val categories = listOf("여행", "공부", "운동", "전시", "뮤지컬")
-                        var draft by remember { mutableStateOf(RecordDraft()) }
-
-                        CategoryInput(
-                            categories = categories,
-                            selected = draft.category,
-                            onSelect = { draft = draft.copy(category = it) }
-                        )
-                    }
+                    CategoryInput(
+                        categories = categories,
+                        selected = draft.category,
+                        onSelect = { draft = draft.copy(category = it) }
+                    )
                 }
             }
             Divider(color = Color(0xffD9D9D9), modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp, vertical = 10.dp))
 
-            var title by rememberSaveable { mutableStateOf("") }
             RowInfoInput(label = "활동명") {
                 TextField(
-                    value = title,
-                    onValueChange = { title = it },
+                    value = draft.title,
+                    onValueChange = { draft = draft.copy(title = it) },
                     singleLine = true,
                     colors = textfieldColors,
                     modifier = Modifier
@@ -200,12 +203,17 @@ fun RecordInputScreen(
                 .padding(horizontal = 30.dp, vertical = 10.dp))
 
             /* 사진에서 날짜/시간, 장소 정보 뽑아서 넣기 */
-            RowInfoInput(label = "날짜 / 시간") {
-                Text("사진 업로드 시 자동 등록",
-                    color = Color(0xFF898989),
-                    fontWeight = FontWeight.Light,
-                    fontSize = 14.sp
-                )
+            RowInfoInput(label = "날짜") {
+                Column {
+                    DateTimePicker(
+                        selectedDateTime = selectedDateTime,
+                        onDateTimeSelected = { date ->
+                            selectedDateTime = date
+                            val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            draft = draft.copy(activityDate = formatter.format(date))
+                        }
+                    )
+                }
             }
             Divider(color = Color(0xffD9D9D9), modifier = Modifier
                 .fillMaxWidth()
@@ -222,11 +230,10 @@ fun RecordInputScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp, vertical = 10.dp))
 
-            var memo by rememberSaveable { mutableStateOf("") }
             RowInfoInput(label = "메모") {
                 TextField(
-                    value = title,
-                    onValueChange = { title = it },
+                    value = draft.memo,
+                    onValueChange = { draft = draft.copy(memo = it) },
                     singleLine = true,
                     colors = textfieldColors,
                     modifier = Modifier

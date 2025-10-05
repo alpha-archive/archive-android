@@ -124,4 +124,8 @@ dependencies {
     // Paging 3
     implementation("androidx.paging:paging-runtime:3.2.1")
     implementation("androidx.paging:paging-compose:3.2.1")
+    
+    // Material Design 3 Date/Time Pickers
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
 }

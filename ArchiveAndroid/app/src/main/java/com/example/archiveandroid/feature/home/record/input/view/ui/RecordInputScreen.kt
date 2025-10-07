@@ -133,11 +133,14 @@ fun RecordInputScreen(
                                title = draft.title,
                                category = draft.category,
                                location = draft.location,
-                               activityDate = draft.activityDate,
+                               activityDate = draft.activityDate?.let { dateStr ->
+                                   // yyyy-MM-dd 형식을 yyyy-MM-ddT00:00:00.000Z 형식으로 변환
+                                   "${dateStr}T00:00:00.000Z"
+                               },
                                rating = draft.rating,
                                memo = draft.memo,
                                imageIds = ui.uploadedImages.map { it.id },
-                               publicEventId = draft.publicEventId
+                            //    publicEventId = draft.publicEventId
                            )
                            onSave(req)
                     },
@@ -175,7 +178,9 @@ fun RecordInputScreen(
                     CategoryInput(
                         categories = categories,
                         selected = draft.category,
-                        onSelect = { draft = draft.copy(category = it) }
+                        onSelect = {
+//                            draft = draft.copy(category = it)
+                        }
                     )
                 }
             }
@@ -264,7 +269,7 @@ fun RecordInputScreen(
 
 data class RecordDraft(
     val imageUri: Uri? = null,
-    val category: String = "",
+    val category: String = "MUSICAL",
     val title: String = "",
     val memo: String = "",
     val location: String? = null,

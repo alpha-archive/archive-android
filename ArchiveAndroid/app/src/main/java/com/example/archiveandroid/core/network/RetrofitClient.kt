@@ -29,7 +29,7 @@ object RetrofitClient {
 
         if (BuildConfig.DEBUG) {
             val logging = HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BASIC
+                level = HttpLoggingInterceptor.Level.BODY
             }
             builder.addInterceptor(logging)
         }

@@ -148,19 +148,41 @@ fun LocationPicker(
                             CircularProgressIndicator()
                         }
                     }
-                    // 에러 상태
-                    else if (error != null) {
+                    // 에러 상태 - 사용자 입력 텍스트를 주소로 사용
+                    else if (error != null && searchQuery.isNotBlank()) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(100.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = error.toString(),
-                                color = Color.Red,
-                                fontSize = 14.sp
-                            )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "검색 중 오류가 발생했습니다.",
+                                    color = Color.Red,
+                                    fontSize = 12.sp
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                androidx.compose.material3.TextButton(
+                                    onClick = {
+                                        val place = Place(
+                                            id = "manual_${System.currentTimeMillis()}",
+                                            name = searchQuery,
+                                            address = searchQuery
+                                        )
+                                        onPlaceSelected(place)
+                                        showSearchDialog = false
+                                    }
+                                ) {
+                                    Text(
+                                        text = "\"$searchQuery\"를 주소로 사용",
+                                        color = Color(0xFF646464),
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
                         }
                     }
                     // 검색 결과

@@ -2,8 +2,8 @@ package com.example.archiveandroid.feature.home.record.input
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.example.archiveandroid.feature.home.record.input.data.repository.RecordInputRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -83,7 +83,6 @@ class RecordInputViewModel @Inject constructor(
             val requestWithImages = req.copy(
                 imageIds = currentState.uploadedImages.map { it.id }
             )
-            
             repository.createRecord(requestWithImages)
                 .onSuccess { 
                     _uiState.value = currentState.copy(

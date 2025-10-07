@@ -8,5 +8,5 @@ data class RecordInputRequest(
     val rating: Int?,
     val memo: String?,
     val imageIds: List<String> = emptyList(),
-    val publicEventId: String? = null
+    // val publicEventId: String? = null
 )

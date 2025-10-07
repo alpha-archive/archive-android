@@ -2,7 +2,8 @@ package com.example.archiveandroid.feature.home.recorddetail.view
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.archiveandroid.feature.home.recorddetail.data.repository.RecordDetailRepository
+import com.example.archiveandroid.feature.home.record.data.repository.ActivityRepository
+import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityDetailDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,12 +14,12 @@ import javax.inject.Inject
 data class RecordDetailUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
-    val recordData: Any? = null // TODO: 실제 Record 데이터 타입으로 변경
+    val recordData: ActivityDetailDto? = null
 )
 
 @HiltViewModel
 class RecordDetailViewModel @Inject constructor(
-    private val repository: RecordDetailRepository
+    private val repository: ActivityRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecordDetailUiState())
@@ -28,26 +29,26 @@ class RecordDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             
-            // TODO: 서버 완성 후 실제 API 호출로 변경
-            // repository.getActivityDetail(recordId)
-            //     .onSuccess { record ->
-            //         _uiState.value = _uiState.value.copy(
-            //             isLoading = false,
-            //             recordData = record
-            //         )
-            //     }
-            //     .onFailure { exception ->
-            //         _uiState.value = _uiState.value.copy(
-            //             isLoading = false,
-            //             error = exception.message ?: "로드 실패"
-            //         )
-            //     }
-            
-            // 임시 더미 데이터 (서버 완성 전까지 사용)
-            _uiState.value = _uiState.value.copy(
-                isLoading = false,
-                recordData = "Dummy record data for ID: $recordId"
-            )
+            try {
+                repository.getActivity(recordId)
+                    .onSuccess { record ->
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            recordData = record
+                        )
+                    }
+                    .onFailure { exception ->
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = exception.message ?: "로드 실패"
+                        )
+                    }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = "예외 발생: ${e.message}"
+                )
+            }
         }
     }
 }

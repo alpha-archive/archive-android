@@ -28,19 +28,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.archiveandroid.R
 import com.example.yourapp.ui.components.AppBarMenuItem
 import com.example.yourapp.ui.components.TopAppBar
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordDetailScreen(
+    uiState: com.example.archiveandroid.feature.home.recorddetail.view.RecordDetailUiState,
     onBack: () -> Unit = {},
     onMore: () -> Unit = {},
 ) {
@@ -61,57 +68,103 @@ fun RecordDetailScreen(
             )
         }
     ) { innerPadding ->
-        androidx.compose.foundation.lazy.LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding)
-                .padding(top = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item {
-                Image(
-                    painter = painterResource(id = R.drawable.detail_dummy_image),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .width(330.dp)
-                        .aspectRatio(4f / 3f)
-                        .padding(bottom = 30.dp)
-                        .clip(RoundedCornerShape(10.dp)),
-                    contentScale = ContentScale.Crop
-                )
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("로딩 중...")
+                }
             }
-
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-
-                    RowInfo(label = "카테고리") {
-                        CategoryButton(text = "여행")
+            uiState.error != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("오류: ${uiState.error}")
+                }
+            }
+            uiState.recordData != null -> {
+                androidx.compose.foundation.lazy.LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(innerPadding)
+                        .padding(top = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // 이미지 섹션
+                    if (uiState.recordData.images.isNotEmpty()) {
+                        item {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(uiState.recordData.images.first().imageUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .width(330.dp)
+                                    .aspectRatio(4f / 3f)
+                                    .padding(bottom = 30.dp)
+                                    .clip(RoundedCornerShape(10.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    } else {
+                        // 이미지가 없을 때 기본 이미지 표시
+                        item {
+                            Image(
+                                painter = painterResource(id = R.drawable.detail_dummy_image),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .width(330.dp)
+                                    .aspectRatio(4f / 3f)
+                                    .padding(bottom = 30.dp)
+                                    .clip(RoundedCornerShape(10.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
-                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp, vertical = 10.dp))
 
-                    RowInfo(label = "활동명", value = "KOSS 여름 LT")
-                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp, vertical = 10.dp))
+                    // 정보 섹션
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            RowInfo(label = "카테고리") {
+                                CategoryButton(text = uiState.recordData.categoryDisplayName)
+                            }
+                            Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 30.dp, vertical = 10.dp))
 
-                    RowInfo(label = "날짜 / 시간", value = "2025/7/31 16:22")
-                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp, vertical = 10.dp))
+                            RowInfo(label = "활동명", value = uiState.recordData.title)
+                            Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 30.dp, vertical = 10.dp))
 
-                    RowInfo(label = "위치", value = "강원도 양양군 정암해변")
-                    Divider(color = Color(0xffD9D9D9), modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp, vertical = 10.dp))
+                            RowInfo(label = "날짜", value = formatActivityDate(uiState.recordData.activityDate))
+                            Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 30.dp, vertical = 10.dp))
 
-                    MemoSection(memo = "아 집가고 싶다")
+                            RowInfo(label = "위치", value = uiState.recordData.location)
+                            Divider(color = Color(0xffD9D9D9), modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 30.dp, vertical = 10.dp))
+
+                            MemoSection(memo = uiState.recordData.memo)
+                        }
+                    }
+                }
+            }
+            else -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("데이터가 없습니다")
                 }
             }
         }
-
-        NextButton { /* 다음 기록으로 넘어가기 */ }
     }
 }
 
@@ -229,5 +282,17 @@ fun NextButton(
                 )
             }
         }
+    }
+}
+
+// 날짜 포맷팅 함수
+private fun formatActivityDate(activityDate: String): String {
+    return try {
+        // T 이전의 날짜 부분만 추출
+        val datePart = activityDate.substringBefore("T")
+        // yyyy-MM-dd 형식을 yyyy/MM/dd로 변환
+        datePart.replace("-", "/")
+    } catch (e: Exception) {
+        activityDate // 파싱 실패 시 원본 반환
     }
 }

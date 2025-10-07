@@ -1,8 +1,7 @@
 package com.example.archiveandroid.feature.home.record.data.repository
 
-import androidx.paging.PagingData
+import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityDetailDto
 import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityDto
-import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityListResponse
 import com.example.archiveandroid.feature.home.record.data.remote.dto.CreateActivityRequest
 import com.example.archiveandroid.feature.home.record.data.remote.dto.UpdateActivityRequest
 import dagger.Binds
@@ -16,7 +15,7 @@ interface ActivityRepository {
     
     suspend fun getActivities(): Result<List<ActivityDto>>
     
-    suspend fun getActivity(id: String): Result<ActivityDto>
+    suspend fun getActivity(id: String): Result<ActivityDetailDto>
     
     suspend fun createActivity(request: CreateActivityRequest): Result<ActivityDto>
     

@@ -112,9 +112,9 @@ fun RecordScreen(
         context.startActivity(intent)
     }
 
-    fun startRecordDetailActivity(recordId: String) {
+    fun startRecordDetailActivity(activityId: String) {
         val intent = Intent(context, RecordDetailActivity::class.java).apply {
-            putExtra("record_id", recordId)
+            putExtra("activityId", activityId)
         }
         context.startActivity(intent)
     }

@@ -1,13 +1,9 @@
 package com.example.archiveandroid.feature.home.record.data.repository
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import com.example.archiveandroid.core.repository.BaseRepository
-import com.example.archiveandroid.feature.home.record.data.paging.RecordPagingSource
 import com.example.archiveandroid.feature.home.record.data.remote.ActivityApi
+import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityDetailDto
 import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityDto
-import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityListResponse
 import com.example.archiveandroid.feature.home.record.data.remote.dto.CreateActivityRequest
 import com.example.archiveandroid.feature.home.record.data.remote.dto.UpdateActivityRequest
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +26,7 @@ class ActivityRepositoryImpl @Inject constructor(
         }
     }
     
-    override suspend fun getActivity(id: String): Result<ActivityDto> {
+    override suspend fun getActivity(id: String): Result<ActivityDetailDto> {
         return handleApiCall {
             activityApi.getActivity(id)
         }

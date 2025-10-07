@@ -24,12 +24,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,6 +41,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -46,6 +50,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults.colors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,7 +66,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.example.archiveandroid.feature.home.record.input.view.ui.DateTimePicker
 import com.example.archiveandroid.feature.home.record.input.view.ui.LocationPicker
@@ -92,10 +99,17 @@ fun RecordInputScreen(
     var selectedPlace by remember { mutableStateOf<Place?>(null) }
     var draft by remember { 
         mutableStateOf(
-            RecordDraft(
+            ui.draft ?: RecordDraft(
                 activityDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
             )
         ) 
+    }
+
+    // 수정 모드일 때 기존 데이터 로드
+    LaunchedEffect(ui.draft) {
+        ui.draft?.let { loadedDraft ->
+            draft = loadedDraft
+        }
     }
 
     val categories = listOf("여행", "공부", "운동", "전시", "뮤지컬")
@@ -170,7 +184,9 @@ fun RecordInputScreen(
                         val file = uriToFile(context, uri)
                         onImageUpload(file)
                     }
-                }
+                },
+                uploadedImages = ui.uploadedImages,
+                onImageRemove = onImageRemove
             )
 
             RowInfoInput(label = "카테고리") {
@@ -283,35 +299,104 @@ data class RecordDraft(
 private fun PhotoInput(
     imageUri: Uri?,
     isUploading: Boolean,
-    onPick: (Uri?) -> Unit
+    onPick: (Uri?) -> Unit,
+    uploadedImages: List<ImageUploadData> = emptyList(),
+    onImageRemove: (String) -> Unit = {}
 ) {
     val picker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri -> onPick(uri) }
 
     val painter = rememberAsyncImagePainter(model = imageUri)
-    val hasImage = imageUri != null
+    val hasImage = imageUri != null || uploadedImages.isNotEmpty()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 50.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .width(330.dp)
-                .aspectRatio(4f / 3f)
-                .padding(bottom = 30.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color(0xFFD9D9D9))
-                .clickable {
-                    if (!isUploading) {
-                        picker.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+        // 기존 이미지들이 있으면 LazyRow로 표시
+        if (uploadedImages.isNotEmpty()) {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                items(uploadedImages) { imageData ->
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    ) {
+                        AsyncImage(
+                            model = imageData.imageUrl,
+                            contentDescription = "uploaded image",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                        // 삭제 버튼
+                        IconButton(
+                            onClick = { onImageRemove(imageData.id) },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(24.dp)
+                                .background(
+                                    Color.Black.copy(alpha = 0.6f),
+                                    CircleShape
+                                )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "삭제",
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+                // 작은 추가 버튼
+                item {
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFFD9D9D9))
+                            .clickable {
+                                if (!isUploading) {
+                                    picker.launch(
+                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    )
+                                }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "추가",
+                            tint = Color(0xFF646464),
+                            modifier = Modifier.size(32.dp)
                         )
                     }
                 }
-        ) {
+            }
+        }
+        
+        // 기존 이미지가 없을 때만 큰 추가 버튼 표시
+        if (uploadedImages.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .width(330.dp)
+                    .aspectRatio(4f / 3f)
+                    .padding(bottom = 30.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFFD9D9D9))
+                    .clickable {
+                        if (!isUploading) {
+                            picker.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        }
+                    }
+            ) {
             if (hasImage) {
                 Image(
                     painter = painter,
@@ -380,6 +465,7 @@ private fun PhotoInput(
                     }
                 }
             }
+        }
         }
     }
 }

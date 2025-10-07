@@ -1,6 +1,9 @@
 package com.example.archiveandroid.feature.home.record.input.data.repository
 
 import com.example.archiveandroid.core.repository.BaseRepository
+import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityDetailDto
+import com.example.archiveandroid.feature.home.record.data.remote.dto.UpdateActivityRequest
+import com.example.archiveandroid.feature.home.record.data.repository.ActivityRepository
 import com.example.archiveandroid.feature.home.record.input.data.remote.RecordInputApi
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
@@ -13,13 +16,32 @@ import javax.inject.Singleton
 
 @Singleton
 class RecordInputRepositoryImpl @Inject constructor(
-    private val api: RecordInputApi
+    private val api: RecordInputApi,
+    private val activityRepository: ActivityRepository
 ) : BaseRepository(), RecordInputRepository {
 
     override suspend fun createRecord(request: RecordInputRequest): Result<Unit> {
         return handleUnitApiCall {
             api.createRecord(request)
         }
+    }
+
+    override suspend fun updateRecord(activityId: String, request: RecordInputRequest, addImageIds: List<String>, removeImageIds: List<String>): Result<Unit> {
+        val updateRequest = UpdateActivityRequest(
+            title = request.title,
+            category = request.category,
+            location = request.location ?: "",
+            activityDate = request.activityDate ?: "",
+            rating = request.rating ?: 0,
+            memo = request.memo,
+            addImageIds = addImageIds,
+            removeImageIds = removeImageIds
+        )
+        return activityRepository.updateActivity(activityId, updateRequest).map { }
+    }
+
+    override suspend fun getActivityForEdit(activityId: String): Result<ActivityDetailDto> {
+        return activityRepository.getActivity(activityId)
     }
 
     override suspend fun uploadImage(file: File): Result<ImageUploadData> {

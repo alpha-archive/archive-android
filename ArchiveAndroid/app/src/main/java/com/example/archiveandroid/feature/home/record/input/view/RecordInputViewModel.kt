@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.example.archiveandroid.feature.home.record.input.data.repository.RecordInputRepository
+import com.example.archiveandroid.feature.home.record.input.RecordDraft
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,12 @@ data class RecordInputUiState(
     val errorMessage: String? = null,
     val isSuccess: Boolean = false,
     val uploadedImages: List<ImageUploadData> = emptyList(),
-    val isUploadingImage: Boolean = false
+    val isUploadingImage: Boolean = false,
+    val isEditMode: Boolean = false,
+    val activityId: String? = null,
+    val isLoadingActivity: Boolean = false,
+    val draft: RecordDraft? = null,
+    val originalImageIds: List<String> = emptyList() // 수정 모드에서 기존 이미지 ID들
 )
 
 @HiltViewModel
@@ -28,6 +34,55 @@ class RecordInputViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(RecordInputUiState())
     val uiState: StateFlow<RecordInputUiState> = _uiState.asStateFlow()
+
+    fun loadActivityForEdit(activityId: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoadingActivity = true,
+                isEditMode = true,
+                activityId = activityId,
+                errorMessage = null
+            )
+
+            repository.getActivityForEdit(activityId)
+                .onSuccess { activityDetail ->
+                    // ActivityDetailDto를 RecordDraft로 변환
+                    val draft = RecordDraft(
+                        category = activityDetail.category,
+                        title = activityDetail.title,
+                        memo = activityDetail.memo ?: "",
+                        location = activityDetail.location,
+                        activityDate = activityDetail.activityDate.substringBefore("T"), // T 이전의 날짜 부분만
+                        rating = activityDetail.rating,
+                        imageIds = activityDetail.images.map { it.id }
+                    )
+                    
+                    // 기존 데이터로 UI 상태 업데이트
+                    _uiState.value = _uiState.value.copy(
+                        isLoadingActivity = false,
+                        draft = draft,
+                        originalImageIds = activityDetail.images.map { it.id },
+                        uploadedImages = activityDetail.images.map { imageInfo ->
+                            ImageUploadData(
+                                id = imageInfo.id,
+                                imageKey = imageInfo.id, // 임시로 id 사용
+                                imageUrl = imageInfo.imageUrl,
+                                originalFilename = "existing_image.jpg", // 임시값
+                                fileSize = 0L, // 임시값
+                                contentType = "image/jpeg", // 임시값
+                                status = "uploaded" // 임시값
+                            )
+                        }
+                    )
+                }
+                .onFailure { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoadingActivity = false,
+                        errorMessage = "기존 데이터를 불러올 수 없습니다: ${exception.message}"
+                    )
+                }
+        }
+    }
 
     fun uploadImage(file: File) {
         viewModelScope.launch {
@@ -79,23 +134,53 @@ class RecordInputViewModel @Inject constructor(
         _uiState.value = currentState.copy(submitting = true, errorMessage = null)
 
         viewModelScope.launch {
-            // 업로드된 이미지 ID들을 포함한 요청 생성
-            val requestWithImages = req.copy(
-                imageIds = currentState.uploadedImages.map { it.id }
-            )
-            repository.createRecord(requestWithImages)
-                .onSuccess { 
-                    _uiState.value = currentState.copy(
-                        submitting = false,
-                        isSuccess = true
-                    )
-                }
-                .onFailure { exception ->
-                    _uiState.value = currentState.copy(
-                        submitting = false,
-                        errorMessage = exception.message ?: "저장 실패"
-                    )
-                }
+            if (currentState.isEditMode && currentState.activityId != null) {
+                // 수정 모드: PUT API 호출
+                val currentImageIds = currentState.uploadedImages.map { it.id }
+                val originalImageIds = currentState.originalImageIds
+                
+                // 새로 추가된 이미지들
+                val addImageIds = currentImageIds.filter { it !in originalImageIds }
+                // 제거된 이미지들
+                val removeImageIds = originalImageIds.filter { it !in currentImageIds }
+                
+                val requestWithImages = req.copy(
+                    imageIds = currentImageIds
+                )
+                
+                repository.updateRecord(currentState.activityId, requestWithImages, addImageIds, removeImageIds)
+                    .onSuccess { 
+                        _uiState.value = currentState.copy(
+                            submitting = false,
+                            isSuccess = true
+                        )
+                    }
+                    .onFailure { exception ->
+                        _uiState.value = currentState.copy(
+                            submitting = false,
+                            errorMessage = exception.message ?: "수정 실패"
+                        )
+                    }
+            } else {
+                // 생성 모드: POST API 호출
+                val requestWithImages = req.copy(
+                    imageIds = currentState.uploadedImages.map { it.id }
+                )
+                
+                repository.createRecord(requestWithImages)
+                    .onSuccess { 
+                        _uiState.value = currentState.copy(
+                            submitting = false,
+                            isSuccess = true
+                        )
+                    }
+                    .onFailure { exception ->
+                        _uiState.value = currentState.copy(
+                            submitting = false,
+                            errorMessage = exception.message ?: "저장 실패"
+                        )
+                    }
+            }
         }
     }
 }

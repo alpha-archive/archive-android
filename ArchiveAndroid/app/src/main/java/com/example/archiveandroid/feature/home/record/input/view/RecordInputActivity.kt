@@ -20,9 +20,18 @@ class RecordInputActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        val activityId = intent.getStringExtra("activityId")
+        
         setContent {
             ArchiveAndroidTheme {
                 val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+                // 수정 모드일 때 기존 데이터 로드
+                LaunchedEffect(activityId) {
+                    activityId?.let { id ->
+                        viewModel.loadActivityForEdit(id)
+                    }
+                }
 
                 LaunchedEffect(uiState.isSuccess) {
                     if (uiState.isSuccess) {

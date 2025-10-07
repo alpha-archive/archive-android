@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.archiveandroid.core.ui.theme.ArchiveAndroidTheme
 import com.example.archiveandroid.feature.home.recorddetail.view.ui.RecordDetailScreen
+import com.example.archiveandroid.feature.home.record.input.RecordInputActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -44,7 +45,14 @@ class RecordDetailActivity : ComponentActivity() {
                 RecordDetailScreen(
                     uiState = uiState,
                     onBack = { finish() },
-                    onEdit = { /* TODO: 수정 기능 구현 */ },
+                    onEdit = { 
+                        if (activityId != null) {
+                            val intent = Intent(this@RecordDetailActivity, RecordInputActivity::class.java).apply {
+                                putExtra("activityId", activityId)
+                            }
+                            startActivityForResult(intent, 1001)
+                        }
+                    },
                     onDelete = { 
                         if (activityId != null) {
                             viewModel.deleteActivity(activityId)
@@ -52,6 +60,15 @@ class RecordDetailActivity : ComponentActivity() {
                     }
                 )
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1001 && resultCode == Activity.RESULT_OK) {
+            // 수정 완료 시 결과 반환
+            setResult(Activity.RESULT_OK)
+            finish()
         }
     }
 }

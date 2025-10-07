@@ -98,11 +98,26 @@ data class CreateActivityRequest(
 
 data class UpdateActivityRequest(
     @SerializedName("title")
-    val title: String? = null,
-    @SerializedName("location")
-    val location: String? = null,
+    val title: String,
+    
     @SerializedName("category")
-    val category: String? = null,
-    @SerializedName("imageUrl")
-    val imageUrl: String? = null
+    val category: String,
+    
+    @SerializedName("location")
+    val location: String,
+    
+    @SerializedName("activityDate")
+    val activityDate: String,
+    
+    @SerializedName("rating")
+    val rating: Int,
+    
+    @SerializedName("memo")
+    val memo: String?,
+    
+    @SerializedName("addImageIds")
+    val addImageIds: List<String>,
+    
+    @SerializedName("removeImageIds")
+    val removeImageIds: List<String>
 )

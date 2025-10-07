@@ -49,7 +49,8 @@ import java.util.Locale
 fun RecordDetailScreen(
     uiState: com.example.archiveandroid.feature.home.recorddetail.view.RecordDetailUiState,
     onBack: () -> Unit = {},
-    onMore: () -> Unit = {},
+    onEdit: () -> Unit = {},
+    onDelete: () -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -60,8 +61,8 @@ fun RecordDetailScreen(
                 showBack = true,
                 onBackClick = onBack,
                 menuItems = listOf(
-                    AppBarMenuItem("more", "수정", onMore),
-                    AppBarMenuItem("more", "삭제", onMore),
+                    AppBarMenuItem("more", "수정", onEdit),
+                    AppBarMenuItem("more", "삭제", onDelete),
                 ),
                 scrollBehavior = scrollBehavior,
                 actions = {}
@@ -75,6 +76,14 @@ fun RecordDetailScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text("로딩 중...")
+                }
+            }
+            uiState.isDeleting -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("삭제 중...")
                 }
             }
             uiState.error != null -> {

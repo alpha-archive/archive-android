@@ -23,6 +23,9 @@ class RecordViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
     
@@ -30,9 +33,9 @@ class RecordViewModel @Inject constructor(
         loadActivities()
     }
     
-    fun loadActivities() {
+    private fun loadActivities(loadingState: MutableStateFlow<Boolean>) {
         viewModelScope.launch {
-            _isLoading.value = true
+            loadingState.value = true
             _error.value = null
             
             activityRepository.getActivities()
@@ -43,7 +46,15 @@ class RecordViewModel @Inject constructor(
                     _error.value = exception.message ?: "데이터를 불러올 수 없습니다"
                 }
             
-            _isLoading.value = false
+            loadingState.value = false
         }
+    }
+    
+    fun loadActivities() {
+        loadActivities(_isLoading)
+    }
+    
+    fun refreshActivities() {
+        loadActivities(_isRefreshing)
     }
 }

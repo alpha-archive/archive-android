@@ -33,9 +33,23 @@ class RecordDetailActivity : ComponentActivity() {
                     }
                 }
 
+                // 삭제 성공 시 화면 닫기
+                LaunchedEffect(uiState.isDeleted) {
+                    if (uiState.isDeleted) {
+                        setResult(android.app.Activity.RESULT_OK)
+                        finish()
+                    }
+                }
+
                 RecordDetailScreen(
                     uiState = uiState,
-                    onBack = { finish() }
+                    onBack = { finish() },
+                    onEdit = { /* TODO: 수정 기능 구현 */ },
+                    onDelete = { 
+                        if (activityId != null) {
+                            viewModel.deleteActivity(activityId)
+                        }
+                    }
                 )
             }
         }

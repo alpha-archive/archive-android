@@ -1,6 +1,9 @@
 package com.example.archiveandroid.feature.home.record
+import android.app.Activity
 import android.content.Intent
 import android.graphics.BitmapFactory
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -101,22 +104,43 @@ fun RecordScreen(
     var lastScroll by remember { mutableIntStateOf(0) }
     var fabVisible by remember { mutableStateOf(true) }
     var showFilter by remember { mutableStateOf(false) }
-    
-    // Paging 3 사용
+
+    // 데이터 상태
     val activities by viewModel.activities.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     
+
+    // Activity Result Launcher
+    val recordInputLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // 기록 추가 완료 시 리스트 갱신
+            viewModel.refreshActivities()
+        }
+    }
+
+    val recordDetailLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // 기록 삭제 완료 시 리스트 갱신
+            viewModel.refreshActivities()
+        }
+    }
+
     fun startRecordInputActivity() {
         val intent = Intent(context, RecordInputActivity::class.java)
-        context.startActivity(intent)
+        recordInputLauncher.launch(intent)
     }
 
     fun startRecordDetailActivity(activityId: String) {
         val intent = Intent(context, RecordDetailActivity::class.java).apply {
             putExtra("activityId", activityId)
         }
-        context.startActivity(intent)
+        recordDetailLauncher.launch(intent)
     }
 
     LaunchedEffect(scrollState.value) {
@@ -125,6 +149,7 @@ fun RecordScreen(
         if (delta < 0) fabVisible = true
         lastScroll = scrollState.value
     }
+
 
     Scaffold(
         topBar = {
@@ -210,25 +235,30 @@ fun RecordScreen(
                     }
                 }
                 else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
+                    Box(
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        items(
-                            count = activities.size,
-                            key = { index -> activities[index].id }
-                        ) { index ->
-                            val activity = activities[index]
-                            // ActivityDto를 RecordItem으로 변환
-                            val recordItem = activity.toRecordItem()
-                            
-                            RecordListItem(
-                                item = recordItem,
-                                onClick = { startRecordDetailActivity(activity.id) },
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                        ) {
+                            items(
+                                count = activities.size,
+                                key = { index -> activities[index].id }
+                            ) { index ->
+                                val activity = activities[index]
+                                // ActivityDto를 RecordItem으로 변환
+                                val recordItem = activity.toRecordItem()
+
+                                RecordListItem(
+                                    item = recordItem,
+                                    onClick = { startRecordDetailActivity(activity.id) },
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                )
+                            }
+                            item { Spacer(modifier = Modifier.height(72.dp)) }
                         }
-                        item { Spacer(modifier = Modifier.height(72.dp)) }
                     }
+
                 }
             }
         }

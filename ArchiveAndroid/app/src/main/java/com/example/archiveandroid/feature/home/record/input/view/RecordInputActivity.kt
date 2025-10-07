@@ -26,6 +26,7 @@ class RecordInputActivity : ComponentActivity() {
 
                 LaunchedEffect(uiState.isSuccess) {
                     if (uiState.isSuccess) {
+                        setResult(android.app.Activity.RESULT_OK)
                         finish()
                     }
                 }

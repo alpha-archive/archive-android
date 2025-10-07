@@ -14,7 +14,9 @@ import javax.inject.Inject
 data class RecordDetailUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
-    val recordData: ActivityDetailDto? = null
+    val recordData: ActivityDetailDto? = null,
+    val isDeleting: Boolean = false,
+    val isDeleted: Boolean = false
 )
 
 @HiltViewModel
@@ -46,6 +48,33 @@ class RecordDetailViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
+                    error = "예외 발생: ${e.message}"
+                )
+            }
+        }
+    }
+
+    fun deleteActivity(activityId: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isDeleting = true, error = null)
+            
+            try {
+                repository.deleteActivity(activityId)
+                    .onSuccess {
+                        _uiState.value = _uiState.value.copy(
+                            isDeleting = false,
+                            isDeleted = true
+                        )
+                    }
+                    .onFailure { exception ->
+                        _uiState.value = _uiState.value.copy(
+                            isDeleting = false,
+                            error = exception.message ?: "삭제 실패"
+                        )
+                    }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isDeleting = false,
                     error = "예외 발생: ${e.message}"
                 )
             }

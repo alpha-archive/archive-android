@@ -11,31 +11,23 @@ import java.io.IOException
 
 /**
  * Record 목록을 위한 PagingSource
- * limit/cursor 프로토콜을 Paging 3에 매핑
+ * 단순한 목록 API를 Paging 3에 매핑
  */
 class RecordPagingSource(
     private val api: ActivityApi
-) : PagingSource<String, ActivityDto>() {
+) : PagingSource<Int, ActivityDto>() {
 
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, ActivityDto> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ActivityDto> {
         return try {
-            val cursor = params.key ?: "" // 첫 로드시 빈 문자열
-            val limit = params.loadSize
-            
-            val response = api.getActivities(
-                limit = limit,
-                cursor = cursor
-            )
+            val response = api.getActivities()
             
             if (response.isSuccessful && response.body()?.success == true) {
-                val listResponse = response.body()?.data
-                val data = listResponse?.activities ?: emptyList()
-                val nextCursor = listResponse?.nextCursor
+                val data = response.body()?.data ?: emptyList()
                 
                 LoadResult.Page(
                     data = data,
-                    prevKey = null, // 이전 페이지는 없음 (무한 스크롤)
-                    nextKey = nextCursor // 다음 커서
+                    prevKey = null, // 이전 페이지는 없음
+                    nextKey = null // 모든 데이터를 한 번에 로드
                 )
             } else {
                 LoadResult.Error(
@@ -57,7 +49,7 @@ class RecordPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<String, ActivityDto>): String? {
+    override fun getRefreshKey(state: PagingState<Int, ActivityDto>): Int? {
         // 새로고침 시 첫 페이지로 이동
         return null
     }

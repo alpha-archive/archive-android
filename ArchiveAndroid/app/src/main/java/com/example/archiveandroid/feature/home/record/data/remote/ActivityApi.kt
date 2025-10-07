@@ -15,12 +15,8 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ActivityApi {
-    @GET("/api/activities")
-    suspend fun getActivities(
-        @Query("limit") limit: Int = 20,
-        @Query("cursor") cursor: String? = null,
-        @Query("category") category: String? = null
-    ): Response<ApiResponse<ActivityListResponse>>
+    @GET("api/activities")
+    suspend fun getActivities(): Response<ApiResponse<List<ActivityDto>>>
     
     @GET("/api/activities/{id}")
     suspend fun getActivity(

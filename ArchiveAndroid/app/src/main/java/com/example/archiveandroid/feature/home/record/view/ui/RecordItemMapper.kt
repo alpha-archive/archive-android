@@ -17,16 +17,17 @@ object RecordItemMapper {
     )
     
     fun ActivityDto.toRecordItem(): RecordItem {
-        val (bgColor, fgColor) = categoryColors[category] ?: Pair(Color(0xFFE0E0E0), Color(0xFF666666))
+        val (bgColor, fgColor) = categoryColors[categoryDisplayName] ?: Pair(Color(0xFFE0E0E0), Color(0xFF666666))
         
         return RecordItem(
             id = id,
             title = title,
             location = location,
-            categoryLabel = category,
+            categoryLabel = categoryDisplayName,
             categoryBg = bgColor,
             categoryFg = fgColor,
-            imagePainter = null // TODO: 서버 이미지 로드
+            imagePainter = null,
+            thumbnailImageUrl = thumbnailImageUrl
         )
     }
 }

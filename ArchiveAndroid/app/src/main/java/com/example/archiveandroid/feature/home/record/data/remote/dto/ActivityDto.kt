@@ -2,15 +2,42 @@ package com.example.archiveandroid.feature.home.record.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class ActivityDto(
+// 목록용 DTO
+data class ActivityListItemDto(
     @SerializedName("id")
     val id: String,
     @SerializedName("title")
     val title: String,
-    @SerializedName("location")
-    val location: String,
     @SerializedName("category")
     val category: String,
+    @SerializedName("categoryDisplayName")
+    val categoryDisplayName: String,
+    @SerializedName("location")
+    val location: String,
+    @SerializedName("activityDate")
+    val activityDate: String,
+    @SerializedName("rating")
+    val rating: Int,
+    @SerializedName("thumbnailImageUrl")
+    val thumbnailImageUrl: String?,
+    @SerializedName("isPublicEvent")
+    val isPublicEvent: Boolean,
+    @SerializedName("imageCount")
+    val imageCount: Int
+)
+
+// 상세용 DTO
+data class ActivityDetailDto(
+    @SerializedName("id")
+    val id: String,
+    @SerializedName("title")
+    val title: String,
+    @SerializedName("category")
+    val category: String,
+    @SerializedName("categoryDisplayName")
+    val categoryDisplayName: String,
+    @SerializedName("location")
+    val location: String,
     @SerializedName("activityDate")
     val activityDate: String,
     @SerializedName("rating")
@@ -24,6 +51,9 @@ data class ActivityDto(
     @SerializedName("updatedAt")
     val updatedAt: String
 )
+
+// 기존 호환성을 위한 타입 별칭
+typealias ActivityDto = ActivityListItemDto
 
 data class CreateActivityRequest(
     @SerializedName("title")

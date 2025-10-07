@@ -45,14 +45,14 @@ class DummyRecordPagingSource : PagingSource<String, ActivityDto>() {
             ActivityDto(
                 id = id.toString(),
                 title = getDummyTitle(id),
-                location = getDummyLocation(id),
                 category = getDummyCategory(id),
+                categoryDisplayName = getDummyCategoryDisplayName(id),
+                location = getDummyLocation(id),
                 activityDate = getDummyDate(id),
                 rating = getDummyRating(id),
-                memo = getDummyMemo(id),
-                imageUrls = getDummyImages(id),
-                createdAt = getDummyCreatedAt(id),
-                updatedAt = getDummyUpdatedAt(id)
+                thumbnailImageUrl = getDummyThumbnailImageUrl(id),
+                isPublicEvent = getDummyIsPublicEvent(id),
+                imageCount = getDummyImageCount(id)
             )
         }
     }
@@ -90,6 +90,11 @@ class DummyRecordPagingSource : PagingSource<String, ActivityDto>() {
     }
     
     private fun getDummyCategory(id: Int): String {
+        val categories = listOf("TRAVEL", "EXHIBITION", "EXERCISE", "MUSICAL", "READING", "SPORTS", "MUSIC", "VOLUNTEER", "WORK", "MOVIE")
+        return categories[id % categories.size]
+    }
+    
+    private fun getDummyCategoryDisplayName(id: Int): String {
         val categories = listOf("여행", "전시", "운동", "뮤지컬", "독서", "스포츠", "음악", "봉사", "작업", "영화")
         return categories[id % categories.size]
     }
@@ -104,30 +109,16 @@ class DummyRecordPagingSource : PagingSource<String, ActivityDto>() {
         return (1..5).random()
     }
     
-    private fun getDummyMemo(id: Int): String {
-        val memos = listOf(
-            "정말 즐거웠던 시간이었다.",
-            "다음에도 꼭 가고 싶다.",
-            "친구들과 함께해서 더 좋았다.",
-            "혼자만의 시간이었다.",
-            "가족과 함께한 소중한 시간."
-        )
-        return memos[id % memos.size]
+    private fun getDummyThumbnailImageUrl(id: Int): String? {
+        return "https://kr.object.ncloudstorage.com/archive-image-storage/images/sample_${id % 5 + 1}.jpg"
     }
     
-    private fun getDummyImages(id: Int): List<String> {
-        return if (id % 3 == 0) {
-            listOf("https://picsum.photos/400/300?random=$id")
-        } else {
-            emptyList()
-        }
+    private fun getDummyIsPublicEvent(id: Int): Boolean {
+        return id % 3 == 0 // 1/3 확률로 공개 이벤트
     }
     
-    private fun getDummyCreatedAt(id: Int): String {
-        return "2024-01-01T00:00:00Z"
+    private fun getDummyImageCount(id: Int): Int {
+        return (1..5).random()
     }
     
-    private fun getDummyUpdatedAt(id: Int): String {
-        return "2024-01-01T00:00:00Z"
-    }
 }

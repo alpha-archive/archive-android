@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -47,10 +46,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.archiveandroid.feature.home.record.filter.RecordFilterSheet
 import com.example.archiveandroid.feature.home.record.input.RecordInputActivity
 import com.example.archiveandroid.feature.home.record.ui.RecordItem
+import com.example.archiveandroid.feature.home.record.ui.RecordItemMapper.toRecordItem
 import com.example.archiveandroid.feature.home.record.ui.RecordListItem
 import com.example.archiveandroid.feature.home.recorddetail.view.RecordDetailActivity
 
@@ -103,7 +103,9 @@ fun RecordScreen(
     var showFilter by remember { mutableStateOf(false) }
     
     // Paging 3 사용
-    val activities = viewModel.activities.collectAsLazyPagingItems()
+    val activities by viewModel.activities.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
     
     fun startRecordInputActivity() {
         val intent = Intent(context, RecordInputActivity::class.java)
@@ -182,43 +184,52 @@ fun RecordScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                items(
-                    count = activities.itemCount,
-                    key = { index -> activities[index]?.id ?: index }
-                ) { index ->
-                    val activity = activities[index]
-                    if (activity != null) {
-                        // ActivityDto를 RecordItem으로 변환
-                        val recordItem = RecordItem(
-                            id = activity.id,
-                            title = activity.title,
-                            location = activity.location,
-                            categoryLabel = activity.category,
-                            categoryBg = getCategoryColor(activity.category).first,
-                            categoryFg = getCategoryColor(activity.category).second
-                        )
-                        
-                        RecordListItem(
-                            item = recordItem,
-                            onClick = { startRecordDetailActivity(activity.id) },
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
-                    } else {
-                        // 로딩 상태 표시
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("로딩 중...", style = MaterialTheme.typography.bodyMedium)
-                        }
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("로딩 중...", style = MaterialTheme.typography.bodyMedium)
                     }
                 }
-                item { Spacer(modifier = Modifier.height(72.dp)) }
+                error != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("오류: $error", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+                activities.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("기록이 없습니다", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        items(
+                            count = activities.size,
+                            key = { index -> activities[index].id }
+                        ) { index ->
+                            val activity = activities[index]
+                            // ActivityDto를 RecordItem으로 변환
+                            val recordItem = activity.toRecordItem()
+                            
+                            RecordListItem(
+                                item = recordItem,
+                                onClick = { startRecordDetailActivity(activity.id) },
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                        item { Spacer(modifier = Modifier.height(72.dp)) }
+                    }
+                }
             }
         }
     }

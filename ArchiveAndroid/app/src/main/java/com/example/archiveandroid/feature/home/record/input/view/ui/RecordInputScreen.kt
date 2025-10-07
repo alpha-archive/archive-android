@@ -272,7 +272,7 @@ data class RecordDraft(
     val category: String = "MUSICAL",
     val title: String = "",
     val memo: String = "",
-    val location: String? = null,
+    val location: String = "",
     val activityDate: String? = null,
     val rating: Int? = null,
     val imageIds: List<String> = emptyList(),

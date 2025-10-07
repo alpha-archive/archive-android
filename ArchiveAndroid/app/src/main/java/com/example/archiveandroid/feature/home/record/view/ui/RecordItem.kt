@@ -32,6 +32,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 
 data class RecordItem(
     val id: String,
@@ -40,7 +42,8 @@ data class RecordItem(
     val categoryLabel: String,
     val categoryBg: Color,
     val categoryFg: Color,
-    val imagePainter: Painter? = null
+    val imagePainter: Painter? = null,
+    val thumbnailImageUrl: String? = null
 )
 
 @Composable
@@ -64,13 +67,31 @@ fun RecordListItem(
                     .height(180.dp)
                     .background(Color(0xFFE0E0E0)) // 기본 배경색
             ) {
-                val imagePainter = item.imagePainter ?: rememberDefaultImagePainter()
-                Image(
-                    painter = imagePainter,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.Crop
-                )
+                if (item.thumbnailImageUrl != null) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(item.thumbnailImageUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    val imagePainter = item.imagePainter ?: rememberDefaultImagePainter()
+                    Image(
+                        painter = imagePainter,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
             
             // 하단 정보 영역

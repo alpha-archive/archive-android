@@ -2,10 +2,8 @@ package com.example.archiveandroid.feature.home.record.data.remote.dto
 
 /**
  * Activity 목록 응답 DTO
- * Paging을 위한 cursor 정보 포함
+ * API 응답 형식에 맞춤
  */
 data class ActivityListResponse(
-    val activities: List<ActivityDto>,
-    val nextCursor: String?,
-    val hasMore: Boolean
+    val activities: List<ActivityDto>
 )

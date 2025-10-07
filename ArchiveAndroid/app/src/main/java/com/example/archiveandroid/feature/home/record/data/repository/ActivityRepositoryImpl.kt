@@ -4,13 +4,14 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.archiveandroid.core.repository.BaseRepository
-import com.example.archiveandroid.feature.home.record.data.paging.DummyRecordPagingSource
+import com.example.archiveandroid.feature.home.record.data.paging.RecordPagingSource
 import com.example.archiveandroid.feature.home.record.data.remote.ActivityApi
 import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityDto
 import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityListResponse
 import com.example.archiveandroid.feature.home.record.data.remote.dto.CreateActivityRequest
 import com.example.archiveandroid.feature.home.record.data.remote.dto.UpdateActivityRequest
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,24 +20,13 @@ class ActivityRepositoryImpl @Inject constructor(
     private val activityApi: ActivityApi
 ) : BaseRepository(), ActivityRepository {
     
-    override fun getActivitiesPaging(): Flow<PagingData<ActivityDto>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 10, // 더미 데이터이므로 작은 페이지 크기
-                enablePlaceholders = false,
-                prefetchDistance = 3
-            ),
-            pagingSourceFactory = { DummyRecordPagingSource() }
-        ).flow
+    override fun getActivitiesFlow(): Flow<Result<List<ActivityDto>>> = flow {
+        emit(getActivities())
     }
     
-    override suspend fun getActivities(
-        limit: Int,
-        cursor: String?,
-        category: String?
-    ): Result<ActivityListResponse> {
+    override suspend fun getActivities(): Result<List<ActivityDto>> {
         return handleApiCall {
-            activityApi.getActivities(limit, cursor, category)
+            activityApi.getActivities()
         }
     }
     

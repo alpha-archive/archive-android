@@ -12,13 +12,9 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 
 interface ActivityRepository {
-    fun getActivitiesPaging(): Flow<PagingData<ActivityDto>>
+    fun getActivitiesFlow(): Flow<Result<List<ActivityDto>>>
     
-    suspend fun getActivities(
-        limit: Int = 20,
-        cursor: String? = null,
-        category: String? = null
-    ): Result<ActivityListResponse>
+    suspend fun getActivities(): Result<List<ActivityDto>>
     
     suspend fun getActivity(id: String): Result<ActivityDto>
     

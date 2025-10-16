@@ -80,6 +80,9 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.material3)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.benchmark.common)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -114,4 +117,15 @@ dependencies {
 
     // poet버전 강제 통일
     implementation("com.squareup:javapoet:1.13.0")
+
+    // 이미지 로딩
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    
+    // Paging 3
+    implementation("androidx.paging:paging-runtime:3.2.1")
+    implementation("androidx.paging:paging-compose:3.2.1")
+    
+    // Material Design 3 Date/Time Pickers
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
 }

@@ -11,10 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.example.archiveandroid.core.ui.theme.ArchiveAndroidTheme
 import com.example.archiveandroid.feature.home.ui.HomeBottomBar
 import com.example.archiveandroid.feature.home.ui.HomeNavHost
-import com.example.archiveandroid.core.ui.theme.ArchiveAndroidTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

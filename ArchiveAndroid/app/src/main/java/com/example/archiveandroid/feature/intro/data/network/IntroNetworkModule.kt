@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
+import javax.inject.Named
 import javax.inject.Singleton
 
 /**
@@ -20,6 +21,6 @@ object IntroNetworkModule {
     
     @Provides
     @Singleton
-    fun provideAuthApi(retrofit: Retrofit): AuthApi =
+    fun provideAuthApi(@Named("AppRetrofit") retrofit: Retrofit): AuthApi =
         retrofit.create(AuthApi::class.java)
 }

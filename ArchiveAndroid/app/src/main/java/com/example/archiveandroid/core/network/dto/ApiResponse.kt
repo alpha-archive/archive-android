@@ -1,4 +1,4 @@
-package com.example.archiveandroid.feature.intro.data.remote.dto
+package com.example.archiveandroid.core.network.dto
 
 data class ApiResponse<T>(
     val success: Boolean,

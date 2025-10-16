@@ -9,7 +9,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -110,6 +112,7 @@ fun RecordScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
+    val selectedFilters by viewModel.selectedFilters.collectAsStateWithLifecycle()
     
 
     // Activity Result Launcher
@@ -167,12 +170,26 @@ fun RecordScreen(
                 },
                 actions = {
                     IconButton(onClick = { showFilter = true; onFilterClick() }) {
-                        Icon(
-                            painter = rememberAssetIconPainter("icons/filter.png"),
-                            contentDescription = "필터",
-                            modifier = Modifier.size(28.dp),
-                            tint = Color.Unspecified
-                        )
+                        Box {
+                            Icon(
+                                painter = rememberAssetIconPainter("icons/filter.png"),
+                                contentDescription = "필터",
+                                modifier = Modifier.size(28.dp),
+                                tint = if (selectedFilters.isNotEmpty()) Color(0xFF2196F3) else Color.Unspecified
+                            )
+                            // 필터가 적용되었을 때 작은 점 표시
+                            if (selectedFilters.isNotEmpty()) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(
+                                            Color(0xFF2196F3),
+                                            CircleShape
+                                        )
+                                        .align(Alignment.TopEnd)
+                                )
+                            }
+                        }
                     }
                 }
             )
@@ -231,7 +248,23 @@ fun RecordScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("기록이 없습니다", style = MaterialTheme.typography.bodyMedium)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = if (selectedFilters.isNotEmpty()) "선택한 카테고리의 기록이 없습니다" else "기록이 없습니다", 
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFF898989)
+                            )
+                            if (selectedFilters.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "다른 카테고리를 선택해보세요",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color(0xFF898989)
+                                )
+                            }
+                        }
                     }
                 }
                 else -> {
@@ -265,7 +298,14 @@ fun RecordScreen(
     }
 
     if (showFilter) {
-        RecordFilterSheet(onDismiss = { showFilter = false })
+        RecordFilterSheet(
+            onDismiss = { showFilter = false },
+            onFiltersApplied = { selectedIds ->
+                viewModel.updateFilters(selectedIds)
+                showFilter = false
+            },
+            selectedFilters = selectedFilters
+        )
     }
 }
 

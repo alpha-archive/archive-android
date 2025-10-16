@@ -43,6 +43,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 @Composable
 fun RecordFilterSheet(
     onDismiss: () -> Unit,
+    onFiltersApplied: (Set<String>) -> Unit,
+    selectedFilters: Set<String>,
     onDone: (() -> Unit)? = null,
     viewModel: RecordFilterViewModel = hiltViewModel()
 ) {
@@ -51,6 +53,12 @@ fun RecordFilterSheet(
 
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val maxSheetHeight = (screenHeight * 0.85f).dp
+
+    // 선택된 필터 상태를 초기화
+    LaunchedEffect(selectedFilters) {
+        // RecordFilterViewModel의 상태를 selectedFilters로 초기화
+        viewModel.initializeWithSelectedFilters(selectedFilters)
+    }
 
     LaunchedEffect(Unit) {
         if (sheetState.hasPartiallyExpandedState) {
@@ -72,7 +80,11 @@ fun RecordFilterSheet(
                 Text(
                     text = "완료",
                     color = Color(0xFF2196F3),
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp).clickable { onDone?.invoke() ?: onDismiss() }
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp).clickable { 
+                        val selectedIds = uiState.options.filter { it.selected }.map { it.id }.toSet()
+                        onFiltersApplied(selectedIds)
+                        onDone?.invoke()
+                    }
                 )
                 // Title centered, single line
                 Row(

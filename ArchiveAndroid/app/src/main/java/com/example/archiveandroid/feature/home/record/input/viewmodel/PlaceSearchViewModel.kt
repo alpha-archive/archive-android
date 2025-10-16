@@ -3,6 +3,7 @@ package com.example.archiveandroid.feature.home.record.input.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.archiveandroid.feature.home.record.input.data.repository.PlaceSearchRepository
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Place
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,44 +11,62 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class PlaceSearchUiState(
+    val searchResults: List<Place> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val searchQuery: String = ""
+)
+
 @HiltViewModel
 class PlaceSearchViewModel @Inject constructor(
     private val placeSearchRepository: PlaceSearchRepository
 ) : ViewModel() {
     
-    private val _searchResults = MutableStateFlow<List<com.example.archiveandroid.feature.home.record.input.data.remote.dto.PlaceDocument>>(emptyList())
-    val searchResults: StateFlow<List<com.example.archiveandroid.feature.home.record.input.data.remote.dto.PlaceDocument>> = _searchResults.asStateFlow()
-    
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-    
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
+    private val _uiState = MutableStateFlow(PlaceSearchUiState())
+    val uiState: StateFlow<PlaceSearchUiState> = _uiState.asStateFlow()
     
     fun searchPlaces(query: String) {
         if (query.isBlank()) {
-            _searchResults.value = emptyList()
+            _uiState.value = _uiState.value.copy(
+                searchResults = emptyList(),
+                searchQuery = query
+            )
             return
         }
         
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                error = null,
+                searchQuery = query
+            )
             
             placeSearchRepository.searchPlaces(query)
-                .onSuccess { response ->
-                    _searchResults.value = response.documents
+                .onSuccess { places ->
+                    _uiState.value = _uiState.value.copy(
+                        searchResults = places,
+                        isLoading = false
+                    )
                 }
                 .onFailure { exception ->
-                    _error.value = exception.message ?: "검색 중 오류가 발생했습니다."
-                    _searchResults.value = emptyList()
+                    _uiState.value = _uiState.value.copy(
+                        error = exception.message ?: "검색 중 오류가 발생했습니다.",
+                        searchResults = emptyList(),
+                        isLoading = false
+                    )
                 }
-            
-            _isLoading.value = false
         }
     }
     
     fun clearError() {
-        _error.value = null
+        _uiState.value = _uiState.value.copy(error = null)
+    }
+    
+    fun clearSearchResults() {
+        _uiState.value = _uiState.value.copy(
+            searchResults = emptyList(),
+            searchQuery = ""
+        )
     }
 }

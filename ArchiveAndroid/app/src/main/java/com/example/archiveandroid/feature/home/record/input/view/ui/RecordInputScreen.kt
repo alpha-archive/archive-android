@@ -72,7 +72,7 @@ import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Imag
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.example.archiveandroid.feature.home.record.input.view.ui.DateTimePicker
 import com.example.archiveandroid.feature.home.record.input.view.ui.LocationPicker
-import com.example.archiveandroid.feature.home.record.input.view.ui.Place
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Place
 import com.example.yourapp.ui.components.TopAppBar
 import java.io.File
 import java.text.SimpleDateFormat

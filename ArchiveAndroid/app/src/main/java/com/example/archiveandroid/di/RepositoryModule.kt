@@ -1,7 +1,5 @@
 package com.example.archiveandroid.di
 
-import com.example.archiveandroid.feature.home.record.input.data.repository.PlaceSearchRepository
-import com.example.archiveandroid.feature.home.record.input.data.repository.PlaceSearchRepositoryImpl
 import com.example.archiveandroid.feature.home.record.input.data.repository.RecordInputRepository
 import com.example.archiveandroid.feature.home.record.input.data.repository.RecordInputRepositoryImpl
 import com.example.archiveandroid.feature.home.recorddetail.data.repository.RecordDetailRepository
@@ -32,8 +30,4 @@ abstract class RepositoryModule {
         impl: RecordInputRepositoryImpl
     ): RecordInputRepository
 
-    @Binds
-    abstract fun bindPlaceSearchRepository(
-        impl: PlaceSearchRepositoryImpl
-    ): PlaceSearchRepository
 }

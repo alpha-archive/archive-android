@@ -39,15 +39,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.archiveandroid.feature.home.record.input.data.remote.dto.PlaceDocument
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Place
 import com.example.archiveandroid.feature.home.record.input.viewmodel.PlaceSearchViewModel
 
-data class Place(
-    val id: String,
-    val name: String,
-    val address: String,
-    val category: String? = null
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,9 +54,7 @@ fun LocationPicker(
     var showSearchDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     
-    val searchResults by viewModel.searchResults.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     
     val displayText = selectedPlace?.let { "${it.name} (${it.address})" } ?: "장소를 선택하세요"
     
@@ -138,7 +130,7 @@ fun LocationPicker(
                     Spacer(modifier = Modifier.padding(16.dp))
                     
                     // 로딩 상태
-                    if (isLoading) {
+                    if (uiState.isLoading) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -149,7 +141,7 @@ fun LocationPicker(
                         }
                     }
                     // 에러 상태 - 사용자 입력 텍스트를 주소로 사용
-                    else if (error != null && searchQuery.isNotBlank()) {
+                    else if (uiState.error != null && searchQuery.isNotBlank()) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -170,7 +162,13 @@ fun LocationPicker(
                                         val place = Place(
                                             id = "manual_${System.currentTimeMillis()}",
                                             name = searchQuery,
-                                            address = searchQuery
+                                            category = "기타",
+                                            phone = "",
+                                            address = searchQuery,
+                                            roadAddress = searchQuery,
+                                            longitude = "",
+                                            latitude = "",
+                                            distance = ""
                                         )
                                         onPlaceSelected(place)
                                         showSearchDialog = false
@@ -186,27 +184,21 @@ fun LocationPicker(
                         }
                     }
                     // 검색 결과
-                    else if (searchResults.isNotEmpty()) {
+                    else if (uiState.searchResults.isNotEmpty()) {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(300.dp)
                         ) {
-                            items(searchResults) { document ->
-                                PlaceDocumentItem(
-                                    document = document,
+                            items(uiState.searchResults) { place ->
+                                PlaceItem(
+                                    place = place,
                                     onClick = {
-                                        val place = Place(
-                                            id = document.id,
-                                            name = document.placeName,
-                                            address = document.addressName,
-                                            category = document.categoryName
-                                        )
                                         onPlaceSelected(place)
                                         showSearchDialog = false
                                     }
                                 )
-                                if (document != searchResults.last()) {
+                                if (place != uiState.searchResults.last()) {
                                     Divider()
                                 }
                             }
@@ -239,8 +231,8 @@ fun LocationPicker(
 }
 
 @Composable
-private fun PlaceDocumentItem(
-    document: PlaceDocument,
+private fun PlaceItem(
+    place: Place,
     onClick: () -> Unit
 ) {
     Row(
@@ -263,18 +255,18 @@ private fun PlaceDocumentItem(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = document.placeName,
+                text = place.name,
                 fontWeight = FontWeight.Medium,
                 fontSize = 14.sp,
                 color = Color(0xFF333333)
             )
             Text(
-                text = document.addressName,
+                text = place.address,
                 fontSize = 12.sp,
                 color = Color(0xFF898989)
             )
             Text(
-                text = document.categoryName,
+                text = place.category,
                 fontSize = 11.sp,
                 color = Color(0xFF646464)
             )

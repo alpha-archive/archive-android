@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -17,7 +18,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideActivityApi(
-        retrofit: Retrofit
+        @Named("AppRetrofit") retrofit: Retrofit
     ): ActivityApi {
         return retrofit.create(ActivityApi::class.java)
     }
@@ -26,7 +27,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideRecordDetailApi(
-        retrofit: Retrofit
+        @Named("AppRetrofit") retrofit: Retrofit
     ): RecordDetailApi {
         return retrofit.create(RecordDetailApi::class.java)
     }
@@ -34,7 +35,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideRecordInputApi(
-        retrofit: Retrofit
+        @Named("AppRetrofit") retrofit: Retrofit
     ): RecordInputApi {
         return retrofit.create(RecordInputApi::class.java)
     }

@@ -1,30 +1,43 @@
 package com.example.archiveandroid.feature.home.record.input.data.repository
 
-import com.example.archiveandroid.BuildConfig
-import com.example.archiveandroid.feature.home.record.input.data.remote.PlaceSearchApi
-import com.example.archiveandroid.feature.home.record.input.data.remote.dto.PlaceSearchResponse
+import com.example.archiveandroid.feature.home.record.input.data.remote.KakaoPlaceApi
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Place
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.toPlace
+import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PlaceSearchRepositoryImpl @Inject constructor(
-    private val placeSearchApi: PlaceSearchApi
+    private val kakaoPlaceApi: KakaoPlaceApi
 ) : PlaceSearchRepository {
-    
-    override suspend fun searchPlaces(query: String): Result<PlaceSearchResponse> {
+
+    override suspend fun searchPlaces(
+        query: String,
+        longitude: String?,
+        latitude: String?,
+        radius: Int?,
+        page: Int?,
+        size: Int?
+    ): Result<List<Place>> {
         return try {
-            val apiKey = BuildConfig.kakaoAppKey.ifEmpty { BuildConfig.kakaoAppKey }
-            android.util.Log.d("PlaceSearch", "Using API Key: $apiKey")
-            
-            val response = placeSearchApi.searchPlaces(
-                authorization = "KakaoAK $apiKey",
+            val response = kakaoPlaceApi.searchPlaces(
+                authorization = "KakaoAK ${System.getProperty("KAKAO_API_KEY", "YOUR_KAKAO_API_KEY")}",
                 query = query,
-                page = 1,
-                size = 15
+                longitude = longitude,
+                latitude = latitude,
+                radius = radius,
+                page = page,
+                size = size ?: 15
             )
-            Result.success(response)
+            
+            if (response.isSuccessful) {
+                val places = response.body()?.documents?.map { it.toPlace() } ?: emptyList()
+                Result.success(places)
+            } else {
+                Result.failure(Exception("API 호출 실패: ${response.code()} ${response.message()}"))
+            }
         } catch (e: Exception) {
-            android.util.Log.e("PlaceSearch", "Error: ${e.message}", e)
             Result.failure(e)
         }
     }

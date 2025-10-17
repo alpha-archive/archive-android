@@ -3,6 +3,7 @@ package com.example.archiveandroid.core.network
 import com.example.archiveandroid.feature.home.record.data.remote.ActivityApi
 import com.example.archiveandroid.feature.home.record.input.data.remote.RecordInputApi
 import com.example.archiveandroid.feature.home.recorddetail.data.remote.RecordDetailApi
+import com.example.archiveandroid.feature.home.recommend.data.remote.RecommendApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,5 +39,13 @@ object NetworkModule {
         @Named("AppRetrofit") retrofit: Retrofit
     ): RecordInputApi {
         return retrofit.create(RecordInputApi::class.java)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideRecommendApi(
+        @Named("AppRetrofit") retrofit: Retrofit
+    ): RecommendApi {
+        return retrofit.create(RecommendApi::class.java)
     }
 }

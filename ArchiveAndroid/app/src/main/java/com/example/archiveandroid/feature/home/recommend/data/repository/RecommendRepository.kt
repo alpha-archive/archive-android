@@ -1,0 +1,28 @@
+package com.example.archiveandroid.feature.home.recommend.data.repository
+
+import com.example.archiveandroid.feature.home.recommend.data.remote.dto.RecommendActivityDetailDto
+import com.example.archiveandroid.feature.home.recommend.data.remote.dto.RecommendActivityDto
+import com.example.archiveandroid.feature.home.recommend.data.remote.dto.RecommendRequest
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+
+interface RecommendRepository {
+    suspend fun getRecommendActivities(
+        cursor: String? = null,
+        size: Int? = null,
+        location: String? = null,
+        title: String? = null,
+        category: String? = null
+    ): Result<List<RecommendActivityDto>>
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RecommendDataModule {
+    @Binds
+    abstract fun bindRecommendRepository(
+        impl: RecommendRepositoryImpl
+    ): RecommendRepository
+}

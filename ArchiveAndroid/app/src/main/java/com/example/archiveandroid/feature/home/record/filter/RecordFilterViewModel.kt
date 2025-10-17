@@ -54,14 +54,16 @@ class RecordFilterViewModel : ViewModel() {
     private fun defaultCategoryOptions(): List<FilterOption> {
         // Pastel background with darker text color for readability
         return listOf(
-            FilterOption("여행", "여행", Color(0xFFE8F0FF), Color(0xFF335C99), false),
-            FilterOption("독서", "독서", Color(0xFFFFEFE6), Color(0xFFB04A17), false),
-            FilterOption("스포츠 관람", "스포츠 관람", Color(0xFFEAF5FF), Color(0xFF2C5A8A), false),
-            FilterOption("운동", "운동", Color(0xFFE7FFF2), Color(0xFF138A52), false),
-            FilterOption("전시", "전시", Color(0xFFFFF4E5), Color(0xFF9A6B1A), false),
-            FilterOption("봉사", "봉사", Color(0xFFEFF7FF), Color(0xFF2D6AA3), false),
-            FilterOption("뮤지컬", "뮤지컬", Color(0xFFF4E9FF), Color(0xFF6B39A6), false),
-            FilterOption("악기 연주", "악기 연주", Color(0xFFEFF9FF), Color(0xFF1F6E8C), false)
+            FilterOption("TRAVEL", "여행", Color(0xFFE8F0FF), Color(0xFF335C99), false),
+            FilterOption("READING", "독서", Color(0xFFFFEFE6), Color(0xFFB04A17), false),
+            FilterOption("SPORTS", "스포츠", Color(0xFFEAF5FF), Color(0xFF2C5A8A), false),
+            FilterOption("EXHIBITION", "전시", Color(0xFFFFF4E5), Color(0xFF9A6B1A), false),
+            FilterOption("VOLUNTEER", "봉사", Color(0xFFEFF7FF), Color(0xFF2D6AA3), false),
+            FilterOption("MUSICAL", "뮤지컬", Color(0xFFF4E9FF), Color(0xFF6B39A6), false),
+            FilterOption("THEATER", "연극", Color(0xFFEFF9FF), Color(0xFF1F6E8C), false),
+            FilterOption("CONCERT", "콘서트", Color(0xFFFFE8E8), Color(0xFFB04A17), false),
+            FilterOption("MOVIE", "영화", Color(0xFFE8F8E8), Color(0xFF138A52), false),
+            FilterOption("FESTIVAL", "축제", Color(0xFFFFF8E8), Color(0xFF9A6B1A), false)
         )
     }
 }

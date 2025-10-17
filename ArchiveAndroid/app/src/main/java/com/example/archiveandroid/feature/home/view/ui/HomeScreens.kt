@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.archiveandroid.feature.home.recommend.view.ui.RecommendScreen
 
 @Composable
 fun CenterLabel(text: String) {
@@ -19,7 +20,10 @@ fun CenterLabel(text: String) {
     }
 }
 
-@Composable fun RecommendScreen() { CenterLabel("추천") }
+@Composable 
+fun RecommendScreen() { 
+    com.example.archiveandroid.feature.home.recommend.view.ui.RecommendScreen()
+}
 @Composable fun ChatbotScreen() { CenterLabel("챗봇") }
 @Composable fun StatsScreen() { CenterLabel("통계") }
 @Composable fun UserScreen() { CenterLabel("사용자") }

@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
@@ -25,8 +27,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,20 +57,39 @@ fun RecommendScreen(
     viewModel: RecommendViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
-    var lastScroll by remember { mutableIntStateOf(0) }
+    val listState = rememberLazyListState()
     var showFilter by remember { mutableStateOf(false) }
 
     // 데이터 상태
     val recommendations by viewModel.recommendations.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val isLoadingMore by viewModel.isLoadingMore.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     val selectedFilters by viewModel.selectedFilters.collectAsStateWithLifecycle()
+    val hasNextPage by viewModel.hasNextPage.collectAsStateWithLifecycle()
 
-    LaunchedEffect(scrollState.value) {
-        val delta = scrollState.value - lastScroll
-        lastScroll = scrollState.value
+    // 무한스크롤을 위한 상태 체크
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            val lastVisibleItem = visibleItemsInfo.lastOrNull()
+            
+            if (lastVisibleItem == null) return@derivedStateOf false
+            
+            // 마지막 아이템이 보이고, 더 로드할 데이터가 있고, 현재 로딩 중이 아닐 때
+            lastVisibleItem.index >= recommendations.size - 3 && 
+            hasNextPage && 
+            !isLoadingMore
+        }
+    }
+
+    // 무한스크롤 트리거
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) {
+            viewModel.loadMoreRecommendations()
+        }
     }
 
     Scaffold(
@@ -159,14 +180,14 @@ fun RecommendScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     LazyColumn(
+                        state = listState,
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = innerPadding
                     ) {
-                        items(
-                            count = recommendations.size,
-                            key = { index -> recommendations[index].id }
-                        ) { index ->
-                            val recommendation = recommendations[index]
+                        itemsIndexed(
+                            items = recommendations,
+                            key = { _, recommendation -> recommendation.id }
+                        ) { index, recommendation ->
                             val listItem = recommendation.toListItem()
 
                             ListItemCard(
@@ -174,7 +195,23 @@ fun RecommendScreen(
                                 onClick = { onRecommendItemClick(recommendation.id) },
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                             )
+                            
+                            // 더 로드 중일 때 로딩 인디케이터 표시
+                            if (index == recommendations.size - 1 && isLoadingMore && hasNextPage) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
+                            }
                         }
+                        
+                        // 하단 여백
                         item { Spacer(modifier = Modifier.height(72.dp)) }
                     }
                 }

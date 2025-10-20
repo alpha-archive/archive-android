@@ -43,11 +43,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.archiveandroid.core.ui.components.ListItem
 import com.example.archiveandroid.core.ui.components.ListItemCard
+import com.example.archiveandroid.core.util.DateFormatter
 import com.example.archiveandroid.feature.home.recommend.view.RecommendViewModel
 import com.example.archiveandroid.feature.home.record.filter.RecordFilterSheet
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -282,15 +280,7 @@ private fun com.example.archiveandroid.feature.home.recommend.data.remote.dto.Re
     val (bgColor, fgColor) = getCategoryColor(categoryDisplayName)
     
     // 날짜 포맷팅
-    val dateText = try {
-        val startDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(this.startAt)
-        val endDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(this.endAt)
-        val startStr = SimpleDateFormat("yyyy/M/d", Locale.getDefault()).format(startDate ?: Date())
-        val endStr = SimpleDateFormat("yyyy/M/d", Locale.getDefault()).format(endDate ?: Date())
-        "$startStr ~ $endStr"
-    } catch (e: Exception) {
-        "$startAt ~ $endAt"
-    }
+    val dateText = DateFormatter.formatDateRange(this.startAt, this.endAt)
     
     // 위치 정보 생성
     val locationText = "$placeName ($placeDistrict)"

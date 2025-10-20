@@ -13,10 +13,14 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.example.archiveandroid.feature.home.recommend.detail.view.ui.RecommendDetailScreen
+import com.example.archiveandroid.feature.home.recommend.view.ui.RecommendScreen
 import com.example.archiveandroid.feature.home.record.RecordScreen
 
 enum class HomeRoute(val route: String) {
     Recommend("recommend"),
+    RecommendDetail("recommend_detail/{activityId}"),
     Record("record"),
     Chatbot("chatbot"),
     Stats("stats"),
@@ -58,7 +62,24 @@ fun HomeNavHost(
         startDestination = HomeRoute.Recommend.route,
         modifier = modifier
     ) {
-        composable(HomeRoute.Recommend.route) { RecommendScreen() }
+        composable(HomeRoute.Recommend.route) { 
+            RecommendScreen(
+                onRecommendItemClick = { activityId ->
+                    navController.navigate("recommend_detail/$activityId")
+                }
+            ) 
+        }
+        composable(
+            route = HomeRoute.RecommendDetail.route,
+            arguments = listOf(
+                navArgument("activityId") { type = androidx.navigation.NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val activityId = backStackEntry.arguments?.getString("activityId") ?: ""
+            RecommendDetailScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
         composable(HomeRoute.Record.route) { RecordScreen() }
         composable(HomeRoute.Chatbot.route) { ChatbotScreen() }
         composable(HomeRoute.Stats.route) { StatsScreen() }

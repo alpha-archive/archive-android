@@ -32,4 +32,10 @@ class RecommendRepositoryImpl @Inject constructor(
             response.content
         }
     }
+    
+    override suspend fun getRecommendActivityDetail(id: String): Result<RecommendActivityDetailDto> {
+        return handleApiCall {
+            recommendApi.getRecommendActivityDetail(id)
+        }
+    }
 }

@@ -16,6 +16,8 @@ interface RecommendRepository {
         title: String? = null,
         category: String? = null
     ): Result<List<RecommendActivityDto>>
+    
+    suspend fun getRecommendActivityDetail(id: String): Result<RecommendActivityDetailDto>
 }
 
 @Module

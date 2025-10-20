@@ -1,0 +1,256 @@
+package com.example.archiveandroid.core.ui.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+
+/**
+ * 상세화면 데이터 모델
+ */
+data class DetailScreenData(
+    val title: String,
+    val categoryDisplayName: String,
+    val activityDate: String,
+    val location: String,
+    val memo: String,
+    val images: List<String> = emptyList(),
+    val recommendationReason: String? = null // 추천 이유 (추천 상세화면에서만 사용)
+)
+
+/**
+ * 상세화면 상태
+ */
+data class DetailScreenState(
+    val isLoading: Boolean = false,
+    val isDeleting: Boolean = false,
+    val error: String? = null,
+    val data: DetailScreenData? = null
+)
+
+/**
+ * 공통 상세화면 레이아웃
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DetailScreenLayout(
+    state: DetailScreenState,
+    title: String,
+    showBack: Boolean = true,
+    showMenu: Boolean = false,
+    menuItems: List<String> = emptyList(),
+    onBack: () -> Unit = {},
+    onMenuClick: (String) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    var showDropdownMenu by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                navigationIcon = (if (showBack) {
+                    {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "뒤로가기"
+                            )
+                        }
+                    }
+                } else null)!!,
+                actions = (if (showMenu && menuItems.isNotEmpty()) {
+                    {
+                        Box {
+                            IconButton(onClick = { showDropdownMenu = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "메뉴"
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showDropdownMenu,
+                                onDismissRequest = { showDropdownMenu = false }
+                            ) {
+                                menuItems.forEach { item ->
+                                    DropdownMenuItem(
+                                        text = { Text(item) },
+                                        onClick = {
+                                            showDropdownMenu = false
+                                            onMenuClick(item)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else null)!!,
+                scrollBehavior = scrollBehavior
+            )
+        }
+    ) { innerPadding ->
+        when {
+            state.isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            state.isDeleting -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("삭제 중...")
+                }
+            }
+            state.error != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "오류: ${state.error}",
+                        color = Color.Red
+                    )
+                }
+            }
+            state.data != null -> {
+                LazyColumn(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(innerPadding)
+                        .padding(top = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // 이미지 섹션
+                    if (state.data.images.isNotEmpty()) {
+                        item {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(state.data.images.first())
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .width(330.dp)
+                                    .aspectRatio(4f / 3f)
+                                    .clip(RoundedCornerShape(10.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    } else {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .width(330.dp)
+                                    .aspectRatio(4f / 3f)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(Color(0xFFF5F5F5)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Image,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(48.dp),
+                                    tint = Color.Gray
+                                )
+                            }
+                        }
+                    }
+
+                    // 정보 섹션
+                    item {
+                        DetailInfoGroup {
+                            DetailRowInfo(label = "카테고리") {
+                                CategoryButton(text = state.data.categoryDisplayName)
+                            }
+                            DetailDivider()
+
+                            DetailRowInfo(label = "활동명", value = state.data.title)
+                            DetailDivider()
+
+                            DetailRowInfo(label = "날짜", value = state.data.activityDate)
+                            DetailDivider()
+
+                            DetailRowInfo(label = "위치", value = state.data.location)
+                            DetailDivider()
+
+                            // 추천 이유가 있는 경우 (추천 상세화면)
+                            if (state.data.recommendationReason != null) {
+                                DetailMemoSection(
+                                    label = "추천 이유",
+                                    memo = state.data.recommendationReason
+                                )
+                                DetailDivider()
+                            }
+
+                            DetailMemoSection(memo = state.data.memo)
+                        }
+                    }
+
+                    // 하단 여백
+                    item {
+                        Spacer(modifier = Modifier.padding(bottom = 72.dp))
+                    }
+                }
+            }
+            else -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("데이터가 없습니다")
+                }
+            }
+        }
+    }
+}

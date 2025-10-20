@@ -18,7 +18,11 @@ class RecommendRepositoryImpl @Inject constructor(
         size: Int?,
         location: String?,
         title: String?,
-        category: String?
+        category: String?,
+        startDate: String?,
+        endDate: String?,
+        city: String?,
+        district: String?
     ): Result<List<RecommendActivityDto>> {
         return handleApiCall {
             recommendApi.getRecommendActivities(
@@ -26,7 +30,11 @@ class RecommendRepositoryImpl @Inject constructor(
                 size = size,
                 location = location,
                 title = title,
-                category = category
+                category = category,
+                startDate = startDate,
+                endDate = endDate,
+                city = city,
+                district = district
             )
         }.map { response ->
             response.content

@@ -15,7 +15,11 @@ interface RecommendApi {
         @Query("size") size: Int? = null,
         @Query("location") location: String? = null,
         @Query("title") title: String? = null,
-        @Query("category") category: String? = null
+        @Query("category") category: String? = null,
+        @Query("startDate") startDate: String? = null,
+        @Query("endDate") endDate: String? = null,
+        @Query("city") city: String? = null,
+        @Query("district") district: String? = null
     ): Response<ApiResponse<RecommendActivityListResponse>>
     
     @GET("api/recommendations/activities/{id}")

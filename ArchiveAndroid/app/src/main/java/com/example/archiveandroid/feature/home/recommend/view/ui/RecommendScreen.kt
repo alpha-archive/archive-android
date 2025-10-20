@@ -1,5 +1,8 @@
 package com.example.archiveandroid.feature.home.recommend.view.ui
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,8 +47,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.archiveandroid.core.ui.components.ListItem
 import com.example.archiveandroid.core.ui.components.ListItemCard
 import com.example.archiveandroid.core.util.DateFormatter
+import com.example.archiveandroid.feature.home.recommend.filter.RecommendFilterActivity
+import com.example.archiveandroid.feature.home.recommend.filter.RecommendFilterData
 import com.example.archiveandroid.feature.home.recommend.view.RecommendViewModel
-import com.example.archiveandroid.feature.home.record.filter.RecordFilterSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +60,20 @@ fun RecommendScreen(
 ) {
     val context = LocalContext.current
     val listState = rememberLazyListState()
-    var showFilter by remember { mutableStateOf(false) }
+    var currentFilters by remember { mutableStateOf(RecommendFilterData()) }
+    
+    // 필터 Activity 런처
+    val filterLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val filterData = result.data?.getSerializableExtra("filter_data") as? RecommendFilterData
+            if (filterData != null) {
+                currentFilters = filterData
+                viewModel.applyFilters(filterData)
+            }
+        }
+    }
 
     // 데이터 상태
     val recommendations by viewModel.recommendations.collectAsStateWithLifecycle()
@@ -64,7 +81,6 @@ fun RecommendScreen(
     val isLoadingMore by viewModel.isLoadingMore.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
-    val selectedFilters by viewModel.selectedFilters.collectAsStateWithLifecycle()
     val hasNextPage by viewModel.hasNextPage.collectAsStateWithLifecycle()
 
     // 무한스크롤을 위한 상태 체크
@@ -105,16 +121,31 @@ fun RecommendScreen(
                     )
                 },
                 actions = {
-                    IconButton(onClick = { showFilter = true; onFilterClick() }) {
+                    IconButton(onClick = { 
+                        val currentFilters = viewModel.getCurrentFilters()
+                        val intent = RecommendFilterActivity.createIntent(context, currentFilters)
+                        filterLauncher.launch(intent)
+                        onFilterClick() 
+                    }) {
                         Box {
+                            val hasActiveFilters = currentFilters.selectedCategory.isNotEmpty() || 
+                                                   currentFilters.startYear.isNotEmpty() || 
+                                                   currentFilters.startMonth.isNotEmpty() ||
+                                                   currentFilters.startDay.isNotEmpty() ||
+                                                   currentFilters.endYear.isNotEmpty() ||
+                                                   currentFilters.endMonth.isNotEmpty() ||
+                                                   currentFilters.endDay.isNotEmpty() ||
+                                                   currentFilters.city.isNotEmpty() ||
+                                                   currentFilters.district.isNotEmpty()
+                            
                             Icon(
                                 imageVector = Icons.Default.FilterList,
                                 contentDescription = "필터",
                                 modifier = Modifier.size(28.dp),
-                                tint = if (selectedFilters.isNotEmpty()) Color(0xFF2196F3) else Color.Unspecified
+                                tint = if (hasActiveFilters) Color(0xFF2196F3) else Color.Unspecified
                             )
                             // 필터가 적용되었을 때 작은 점 표시
-                            if (selectedFilters.isNotEmpty()) {
+                            if (hasActiveFilters) {
                                 Box(
                                     modifier = Modifier
                                         .size(8.dp)
@@ -158,11 +189,11 @@ fun RecommendScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = if (selectedFilters.isNotEmpty()) "선택한 카테고리의 추천이 없습니다" else "추천 활동이 없습니다", 
+                            text = if (currentFilters.selectedCategory.isNotEmpty()) "선택한 카테고리의 추천이 없습니다" else "추천 활동이 없습니다", 
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color(0xFF898989)
                         )
-                        if (selectedFilters.isNotEmpty()) {
+                        if (currentFilters.selectedCategory.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "다른 카테고리를 선택해보세요",
@@ -217,16 +248,6 @@ fun RecommendScreen(
         }
     }
 
-    if (showFilter) {
-        RecordFilterSheet(
-            onDismiss = { showFilter = false },
-            onFiltersApplied = { selectedIds ->
-                viewModel.updateFilters(selectedIds)
-                showFilter = false
-            },
-            selectedFilters = selectedFilters
-        )
-    }
 }
 
 /**

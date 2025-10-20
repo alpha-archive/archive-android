@@ -14,7 +14,11 @@ interface RecommendRepository {
         size: Int? = null,
         location: String? = null,
         title: String? = null,
-        category: String? = null
+        category: String? = null,
+        startDate: String? = null,
+        endDate: String? = null,
+        city: String? = null,
+        district: String? = null
     ): Result<List<RecommendActivityDto>>
     
     suspend fun getRecommendActivityDetail(id: String): Result<RecommendActivityDetailDto>

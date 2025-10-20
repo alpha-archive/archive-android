@@ -4,12 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.archiveandroid.feature.home.recommend.data.repository.RecommendRepository
 import com.example.archiveandroid.feature.home.recommend.data.remote.dto.RecommendActivityDto
+import com.example.archiveandroid.feature.home.recommend.filter.RecommendFilterData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,31 +20,15 @@ class RecommendViewModel @Inject constructor(
     // 원본 데이터
     private val _allRecommendations = MutableStateFlow<List<RecommendActivityDto>>(emptyList())
     
-    // 선택된 필터 카테고리들
-    private val _selectedFilters = MutableStateFlow<Set<String>>(emptySet())
+    // 현재 적용된 필터
+    private val _currentFilters = MutableStateFlow<RecommendFilterData>(RecommendFilterData())
     
     // 페이지네이션 상태
     private val _currentCursor = MutableStateFlow<String?>(null)
     private val _hasNextPage = MutableStateFlow(true)
     
-    // 필터링된 데이터 (combine으로 자동 업데이트)
-    val recommendations: StateFlow<List<RecommendActivityDto>> = combine(
-        _allRecommendations,
-        _selectedFilters
-    ) { allRecommendations, selectedFilters ->
-        if (selectedFilters.isEmpty()) {
-            allRecommendations
-        } else {
-            allRecommendations.filter { recommendation ->
-                // 카테고리 enum 값으로 비교 (MUSICAL, THEATER 등)
-                selectedFilters.contains(recommendation.category)
-            }
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
+    // 추천 데이터 (필터는 API 레벨에서 처리)
+    val recommendations: StateFlow<List<RecommendActivityDto>> = _allRecommendations.asStateFlow()
     
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -74,9 +57,19 @@ class RecommendViewModel @Inject constructor(
             loadingState.value = true
             _error.value = null
             
+            val filters = _currentFilters.value
             recommendRepository.getRecommendActivities(
                 cursor = cursor,
-                size = 20 // 페이지 크기
+                size = 20, // 페이지 크기
+                category = if (filters.selectedCategory.isNotEmpty()) filters.selectedCategory else null,
+                startDate = if (filters.startYear.isNotEmpty() && filters.startMonth.isNotEmpty() && filters.startDay.isNotEmpty()) {
+                    "${filters.startYear}-${filters.startMonth.padStart(2, '0')}-${filters.startDay.padStart(2, '0')}"
+                } else null,
+                endDate = if (filters.endYear.isNotEmpty() && filters.endMonth.isNotEmpty() && filters.endDay.isNotEmpty()) {
+                    "${filters.endYear}-${filters.endMonth.padStart(2, '0')}-${filters.endDay.padStart(2, '0')}"
+                } else null,
+                city = if (filters.city.isNotEmpty()) filters.city else null,
+                district = if (filters.district.isNotEmpty()) filters.district else null
             )
                 .onSuccess { recommendations ->
                     if (append) {
@@ -105,6 +98,17 @@ class RecommendViewModel @Inject constructor(
         _currentCursor.value = null
         _hasNextPage.value = true
         loadRecommendations(_isLoading, cursor = null, append = false)
+    }
+    
+    fun applyFilters(filters: RecommendFilterData) {
+        _currentFilters.value = filters
+        _currentCursor.value = null
+        _hasNextPage.value = true
+        loadRecommendations(_isLoading, cursor = null, append = false)
+    }
+    
+    fun getCurrentFilters(): RecommendFilterData {
+        return _currentFilters.value
     }
     
     fun loadMoreRecommendations() {
@@ -155,14 +159,4 @@ class RecommendViewModel @Inject constructor(
         }
     }
     
-    // 필터 관련 함수들
-    fun updateFilters(selectedCategoryIds: Set<String>) {
-        _selectedFilters.value = selectedCategoryIds
-    }
-    
-    fun clearFilters() {
-        _selectedFilters.value = emptySet()
-    }
-    
-    val selectedFilters: StateFlow<Set<String>> = _selectedFilters.asStateFlow()
 }

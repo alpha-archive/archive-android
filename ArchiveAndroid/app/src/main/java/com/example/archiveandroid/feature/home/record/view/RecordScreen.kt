@@ -1,7 +1,6 @@
 package com.example.archiveandroid.feature.home.record
 import android.app.Activity
 import android.content.Intent
-import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -23,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -43,9 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -172,7 +169,7 @@ fun RecordScreen(
                     IconButton(onClick = { showFilter = true; onFilterClick() }) {
                         Box {
                             Icon(
-                                painter = rememberAssetIconPainter("icons/filter.png"),
+                                imageVector = Icons.Default.FilterList,
                                 contentDescription = "필터",
                                 modifier = Modifier.size(28.dp),
                                 tint = if (selectedFilters.isNotEmpty()) Color(0xFF2196F3) else Color.Unspecified
@@ -328,15 +325,5 @@ private fun getCategoryColor(category: String): Pair<Color, Color> {
     }
 }
 
-@Composable
-private fun rememberAssetIconPainter(assetPath: String): Painter {
-    val context = LocalContext.current
-    val bitmap = remember(assetPath) {
-        context.assets.open(assetPath).use { input ->
-            BitmapFactory.decodeStream(input)
-        }
-    }
-    return remember(bitmap) { BitmapPainter(bitmap.asImageBitmap()) }
-}
 
 

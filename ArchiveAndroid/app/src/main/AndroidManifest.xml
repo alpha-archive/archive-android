@@ -35,6 +35,8 @@
             android:exported="true" />
         <activity android:name=".feature.home.record.input.RecordInputActivity"
             android:exported="false" />
+        <activity android:name=".feature.home.recommend.filter.RecommendFilterActivity"
+            android:exported="false" />
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true"

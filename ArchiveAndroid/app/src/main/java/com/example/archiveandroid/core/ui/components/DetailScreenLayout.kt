@@ -1,6 +1,7 @@
 package com.example.archiveandroid.core.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
@@ -91,6 +93,8 @@ fun DetailScreenLayout(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var showDropdownMenu by remember { mutableStateOf(false) }
+    var showImageViewer by remember { mutableStateOf(false) }
+    var selectedImageIndex by remember { mutableStateOf(0) }
 
     Scaffold(
         topBar = {
@@ -202,7 +206,11 @@ fun DetailScreenLayout(
                                         modifier = Modifier
                                             .width(imageWidth)
                                             .aspectRatio(4f / 3f)
-                                            .clip(RoundedCornerShape(10.dp)),
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .clickable {
+                                                selectedImageIndex = page
+                                                showImageViewer = true
+                                            },
                                         contentScale = ContentScale.Crop
                                     )
                                 }
@@ -292,6 +300,82 @@ fun DetailScreenLayout(
                     contentAlignment = Alignment.Center
                 ) {
                     Text("데이터가 없습니다")
+                }
+            }
+        }
+    }
+    
+    // 전체화면 이미지 뷰어
+    if (showImageViewer && state.data?.images?.isNotEmpty() == true) {
+        FullScreenImageViewer(
+            images = state.data.images,
+            initialIndex = selectedImageIndex,
+            onDismiss = { showImageViewer = false }
+        )
+    }
+}
+
+/**
+ * 전체화면 이미지 뷰어
+ */
+@Composable
+private fun FullScreenImageViewer(
+    images: List<String>,
+    initialIndex: Int,
+    onDismiss: () -> Unit
+) {
+    val pagerState = rememberPagerState(
+        initialPage = initialIndex,
+        pageCount = { images.size }
+    )
+    
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.3f))
+            .clickable { onDismiss() }
+    ) {
+        // 이미지 페이저
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(images[page])
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable { onDismiss() },
+                    contentScale = ContentScale.Fit
+                )
+            }
+        }
+        
+        // 인디케이터
+        if (images.size > 1) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 32.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                repeat(images.size) { index ->
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(
+                                color = if (index == pagerState.currentPage) 
+                                    Color.White else Color.White.copy(alpha = 0.5f),
+                                shape = CircleShape
+                            )
+                    )
                 }
             }
         }

@@ -62,6 +62,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -69,10 +70,10 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
+import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Place
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.example.archiveandroid.feature.home.record.input.view.ui.DateTimePicker
 import com.example.archiveandroid.feature.home.record.input.view.ui.LocationPicker
-import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Place
 import com.example.yourapp.ui.components.TopAppBar
 import java.io.File
 import java.text.SimpleDateFormat
@@ -112,7 +113,53 @@ fun RecordInputScreen(
         }
     }
 
-    val categories = listOf("여행", "공부", "운동", "전시", "뮤지컬")
+    val categories = listOf(
+        "체험", "전시", "뮤지컬", "연극", "영화", "콘서트", 
+        "축제", "워크샵", "스포츠", "여행", "독서", "요리",
+        "봉사", "취미", "스터디", "네트워킹", "기타"
+    )
+    
+    // 카테고리 표시명 매핑
+    val categoryDisplayNames = mapOf(
+        "EXPERIENCE" to "체험",
+        "EXHIBITION" to "전시", 
+        "MUSICAL" to "뮤지컬",
+        "THEATER" to "연극",
+        "MOVIE" to "영화",
+        "CONCERT" to "콘서트",
+        "FESTIVAL" to "축제",
+        "WORKSHOP" to "워크샵",
+        "SPORTS" to "스포츠",
+        "TRAVEL" to "여행",
+        "READING" to "독서",
+        "COOKING" to "요리",
+        "VOLUNTEER" to "봉사",
+        "HOBBY" to "취미",
+        "STUDY" to "스터디",
+        "NETWORKING" to "네트워킹",
+        "ETC" to "기타"
+    )
+    
+    // 카테고리 표시명을 실제 값으로 변환하는 매핑
+    val categoryValues = mapOf(
+        "체험" to "EXPERIENCE",
+        "전시" to "EXHIBITION",
+        "뮤지컬" to "MUSICAL", 
+        "연극" to "THEATER",
+        "영화" to "MOVIE",
+        "콘서트" to "CONCERT",
+        "축제" to "FESTIVAL",
+        "워크샵" to "WORKSHOP",
+        "스포츠" to "SPORTS",
+        "여행" to "TRAVEL",
+        "독서" to "READING",
+        "요리" to "COOKING",
+        "봉사" to "VOLUNTEER",
+        "취미" to "HOBBY",
+        "스터디" to "STUDY",
+        "네트워킹" to "NETWORKING",
+        "기타" to "ETC"
+    )
 
     val textfieldColors = colors(
         focusedContainerColor = Color.Transparent,
@@ -148,13 +195,11 @@ fun RecordInputScreen(
                                category = draft.category,
                                location = draft.location,
                                activityDate = draft.activityDate?.let { dateStr ->
-                                   // yyyy-MM-dd 형식을 yyyy-MM-ddT00:00:00.000Z 형식으로 변환
                                    "${dateStr}T00:00:00.000Z"
                                },
                                rating = draft.rating,
                                memo = draft.memo,
                                imageIds = ui.uploadedImages.map { it.id },
-                            //    publicEventId = draft.publicEventId
                            )
                            onSave(req)
                     },
@@ -193,9 +238,10 @@ fun RecordInputScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     CategoryInput(
                         categories = categories,
-                        selected = draft.category,
-                        onSelect = {
-//                            draft = draft.copy(category = it)
+                        selected = categoryDisplayNames[draft.category] ?: draft.category,
+                        onSelect = { displayName ->
+                            val categoryValue = categoryValues[displayName] ?: displayName
+                            draft = draft.copy(category = categoryValue)
                         }
                     )
                 }
@@ -285,7 +331,7 @@ fun RecordInputScreen(
 
 data class RecordDraft(
     val imageUri: Uri? = null,
-    val category: String = "MUSICAL",
+    val category: String = "",
     val title: String = "",
     val memo: String = "",
     val location: String = "",
@@ -481,6 +527,8 @@ fun CategoryInput(
 ) {
     var query by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
 
     val suggestions = remember(query, categories) {
         if (query.isBlank()) categories
@@ -498,17 +546,18 @@ fun CategoryInput(
             onExpandedChange = { expanded = it },
             modifier = Modifier
                 .alignByBaseline()
-                .width(100.dp)
+                .width(200.dp)
                 .heightIn(35.dp)
         ) {
             TextField(
-                value = query,
-                onValueChange = { query = it; expanded = true },
+                value = selected ?: "",
+                onValueChange = { },
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier
                     .menuAnchor()
-                    .fillMaxWidth(),
-                placeholder = { Text("검색",  fontSize = 15.sp) },
+                    .fillMaxWidth()
+                    .clickable { expanded = true },
+                placeholder = { Text("",  fontSize = 15.sp) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -517,6 +566,7 @@ fun CategoryInput(
                 },
                 singleLine = true,
                 textStyle = TextStyle( fontSize = 15.sp),
+                readOnly = true,
                 colors = colors(
                     focusedContainerColor = Color(0xFFD9D9D9),
                     unfocusedContainerColor = Color(0xFFD9D9D9),
@@ -532,8 +582,10 @@ fun CategoryInput(
             )
 
             ExposedDropdownMenu(
-                expanded = expanded && (suggestions.isNotEmpty() || query.isNotBlank()),
-                onDismissRequest = { expanded = false }
+                expanded = expanded,
+                onDismissRequest = { 
+                    expanded = false
+                }
             ) {
                 suggestions.forEach { item ->
                     DropdownMenuItem(
@@ -548,7 +600,7 @@ fun CategoryInput(
                 if (suggestions.isEmpty() && query.isNotBlank()) {
                     Divider()
                     DropdownMenuItem(
-                        text = { Text("“$query” 새로 만들기") },
+                        text = { Text("$query 새로 만들기") },
                         onClick = {
                             onSelect(query)
                             query = ""

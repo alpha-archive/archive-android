@@ -1,5 +1,7 @@
 package com.example.archiveandroid.di
 
+import com.example.archiveandroid.feature.home.chatbot.data.repository.ChatbotRepository
+import com.example.archiveandroid.feature.home.chatbot.data.repository.ChatbotRepositoryImpl
 import com.example.archiveandroid.feature.home.record.input.data.repository.RecordInputRepository
 import com.example.archiveandroid.feature.home.record.input.data.repository.RecordInputRepositoryImpl
 import com.example.archiveandroid.feature.home.recorddetail.data.repository.RecordDetailRepository
@@ -29,5 +31,10 @@ abstract class RepositoryModule {
     abstract fun bindRecordInputRepository(
         impl: RecordInputRepositoryImpl
     ): RecordInputRepository
+
+    @Binds
+    abstract fun bindChatbotRepository(
+        impl: ChatbotRepositoryImpl
+    ): ChatbotRepository
 
 }

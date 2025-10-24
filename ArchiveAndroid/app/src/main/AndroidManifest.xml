@@ -37,6 +37,8 @@
             android:exported="false" />
         <activity android:name=".feature.home.recommend.filter.RecommendFilterActivity"
             android:exported="false" />
+        <activity android:name=".feature.home.recommend.detail.view.RecommendDetailActivity"
+            android:exported="false" />
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true"

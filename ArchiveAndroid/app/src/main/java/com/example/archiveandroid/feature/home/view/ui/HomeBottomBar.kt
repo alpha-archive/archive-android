@@ -43,7 +43,12 @@ fun HomeBottomBar(
                         tint = Color.Unspecified
                     )
                 },
-                label = { Text(dest.label) },
+                label = { 
+                    Text(
+                        text = dest.label,
+                        style = MaterialTheme.typography.labelSmall
+                    ) 
+                },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = MaterialTheme.colorScheme.surface
                 )

@@ -50,6 +50,33 @@ object DateFormatter {
     }
     
     /**
+     * yyyy-MM-dd 또는 yyyy-MM-ddTHH:mm:ss 형식을 yyyy/M/d 형식으로 변환
+     * T 이후의 시간 부분은 제거됨 (parseISODate 재사용)
+     */
+    fun formatToDisplayDate(dateString: String): String {
+        return try {
+            val date = parseISODate(dateString)
+            val formatter = SimpleDateFormat(DISPLAY_DATE_RANGE_FORMAT, Locale.getDefault())
+            formatter.format(date)
+        } catch (e: Exception) {
+            // 파싱 실패 시 T 이후만 제거해서 반환
+            extractDateOnly(dateString)
+        }
+    }
+    
+    /**
+     * yyyy-MM-dd 또는 yyyy-MM-ddTHH:mm:ss 형식에서 yyyy-MM-dd만 추출
+     * T 이후의 시간 부분은 제거됨
+     */
+    fun extractDateOnly(dateString: String): String {
+        return if (dateString.contains("T")) {
+            dateString.substringBefore("T")
+        } else {
+            dateString
+        }
+    }
+    
+    /**
      * ISO 날짜 문자열을 Date 객체로 파싱
      */
     private fun parseISODate(dateString: String): Date {

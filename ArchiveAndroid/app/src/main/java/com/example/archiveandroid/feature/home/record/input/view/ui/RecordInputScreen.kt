@@ -42,6 +42,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -63,10 +64,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
@@ -206,7 +205,10 @@ fun RecordInputScreen(
                     enabled = !ui.submitting,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("저장")
+                    Text(
+                        text = "저장",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         },
@@ -293,10 +295,12 @@ fun RecordInputScreen(
                         }
                     )
                     if (selectedPlace == null) {
-                        Text("사진 업로드 시 자동 등록",
+                        Text(
+                            text = "사진 업로드 시 자동 등록",
                             color = Color(0xFF898989),
-                            fontWeight = FontWeight.Light,
-                            fontSize = 12.sp,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Light
+                            ),
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }
@@ -474,7 +478,7 @@ private fun PhotoInput(
                             Text(
                                 text = "업로드 중...",
                                 color = Color.White,
-                                fontSize = 14.sp
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
@@ -557,7 +561,7 @@ fun CategoryInput(
                     .menuAnchor()
                     .fillMaxWidth()
                     .clickable { expanded = true },
-                placeholder = { Text("",  fontSize = 15.sp) },
+                placeholder = { Text("", style = MaterialTheme.typography.bodyMedium) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -565,7 +569,7 @@ fun CategoryInput(
                     )
                 },
                 singleLine = true,
-                textStyle = TextStyle( fontSize = 15.sp),
+                textStyle = MaterialTheme.typography.bodyMedium,
                 readOnly = true,
                 colors = colors(
                     focusedContainerColor = Color(0xFFD9D9D9),
@@ -589,7 +593,12 @@ fun CategoryInput(
             ) {
                 suggestions.forEach { item ->
                     DropdownMenuItem(
-                        text = { Text(item) },
+                        text = { 
+                            Text(
+                                text = item,
+                                style = MaterialTheme.typography.bodyMedium
+                            ) 
+                        },
                         onClick = {
                             onSelect(item)
                             query = ""
@@ -600,7 +609,12 @@ fun CategoryInput(
                 if (suggestions.isEmpty() && query.isNotBlank()) {
                     Divider()
                     DropdownMenuItem(
-                        text = { Text("$query 새로 만들기") },
+                        text = { 
+                            Text(
+                                text = "$query 새로 만들기",
+                                style = MaterialTheme.typography.bodyMedium
+                            ) 
+                        },
                         onClick = {
                             onSelect(query)
                             query = ""
@@ -626,7 +640,9 @@ private fun RowInfoInput(
     ) {
         Text(
             text = label,
-            style = TextStyle( fontWeight = FontWeight.Normal, fontSize = 18.sp),
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Normal
+            ),
             modifier = Modifier.alignByBaseline()
         )
         Spacer(Modifier.width(16.dp))

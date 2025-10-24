@@ -1,6 +1,7 @@
 package com.example.archiveandroid.feature.home.recommend.view.ui
 
 import android.app.Activity
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -41,12 +42,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.archiveandroid.core.ui.components.ListItem
 import com.example.archiveandroid.core.ui.components.ListItemCard
 import com.example.archiveandroid.core.util.DateFormatter
+import com.example.archiveandroid.feature.home.recommend.detail.view.RecommendDetailActivity
 import com.example.archiveandroid.feature.home.recommend.filter.RecommendFilterActivity
 import com.example.archiveandroid.feature.home.recommend.filter.RecommendFilterData
 import com.example.archiveandroid.feature.home.recommend.view.RecommendViewModel
@@ -73,6 +74,13 @@ fun RecommendScreen(
                 viewModel.applyFilters(filterData)
             }
         }
+    }
+    
+    // 추천 상세 Activity 런처
+    val recommendDetailLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        // 추천 상세에서 돌아왔을 때 처리 (필요시)
     }
 
     // 데이터 상태
@@ -115,7 +123,6 @@ fun RecommendScreen(
                         text = "나를 위한 추천 활동",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
                         ),
                         maxLines = 1
                     )
@@ -177,7 +184,10 @@ fun RecommendScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("오류: $error", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = "오류: $error", 
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
             recommendations.isEmpty() -> {
@@ -221,7 +231,12 @@ fun RecommendScreen(
 
                             ListItemCard(
                                 item = listItem,
-                                onClick = { onRecommendItemClick(recommendation.id) },
+                                onClick = { 
+                                    val intent = Intent(context, RecommendDetailActivity::class.java).apply {
+                                        putExtra("activityId", recommendation.id)
+                                    }
+                                    recommendDetailLauncher.launch(intent)
+                                },
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                             )
                             
@@ -315,6 +330,8 @@ private fun com.example.archiveandroid.feature.home.recommend.data.remote.dto.Re
         categoryFg = fgColor,
         thumbnailImageUrl = null, // API에서 이미지 URL이 없으므로 null
         date = dateText,
-        recommendationReason = null // API에서 추천 이유가 없으므로 null
+        recommendationReason = null, // API에서 추천 이유가 없으므로 null
+        startAt = this.startAt,
+        endAt = this.endAt
     )
 }

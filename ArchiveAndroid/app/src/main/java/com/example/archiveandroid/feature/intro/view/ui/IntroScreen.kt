@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 object IntroScreen {
     @Composable
@@ -30,7 +30,7 @@ object IntroScreen {
         ) {
             Text(
                 text = "로딩 중...",
-                fontSize = 18.sp
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }
@@ -51,7 +51,7 @@ object IntroScreen {
                 // 서브 타이틀
                 Text(
                     text = "오프라인을 기록하다,",
-                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.bodyLarge,
                     color = Color.Gray,
                     textAlign = TextAlign.Center
                 )
@@ -61,8 +61,9 @@ object IntroScreen {
                 // 앱 로고 또는 제목
                 Text(
                     text = "Archive",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
                     textAlign = TextAlign.Center
                 )
             }
@@ -72,7 +73,7 @@ object IntroScreen {
                 Text(
                     text = error,
                     color = Color.Red,
-                    fontSize = 14.sp,
+                    style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -96,8 +97,9 @@ object IntroScreen {
                 Text(
                     text = "카카오 로그인",
                     color = Color(0xFF000000),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Medium
+                    )
                 )
             }
         }

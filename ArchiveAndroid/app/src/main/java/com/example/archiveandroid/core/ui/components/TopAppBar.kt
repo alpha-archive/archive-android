@@ -27,7 +27,12 @@ fun TopAppBar(
     var menuOpen by remember { mutableStateOf(false) }
 
     TopAppBar(
-        title = { Text(title) },
+        title = { 
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge
+            ) 
+        },
         navigationIcon = {
             if (showBack) {
                 IconButton(onClick = { onBackClick?.invoke() }) {
@@ -48,7 +53,12 @@ fun TopAppBar(
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                     menuItems.forEach { item ->
                         DropdownMenuItem(
-                            text = { Text(item.label) },
+                            text = { 
+                                Text(
+                                    text = item.label,
+                                    style = MaterialTheme.typography.bodyMedium
+                                ) 
+                            },
                             onClick = {
                                 menuOpen = false
                                 item.onClick()
@@ -75,7 +85,12 @@ fun CenteredAppTopBar(
     var menuOpen by remember { mutableStateOf(false) }
 
     CenterAlignedTopAppBar(
-        title = { Text(title) },
+        title = { 
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge
+            ) 
+        },
         navigationIcon = {
             if (showBack) {
                 IconButton(onClick = { onBackClick?.invoke() }) {
@@ -95,7 +110,12 @@ fun CenteredAppTopBar(
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                     menuItems.forEach { item ->
                         DropdownMenuItem(
-                            text = { Text(item.label) },
+                            text = { 
+                                Text(
+                                    text = item.label,
+                                    style = MaterialTheme.typography.bodyMedium
+                                ) 
+                            },
                             onClick = {
                                 menuOpen = false
                                 item.onClick()

@@ -43,10 +43,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
@@ -129,7 +127,8 @@ fun RecommendDetailScreenLayout(
                 ) {
                     Text(
                         text = "오류: ${state.error}",
-                        color = Color.Red
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
@@ -234,7 +233,10 @@ fun RecommendDetailScreenLayout(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("데이터가 없습니다")
+                    Text(
+                        text = "데이터가 없습니다",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         }
@@ -297,9 +299,8 @@ fun RecommendDetailRowInfo(
     ) {
         Text(
             text = label,
-            style = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 18.sp
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Normal
             )
         )
         if (valueContent != null) {
@@ -307,9 +308,8 @@ fun RecommendDetailRowInfo(
         } else {
             Text(
                 text = value.orEmpty(),
-                style = TextStyle(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Normal
                 )
             )
         }
@@ -332,16 +332,14 @@ fun RecommendDetailInfoSection(
     ) {
         Text(
             text = label,
-            style = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 18.sp
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Normal
             )
         )
         Text(
             text = info,
-            style = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Normal
             ),
             modifier = Modifier.padding(top = 8.dp)
         )

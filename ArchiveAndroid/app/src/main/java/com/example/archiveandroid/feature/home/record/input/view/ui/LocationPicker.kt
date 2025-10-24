@@ -37,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Place
 import com.example.archiveandroid.feature.home.record.input.viewmodel.PlaceSearchViewModel
@@ -84,8 +83,9 @@ fun LocationPicker(
             Text(
                 text = displayText,
                 color = if (selectedPlace != null) Color(0xFF646464) else Color(0xFF898989),
-                fontWeight = FontWeight.Light,
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Light
+                ),
                 modifier = Modifier.weight(1f)
             )
             
@@ -116,7 +116,12 @@ fun LocationPicker(
                         onValueChange = { query ->
                             searchQuery = query
                         },
-                        placeholder = { Text("장소명을 입력하세요") },
+                        placeholder = { 
+                            Text(
+                                text = "장소명을 입력하세요",
+                                style = MaterialTheme.typography.bodyMedium
+                            ) 
+                        },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Search,
@@ -154,7 +159,7 @@ fun LocationPicker(
                                 Text(
                                     text = "검색 중 오류가 발생했습니다.",
                                     color = Color.Red,
-                                    fontSize = 12.sp
+                                    style = MaterialTheme.typography.bodyMedium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 androidx.compose.material3.TextButton(
@@ -177,7 +182,7 @@ fun LocationPicker(
                                     Text(
                                         text = "\"$searchQuery\"를 주소로 사용",
                                         color = Color(0xFF646464),
-                                        fontSize = 12.sp
+                                        style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
                             }
@@ -213,7 +218,7 @@ fun LocationPicker(
                             Text(
                                 text = "검색 결과가 없습니다",
                                 color = Color(0xFF898989),
-                                fontSize = 14.sp
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
@@ -223,7 +228,10 @@ fun LocationPicker(
                 androidx.compose.material3.TextButton(
                     onClick = { showSearchDialog = false }
                 ) {
-                    Text("취소")
+                    Text(
+                        text = "취소",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         )
@@ -256,19 +264,20 @@ private fun PlaceItem(
         ) {
             Text(
                 text = place.name,
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Medium
+                ),
                 color = Color(0xFF333333)
             )
             Text(
                 text = place.address,
-                fontSize = 12.sp,
-                color = Color(0xFF898989)
+                color = Color(0xFF898989),
+                style = MaterialTheme.typography.bodyMedium
             )
             Text(
                 text = place.category,
-                fontSize = 11.sp,
-                color = Color(0xFF646464)
+                color = Color(0xFF646464),
+                style = MaterialTheme.typography.bodySmall
             )
         }
     }

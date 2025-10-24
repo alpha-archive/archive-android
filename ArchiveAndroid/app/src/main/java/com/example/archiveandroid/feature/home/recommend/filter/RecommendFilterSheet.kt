@@ -43,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 // 필터링을 위한 데이터 클래스
 data class RecommendFilterData(
@@ -109,8 +108,7 @@ fun RecommendFilterScreen(
                         Text(
                             text = "필터",
                             style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 24.sp
+                                fontWeight = FontWeight.Bold
                             ),
                             modifier = Modifier.padding(start = 8.dp)
                         )
@@ -158,7 +156,6 @@ fun RecommendFilterScreen(
                 text = "카테고리",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp
                 ),
                 modifier = Modifier.padding(bottom = 12.dp)
             )
@@ -169,9 +166,9 @@ fun RecommendFilterScreen(
                 onValueChange = { searchText = it },
                 placeholder = { 
                     Text(
-                        "카테고리 검색",
+                        text = "카테고리 검색",
                         color = Color(0xFF999999),
-                        fontSize = 14.sp
+                        style = MaterialTheme.typography.bodyMedium
                     ) 
                 },
                 leadingIcon = {
@@ -237,7 +234,6 @@ fun RecommendFilterScreen(
                 text = "일자",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp
                 ),
                 modifier = Modifier.padding(bottom = 12.dp)
             )
@@ -253,9 +249,9 @@ fun RecommendFilterScreen(
                     onValueChange = { startYear = it },
                     placeholder = { 
                         Text(
-                            "년",
+                            text = "년",
                             color = Color(0xFF999999),
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.bodySmall
                         ) 
                     },
                     modifier = Modifier
@@ -276,9 +272,9 @@ fun RecommendFilterScreen(
                     onValueChange = { startMonth = it },
                     placeholder = { 
                         Text(
-                            "월",
+                            text = "월",
                             color = Color(0xFF999999),
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.bodySmall
                         ) 
                     },
                     modifier = Modifier
@@ -299,9 +295,9 @@ fun RecommendFilterScreen(
                     onValueChange = { startDay = it },
                     placeholder = { 
                         Text(
-                            "일",
+                            text = "일",
                             color = Color(0xFF999999),
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.bodySmall
                         ) 
                     },
                     modifier = Modifier
@@ -337,9 +333,9 @@ fun RecommendFilterScreen(
                     onValueChange = { endYear = it },
                     placeholder = { 
                         Text(
-                            "년",
+                            text = "년",
                             color = Color(0xFF999999),
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.bodySmall
                         ) 
                     },
                     modifier = Modifier
@@ -360,9 +356,9 @@ fun RecommendFilterScreen(
                     onValueChange = { endMonth = it },
                     placeholder = { 
                         Text(
-                            "월",
+                            text = "월",
                             color = Color(0xFF999999),
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.bodySmall
                         ) 
                     },
                     modifier = Modifier
@@ -383,9 +379,9 @@ fun RecommendFilterScreen(
                     onValueChange = { endDay = it },
                     placeholder = { 
                         Text(
-                            "일",
+                            text = "일",
                             color = Color(0xFF999999),
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.bodySmall
                         ) 
                     },
                     modifier = Modifier
@@ -415,7 +411,6 @@ fun RecommendFilterScreen(
                 text = "위치",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp
                 ),
                 modifier = Modifier.padding(bottom = 12.dp)
             )
@@ -430,9 +425,9 @@ fun RecommendFilterScreen(
                     onValueChange = { city = it },
                     placeholder = { 
                         Text(
-                            "시",
+                            text = "시",
                             color = Color(0xFF999999),
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.bodySmall
                         ) 
                     },
                     modifier = Modifier
@@ -453,9 +448,9 @@ fun RecommendFilterScreen(
                     onValueChange = { district = it },
                     placeholder = { 
                         Text(
-                            "구",
+                            text = "구",
                             color = Color(0xFF999999),
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.bodySmall
                         ) 
                     },
                     modifier = Modifier
@@ -498,7 +493,10 @@ fun RecommendFilterScreen(
                 shape = RoundedCornerShape(8.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
             ) {
-                Text("취소")
+                Text(
+                    text = "취소",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             
             // 적용 버튼
@@ -527,7 +525,10 @@ fun RecommendFilterScreen(
                 shape = RoundedCornerShape(8.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
             ) {
-                Text("적용")
+                Text(
+                    text = "적용",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }

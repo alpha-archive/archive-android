@@ -80,6 +80,9 @@ fun RecordFilterSheet(
                 Text(
                     text = "완료",
                     color = Color(0xFF2196F3),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
                     modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp).clickable { 
                         val selectedIds = uiState.options.filter { it.selected }.map { it.id }.toSet()
                         onFiltersApplied(selectedIds)
@@ -127,11 +130,13 @@ private fun LabelChip(text: String, bg: Color, fg: Color) {
     Text(
         text = text,
         color = fg,
+        style = MaterialTheme.typography.bodyMedium.copy(
+            fontWeight = FontWeight.Medium
+        ),
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
             .background(bg)
-            .padding(horizontal = 10.dp, vertical = 6.dp),
-        fontWeight = FontWeight.Medium
+            .padding(horizontal = 10.dp, vertical = 6.dp)
     )
 }
 
@@ -140,7 +145,11 @@ private fun SelectedSummary(state: RecordFilterUiState, onRemove: (String) -> Un
     val selected = state.options.filter { it.selected }
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         if (selected.isEmpty()) {
-            Text("하나 이상의 옵션을 선택하세요.", color = Color.Gray)
+            Text(
+                text = "하나 이상의 옵션을 선택하세요.",
+                color = Color.Gray,
+                style = MaterialTheme.typography.bodyMedium
+            )
         } else {
             Row(
                 modifier = Modifier
@@ -159,7 +168,13 @@ private fun SelectedSummary(state: RecordFilterUiState, onRemove: (String) -> Un
                             .clickable { onRemove(opt.id) }
                             .padding(horizontal = 10.dp, vertical = 6.dp)
                     ) {
-                        Text(opt.label, color = opt.textColor, fontWeight = FontWeight.Medium)
+                        Text(
+                            text = opt.label,
+                            color = opt.textColor,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium
+                            )
+                        )
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = null,

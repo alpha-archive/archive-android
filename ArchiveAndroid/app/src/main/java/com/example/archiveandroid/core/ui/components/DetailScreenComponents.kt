@@ -8,16 +8,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 /**
  * 카테고리 표시용 버튼 컴포넌트
@@ -37,9 +36,8 @@ fun CategoryButton(
     ) {
         Text(
             text = text,
-            style = TextStyle(
+            style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 15.sp,
                 color = textColor
             )
         )
@@ -65,9 +63,8 @@ fun DetailRowInfo(
     ) {
         Text(
             text = label,
-            style = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 18.sp
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Normal
             )
         )
         if (valueContent != null) {
@@ -75,9 +72,8 @@ fun DetailRowInfo(
         } else {
             Text(
                 text = value.orEmpty(),
-                style = TextStyle(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Normal
                 )
             )
         }
@@ -100,16 +96,14 @@ fun DetailMemoSection(
     ) {
         Text(
             text = label,
-            style = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 18.sp
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Normal
             )
         )
         Text(
             text = memo,
-            style = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Normal
             ),
             modifier = Modifier.padding(top = 8.dp)
         )

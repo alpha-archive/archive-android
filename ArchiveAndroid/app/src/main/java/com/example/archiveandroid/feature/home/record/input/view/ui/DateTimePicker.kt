@@ -16,6 +16,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -28,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -69,8 +69,9 @@ fun DateTimePicker(
             Text(
                 text = displayText,
                 color = if (selectedDateTime != null) Color(0xFF646464) else Color(0xFF898989),
-                fontWeight = FontWeight.Light,
-                fontSize = 14.sp
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Light
+                )
             )
             
             Icon(
@@ -99,14 +100,20 @@ fun DateTimePicker(
                         }
                     }
                 ) {
-                    Text("확인")
+                    Text(
+                        text = "확인",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             },
             dismissButton = {
                 Button(
                     onClick = { showDatePicker = false }
                 ) {
-                    Text("취소")
+                    Text(
+                        text = "취소",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         ) {

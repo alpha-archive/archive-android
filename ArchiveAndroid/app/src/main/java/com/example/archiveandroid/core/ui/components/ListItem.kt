@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.archiveandroid.core.util.DateFormatter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -76,7 +75,6 @@ fun ListItemCard(
                     text = item.title,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
                     ),
                     modifier = Modifier
                         .weight(1f)
@@ -101,7 +99,6 @@ fun ListItemCard(
                         color = item.categoryFg,
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Medium,
-                            fontSize = 12.sp
                         )
                     )
                 }
@@ -116,7 +113,6 @@ fun ListItemCard(
                 Text(
                     text = "일자",
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 14.sp
                     ),
                     color = Color(0xFF666666)
                 )
@@ -128,7 +124,6 @@ fun ListItemCard(
                         text = dDayText,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
                         ),
                         color = Color(0xFFFF6B6B)
                     )
@@ -142,7 +137,6 @@ fun ListItemCard(
                 Text(
                     text = "${DateFormatter.formatToDisplayDate(item.startAt)} ~ ${DateFormatter.formatToDisplayDate(item.endAt)}",
                     style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = 12.sp
                     ),
                     color = Color(0xFF888888)
                 )
@@ -153,9 +147,7 @@ fun ListItemCard(
             // 위치
             Text(
                 text = item.location,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 14.sp
-                ),
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.basicMarquee(),
                 color = Color(0xFF666666),
                 maxLines = 1

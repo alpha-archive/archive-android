@@ -42,7 +42,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.archiveandroid.core.ui.components.ListItem
@@ -124,7 +123,6 @@ fun RecommendScreen(
                         text = "나를 위한 추천 활동",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
                         ),
                         maxLines = 1
                     )
@@ -186,7 +184,10 @@ fun RecommendScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("오류: $error", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = "오류: $error", 
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
             recommendations.isEmpty() -> {

@@ -133,7 +133,12 @@ fun DetailScreenLayout(
                             ) {
                                 menuItems.forEach { item ->
                                     DropdownMenuItem(
-                                        text = { Text(item) },
+                                        text = { 
+                                            Text(
+                                                text = item,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            ) 
+                                        },
                                         onClick = {
                                             showDropdownMenu = false
                                             onMenuClick(item)
@@ -162,7 +167,10 @@ fun DetailScreenLayout(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("삭제 중...")
+                    Text(
+                        text = "삭제 중...",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
             state.error != null -> {
@@ -172,7 +180,8 @@ fun DetailScreenLayout(
                 ) {
                     Text(
                         text = "오류: ${state.error}",
-                        color = Color.Red
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
@@ -305,7 +314,10 @@ fun DetailScreenLayout(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("데이터가 없습니다")
+                    Text(
+                        text = "데이터가 없습니다",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         }

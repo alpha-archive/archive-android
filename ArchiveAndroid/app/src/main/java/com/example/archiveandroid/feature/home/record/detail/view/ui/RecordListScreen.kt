@@ -16,26 +16,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.archiveandroid.R
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import com.example.archiveandroid.core.ui.theme.Pretendard
+import androidx.compose.ui.unit.dp
+import com.example.archiveandroid.R
 
 
 @Composable
@@ -79,7 +77,9 @@ fun SectionHeader(
     ) {
         Text(
             text = title,
-            style = TextStyle( fontWeight = FontWeight.Bold, fontSize = 24.sp)
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold
+            )
         )
         Spacer(Modifier.weight(1f))
         IconButton(onClick = onActionClick) {
@@ -113,9 +113,8 @@ private fun CategoryButton(
     ) {
         Text(
             text = text,
-            style = TextStyle(
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.SemiBold
             )
         )
     }
@@ -166,9 +165,8 @@ fun RecordCard(
 
                 Text(
                     text = item.title,
-                    style = TextStyle(
+                    style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp,
                         color = Color(0xFF111827)
                     ),
                     maxLines = 1,
@@ -177,9 +175,8 @@ fun RecordCard(
 
                 Text(
                     text = item.dateText,
-                    style = TextStyle(
+                    style = MaterialTheme.typography.bodySmall.copy(
                         fontWeight = FontWeight.Normal,
-                        fontSize = 13.sp,
                         color = Color(0xFF6B7280)
                     ),
                     maxLines = 1,

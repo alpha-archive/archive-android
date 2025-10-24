@@ -57,7 +57,8 @@ fun RecordListItem(
             .fillMaxWidth()
             .clickable { onClick(item) },
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
             // 상단 이미지 영역

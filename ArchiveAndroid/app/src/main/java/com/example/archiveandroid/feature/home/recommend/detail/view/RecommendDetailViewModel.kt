@@ -1,5 +1,6 @@
 package com.example.archiveandroid.feature.home.recommend.detail.view
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -74,6 +75,9 @@ private fun com.example.archiveandroid.feature.home.recommend.data.remote.dto.Re
     // 이미지 URL 리스트 생성
     val imageUrls = this.images.map { it.imageUrl }
     
+    // 카테고리 색상
+    val (bgColor, fgColor) = getCategoryColor(this.categoryDisplayName)
+    
     return com.example.archiveandroid.core.ui.components.DetailScreenData(
         title = this.title,
         categoryDisplayName = this.categoryDisplayName,
@@ -81,6 +85,25 @@ private fun com.example.archiveandroid.feature.home.recommend.data.remote.dto.Re
         location = this.location,
         memo = this.description,
         images = imageUrls,
-        recommendationReason = this.recommendationReason
+        recommendationReason = this.recommendationReason,
+        categoryBg = bgColor,
+        categoryFg = fgColor
     )
+}
+
+/**
+ * 카테고리에 따른 색상 반환
+ */
+private fun getCategoryColor(category: String): Pair<Color, Color> {
+    return when (category) {
+        "여행" -> Pair(Color(0xFFE8F0FF), Color(0xFF335C99))
+        "독서" -> Pair(Color(0xFFFFEFE6), Color(0xFFB04A17))
+        "스포츠 관람" -> Pair(Color(0xFFEAF5FF), Color(0xFF2C5A8A))
+        "운동" -> Pair(Color(0xFFE7FFF2), Color(0xFF138A52))
+        "전시" -> Pair(Color(0xFFFFF4E5), Color(0xFF9A6B1A))
+        "봉사" -> Pair(Color(0xFFEFF7FF), Color(0xFF2D6AA3))
+        "뮤지컬" -> Pair(Color(0xFFF4E9FF), Color(0xFF6B39A6))
+        "악기 연주" -> Pair(Color(0xFFEFF9FF), Color(0xFF1F6E8C))
+        else -> Pair(Color(0xFFE0E0E0), Color(0xFF666666))
+    }
 }

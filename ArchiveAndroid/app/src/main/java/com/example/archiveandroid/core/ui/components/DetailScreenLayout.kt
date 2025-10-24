@@ -63,7 +63,9 @@ data class DetailScreenData(
     val location: String,
     val memo: String,
     val images: List<String> = emptyList(),
-    val recommendationReason: String? = null // 추천 이유 (추천 상세화면에서만 사용)
+    val recommendationReason: String? = null, // 추천 이유 (추천 상세화면에서만 사용)
+    val categoryBg: Color = Color(0xFFA0A6FF), // 카테고리 배경색
+    val categoryFg: Color = Color.White // 카테고리 텍스트색
 )
 
 /**
@@ -262,7 +264,11 @@ fun DetailScreenLayout(
                     item {
                         DetailInfoGroup {
                             DetailRowInfo(label = "카테고리") {
-                                CategoryButton(text = state.data.categoryDisplayName)
+                                CategoryButton(
+                                    text = state.data.categoryDisplayName,
+                                    backgroundColor = state.data.categoryBg,
+                                    textColor = state.data.categoryFg
+                                )
                             }
                             DetailDivider()
 

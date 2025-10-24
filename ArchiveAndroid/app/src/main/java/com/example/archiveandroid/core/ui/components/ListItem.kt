@@ -1,7 +1,7 @@
 package com.example.archiveandroid.core.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -19,15 +20,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import androidx.compose.ui.unit.sp
+import com.example.archiveandroid.core.util.DateFormatter
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 data class ListItem(
     val id: String,
@@ -39,7 +40,9 @@ data class ListItem(
     val imagePainter: Painter? = null,
     val thumbnailImageUrl: String? = null,
     val date: String? = null,
-    val recommendationReason: String? = null // 추천 이유 (추천 기능용)
+    val recommendationReason: String? = null, // 추천 이유 (추천 기능용)
+    val startAt: String? = null, // 시작일 (yyyy-MM-dd 형식)
+    val endAt: String? = null // 종료일 (yyyy-MM-dd 형식)
 )
 
 @Composable
@@ -48,119 +51,153 @@ fun ListItemCard(
     onClick: (ListItem) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val dDayText = calculateDDay(item.startAt, item.endAt)
+    
     Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick(item) },
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Column {
-            // 상단 이미지 영역
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .background(Color(0xFFE0E0E0)) // 기본 배경색
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // 제목과 카테고리
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                if (item.thumbnailImageUrl != null) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(item.thumbnailImageUrl)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp)
-                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    // 기본 이미지가 없을 때는 배경색만 표시
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp)
-                            .background(Color(0xFFE0E0E0))
+                Text(
+                    text = item.title,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .basicMarquee(),
+                    maxLines = 1,
+                    color = Color.Black
+                )
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                // 카테고리 태그
+                Box(
+                    modifier = Modifier
+                        .background(
+                            item.categoryBg,
+                            RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = item.categoryLabel,
+                        color = item.categoryFg,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 12.sp
+                        )
                     )
                 }
             }
             
-            // 하단 정보 영역
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            // 일자와 D-day
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    // 제목과 카테고리 태그
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = item.title,
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold
-                            ),
-                            maxLines = 1
-                        )
-                        
-                        // 카테고리 태그
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    item.categoryBg,
-                                    RoundedCornerShape(8.dp)
-                                )
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = item.categoryLabel,
-                                color = item.categoryFg,
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = FontWeight.Medium
-                                )
-                            )
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    // 위치 정보
+                Text(
+                    text = "일자",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 14.sp
+                    ),
+                    color = Color(0xFF666666)
+                )
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                if (dDayText != null) {
                     Text(
-                        text = item.location,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF666666)
+                        text = dDayText,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        ),
+                        color = Color(0xFFFF6B6B)
                     )
-                    
-                    // 날짜 정보 (있는 경우)
-                    item.date?.let { date ->
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = date,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF888888)
-                        )
-                    }
-                    
-                    // 추천 이유 (있는 경우)
-                    item.recommendationReason?.let { reason ->
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = reason,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF2196F3)
-                        )
-                    }
                 }
             }
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            // 시작일 ~ 종료일
+            if (item.startAt != null && item.endAt != null) {
+                Text(
+                    text = "${DateFormatter.formatToDisplayDate(item.startAt)} ~ ${DateFormatter.formatToDisplayDate(item.endAt)}",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontSize = 12.sp
+                    ),
+                    color = Color(0xFF888888)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            // 위치
+            Text(
+                text = item.location,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 14.sp
+                ),
+                modifier = Modifier.basicMarquee(),
+                color = Color(0xFF666666),
+                maxLines = 1
+            )
         }
+    }
+}
+
+/**
+ * D-day 계산 함수
+ */
+private fun calculateDDay(startAt: String?, endAt: String?): String? {
+    if (startAt == null || endAt == null) return null
+    
+    try {
+        // T 이후 시간 부분 제거
+        val startDateOnly = DateFormatter.extractDateOnly(startAt)
+        val endDateOnly = DateFormatter.extractDateOnly(endAt)
+        
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val today = LocalDate.now()
+        val startDate = LocalDate.parse(startDateOnly, formatter)
+        val endDate = LocalDate.parse(endDateOnly, formatter)
+        
+        return when {
+            today.isBefore(startDate) -> {
+                // 시작일 전
+                val daysUntil = ChronoUnit.DAYS.between(today, startDate)
+                "D-$daysUntil"
+            }
+            today.isAfter(endDate) -> {
+                // 종료일 이후
+                val daysSince = ChronoUnit.DAYS.between(endDate, today)
+                "D+$daysSince"
+            }
+            else -> {
+                // 시작일과 종료일 사이 (진행 중)
+                "D-day"
+            }
+        }
+    } catch (e: Exception) {
+        return null
     }
 }
 

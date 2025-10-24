@@ -2,6 +2,7 @@ package com.example.archiveandroid.feature.home.record.input
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.archiveandroid.core.util.DateFormatter
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.example.archiveandroid.feature.home.record.input.data.repository.RecordInputRepository
@@ -52,7 +53,7 @@ class RecordInputViewModel @Inject constructor(
                         title = activityDetail.title,
                         memo = activityDetail.memo ?: "",
                         location = activityDetail.location,
-                        activityDate = activityDetail.activityDate.substringBefore("T"), // T 이전의 날짜 부분만
+                        activityDate = DateFormatter.extractDateOnly(activityDetail.activityDate), // T 이후 시간 부분 제거
                         rating = activityDetail.rating,
                         imageIds = activityDetail.images.map { it.id }
                     )

@@ -315,6 +315,8 @@ private fun com.example.archiveandroid.feature.home.recommend.data.remote.dto.Re
         categoryFg = fgColor,
         thumbnailImageUrl = null, // API에서 이미지 URL이 없으므로 null
         date = dateText,
-        recommendationReason = null // API에서 추천 이유가 없으므로 null
+        recommendationReason = null, // API에서 추천 이유가 없으므로 null
+        startAt = this.startAt,
+        endAt = this.endAt
     )
 }

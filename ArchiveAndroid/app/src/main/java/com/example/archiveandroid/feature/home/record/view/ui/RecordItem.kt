@@ -57,7 +57,8 @@ fun RecordListItem(
             .fillMaxWidth()
             .clickable { onClick(item) },
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
             // 상단 이미지 영역
@@ -65,7 +66,7 @@ fun RecordListItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
-                    .background(Color(0xFFE0E0E0)) // 기본 배경색
+                    .background(Color(0xFFFFFFFF)) // 기본 배경색
             ) {
                 if (item.thumbnailImageUrl != null) {
                     AsyncImage(
@@ -92,17 +93,8 @@ fun RecordListItem(
                         contentScale = ContentScale.Crop
                     )
                 }
-            }
-            
-            // 하단 정보 영역
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // 카테고리 버튼
+                
+                // 카테고리 버튼 - 이미지 위 우측 상단
                 Text(
                     text = item.categoryLabel,
                     color = item.categoryFg,
@@ -110,30 +102,34 @@ fun RecordListItem(
                         fontWeight = FontWeight.Medium
                     ),
                     modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(12.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(item.categoryBg)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 )
-                
-                // 제목과 장소 정보
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = "제목 : ${item.title}",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = Color.Black
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "장소 : ${item.location}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Black
-                    )
-                }
+            }
+            
+            // 하단 정보 영역 - 제목과 장소
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = item.title,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = item.location,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
             }
         }
     }

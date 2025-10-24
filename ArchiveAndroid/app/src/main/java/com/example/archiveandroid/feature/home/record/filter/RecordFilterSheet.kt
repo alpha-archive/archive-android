@@ -54,16 +54,18 @@ fun RecordFilterSheet(
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val maxSheetHeight = (screenHeight * 0.85f).dp
 
+    // 필터 화면이 열릴 때마다 카테고리 다시 로드
+    LaunchedEffect(Unit) {
+        viewModel.loadCategories()
+        if (sheetState.hasPartiallyExpandedState) {
+            sheetState.partialExpand()
+        }
+    }
+
     // 선택된 필터 상태를 초기화
     LaunchedEffect(selectedFilters) {
         // RecordFilterViewModel의 상태를 selectedFilters로 초기화
         viewModel.initializeWithSelectedFilters(selectedFilters)
-    }
-
-    LaunchedEffect(Unit) {
-        if (sheetState.hasPartiallyExpandedState) {
-            sheetState.partialExpand()
-        }
     }
 
     ModalBottomSheet(

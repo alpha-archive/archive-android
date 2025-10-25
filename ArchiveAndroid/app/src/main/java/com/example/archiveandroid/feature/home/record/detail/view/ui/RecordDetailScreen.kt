@@ -14,6 +14,11 @@ fun RecordDetailScreen(
     onBack: () -> Unit = {},
     onEdit: () -> Unit = {},
     onDelete: () -> Unit = {},
+    showNavigation: Boolean = false,
+    hasPrevious: Boolean = false,
+    hasNext: Boolean = false,
+    onPreviousClick: () -> Unit = {},
+    onNextClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val detailState = DetailScreenState(
@@ -36,6 +41,11 @@ fun RecordDetailScreen(
                 "삭제" -> onDelete()
             }
         },
+        showNavigation = showNavigation,
+        hasPrevious = hasPrevious,
+        hasNext = hasNext,
+        onPreviousClick = onPreviousClick,
+        onNextClick = onNextClick,
         modifier = modifier
     )
 }

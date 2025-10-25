@@ -66,6 +66,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
@@ -215,11 +216,13 @@ fun RecordInputScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
+        val scrollState = rememberScrollState()
+        
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(top = 20.dp, bottom = 24.dp),
+                .verticalScroll(scrollState)
+                .padding(top = 20.dp, bottom = 400.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             PhotoInput(
@@ -311,14 +314,27 @@ fun RecordInputScreen(
                 .padding(horizontal = 30.dp, vertical = 10.dp))
 
             RowInfoInput(label = "메모") {
+                var previousLength by remember { mutableStateOf(draft.memo.length) }
+                
                 TextField(
                     value = draft.memo,
-                    onValueChange = { draft = draft.copy(memo = it) },
-                    singleLine = true,
+                    onValueChange = { newValue ->
+                        draft = draft.copy(memo = newValue)
+                        // 텍스트가 늘어날 때만 스크롤
+                        if (newValue.length > previousLength) {
+                            scope.launch {
+                                kotlinx.coroutines.delay(50)
+                                scrollState.animateScrollTo(scrollState.maxValue)
+                            }
+                        }
+                        previousLength = newValue.length
+                    },
+                    singleLine = false,
+                    minLines = 3,
                     colors = textfieldColors,
                     modifier = Modifier
                         .widthIn(min = 180.dp, max = 420.dp)
-                        .heightIn(min = 44.dp)
+                        .heightIn(min = 100.dp)
                         .fillMaxWidth()
                 )
             }

@@ -289,25 +289,13 @@ fun RecordInputScreen(
                 .padding(horizontal = 30.dp, vertical = 10.dp))
 
             RowInfoInput(label = "장소") {
-                Column {
-                    LocationPicker(
-                        selectedPlace = selectedPlace,
-                        onPlaceSelected = { place ->
-                            selectedPlace = place
-                            draft = draft.copy(location = place.name)
-                        }
-                    )
-                    if (selectedPlace == null) {
-                        Text(
-                            text = "사진 업로드 시 자동 등록",
-                            color = Color(0xFF898989),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.Light
-                            ),
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
+                LocationPicker(
+                    selectedPlace = selectedPlace,
+                    onPlaceSelected = { place ->
+                        selectedPlace = place
+                        draft = draft.copy(location = place.name)
                     }
-                }
+                )
             }
             Divider(color = Color(0xffD9D9D9), modifier = Modifier
                 .fillMaxWidth()

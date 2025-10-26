@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -26,14 +27,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.archiveandroid.core.ui.components.TopAppBar
 import com.example.archiveandroid.feature.home.stats.data.SampleStatsData
+import com.example.archiveandroid.feature.home.stats.view.StatsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatsScreen() {
+fun StatsScreen(
+    viewModel: StatsViewModel = hiltViewModel()
+) {
     val statsData = SampleStatsData.getStatsData()
     var isWeekly by remember { mutableStateOf(true) }
+    
+    val totalActivities by viewModel.totalActivities.collectAsStateWithLifecycle()
+    val categoryStats by viewModel.categoryStats.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -44,63 +55,102 @@ fun StatsScreen() {
         },
         contentWindowInsets = WindowInsets(0)
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 전체 기록 통계
-            Row(
+        if (isLoading) {
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.Center
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
             ) {
-                StatsCard(
-                    title = "활동 기록",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f)
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        StatItem(value = "${statsData.totalRecords}")
-                    }
-                }
+                CircularProgressIndicator()
             }
-
-            // 날짜별 통계 (주간/월간 토글)
-            StatsCard(
-                title = "날짜별 통계",
-                topEndAction = {
-                    CustomToggle(
-                        isWeekly = isWeekly,
-                        onToggleChange = { isWeekly = it }
-                    )
-                }
+        } else if (error != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = error ?: "오류가 발생했습니다",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 차트 표시
-                if (isWeekly) {
-                    DailyChart(dailyData = statsData.dailyData)
-                } else {
-                    MonthlyCalendar(calendarData = statsData.calendarData)
+                // 전체 기록 통계
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    StatsCard(
+                        title = "활동 기록",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            StatItem(value = "$totalActivities")
+                        }
+                    }
                 }
-            }
 
-            // 활동 유형별 통계
-            StatsCard(title = "활동 유형별 통계") {
-                Spacer(modifier = Modifier.height(8.dp))
-                ActivityTypeChart(activityTypes = statsData.activityTypes)
-            }
+                // 날짜별 통계 (주간/월간 토글)
+                StatsCard(
+                    title = "날짜별 통계",
+                    topEndAction = {
+                        CustomToggle(
+                            isWeekly = isWeekly,
+                            onToggleChange = { isWeekly = it }
+                        )
+                    }
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                    // 차트 표시
+                    if (isWeekly) {
+                        DailyChart(dailyData = statsData.dailyData)
+                    } else {
+                        MonthlyCalendar(calendarData = statsData.calendarData)
+                    }
+                }
+
+                // 활동 유형별 통계
+                StatsCard(title = "활동 유형별 통계") {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (categoryStats.isNotEmpty()) {
+                        ActivityTypeChart(activityTypes = categoryStats)
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "활동 유형별 통계가 없습니다",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
     }
 }

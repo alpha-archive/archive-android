@@ -1,5 +1,6 @@
 package com.example.archiveandroid.feature.home.record.input.data.repository
 
+import com.example.archiveandroid.BuildConfig
 import com.example.archiveandroid.feature.home.record.input.data.remote.KakaoPlaceApi
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Place
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.toPlace
@@ -22,7 +23,7 @@ class PlaceSearchRepositoryImpl @Inject constructor(
     ): Result<List<Place>> {
         return try {
             val response = kakaoPlaceApi.searchPlaces(
-                authorization = "KakaoAK ${System.getProperty("KAKAO_API_KEY", "YOUR_KAKAO_API_KEY")}",
+                authorization = "KakaoAK ${BuildConfig.kakaoAppKey}",
                 query = query,
                 longitude = longitude,
                 latitude = latitude,

@@ -66,7 +66,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
@@ -75,6 +74,7 @@ import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Reco
 import com.example.archiveandroid.feature.home.record.input.view.ui.DateTimePicker
 import com.example.archiveandroid.feature.home.record.input.view.ui.LocationPicker
 import com.example.yourapp.ui.components.TopAppBar
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -110,6 +110,31 @@ fun RecordInputScreen(
     LaunchedEffect(ui.draft) {
         ui.draft?.let { loadedDraft ->
             draft = loadedDraft
+            
+            // 기존 장소 정보 로드
+            if (loadedDraft.location.isNotEmpty()) {
+                selectedPlace = Place(
+                    id = "",
+                    name = loadedDraft.location,
+                    address = "",
+                    roadAddress = "",
+                    category = "",
+                    phone = "",
+                    longitude = "",
+                    latitude = "",
+                    distance = ""
+                )
+            }
+            
+            // 기존 날짜 정보 로드
+            loadedDraft.activityDate?.let { dateStr ->
+                try {
+                    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    selectedDateTime = formatter.parse(dateStr)
+                } catch (e: Exception) {
+                    // 파싱 실패 시 현재 날짜 유지
+                }
+            }
         }
     }
 

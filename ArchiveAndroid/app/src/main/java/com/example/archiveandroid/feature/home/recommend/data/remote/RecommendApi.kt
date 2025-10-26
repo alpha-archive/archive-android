@@ -22,8 +22,8 @@ interface RecommendApi {
         @Query("district") district: String? = null
     ): Response<ApiResponse<RecommendActivityListResponse>>
     
-    @GET("api/recommendations/activities/{id}")
+    @GET("api/recommendations/activities/{activityId}")
     suspend fun getRecommendActivityDetail(
-        @retrofit2.http.Path("id") id: String
+        @retrofit2.http.Path("activityId") activityId: String
     ): Response<ApiResponse<RecommendActivityDetailDto>>
 }

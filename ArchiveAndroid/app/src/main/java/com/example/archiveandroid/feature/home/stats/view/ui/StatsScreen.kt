@@ -43,6 +43,7 @@ fun StatsScreen(
     
     val totalActivities by viewModel.totalActivities.collectAsStateWithLifecycle()
     val categoryStats by viewModel.categoryStats.collectAsStateWithLifecycle()
+    val dailyStats by viewModel.dailyStats.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
 
@@ -122,7 +123,22 @@ fun StatsScreen(
 
                     // 차트 표시
                     if (isWeekly) {
-                        DailyChart(dailyData = statsData.dailyData)
+                        if (dailyStats.isNotEmpty()) {
+                            DailyChart(dailyData = dailyStats)
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 32.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "주간 통계 데이터가 없습니다",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     } else {
                         MonthlyCalendar(calendarData = statsData.calendarData)
                     }

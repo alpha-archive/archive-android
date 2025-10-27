@@ -38,12 +38,22 @@ class StatsViewModel @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    private var currentYearMonth: String = ""
+
     init {
         loadStatistics()
         // 초기 월간 통계 로드 (현재 월)
         val calendar = Calendar.getInstance()
-        val currentYearMonth = String.format("%04d-%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1)
+        currentYearMonth = String.format("%04d-%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1)
         loadMonthlyStatistics(currentYearMonth)
+    }
+
+    fun refreshStatistics() {
+        loadStatistics()
+        // 현재 보고 있던 월 다시 로드
+        if (currentYearMonth.isNotEmpty()) {
+            loadMonthlyStatistics(currentYearMonth)
+        }
     }
 
     fun loadStatistics() {
@@ -124,6 +134,7 @@ class StatsViewModel @Inject constructor(
     }
 
     fun loadMonthlyStatistics(yearMonth: String) {
+        currentYearMonth = yearMonth
         viewModelScope.launch {
             statsRepository.getMonthlyStatistics(yearMonth)
                 .onSuccess { response ->

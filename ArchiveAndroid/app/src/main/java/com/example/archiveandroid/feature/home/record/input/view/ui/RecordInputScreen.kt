@@ -74,7 +74,6 @@ import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Plac
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.example.archiveandroid.feature.home.record.input.view.ui.DateTimePicker
 import com.example.archiveandroid.feature.home.record.input.view.ui.LocationPicker
-import com.example.yourapp.ui.components.TopAppBar
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat

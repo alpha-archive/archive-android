@@ -37,7 +37,8 @@ import java.util.Calendar
 
 @Composable
 fun MonthlyCalendar(
-    calendarData: List<CalendarDayData>
+    calendarData: List<CalendarDayData>,
+    onMonthChange: (String) -> Unit = {}
 ) {
     // 현재 날짜를 기본값으로 사용
     val today = remember {
@@ -65,6 +66,9 @@ fun MonthlyCalendar(
                 } else {
                     currentMonth -= 1
                 }
+                // 월 변경 시 콜백 호출
+                val yearMonth = String.format("%04d-%02d", currentYear, currentMonth)
+                onMonthChange(yearMonth)
             }) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowLeft,
@@ -88,6 +92,9 @@ fun MonthlyCalendar(
                 } else {
                     currentMonth += 1
                 }
+                // 월 변경 시 콜백 호출
+                val yearMonth = String.format("%04d-%02d", currentYear, currentMonth)
+                onMonthChange(yearMonth)
             }) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,

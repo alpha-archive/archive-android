@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.archiveandroid.feature.home.stats.data.ActivityTypeData
+import com.example.archiveandroid.feature.home.stats.data.CalendarDayData
 import com.example.archiveandroid.feature.home.stats.data.DailyData
 import com.example.archiveandroid.feature.home.stats.data.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +29,9 @@ class StatsViewModel @Inject constructor(
     private val _dailyStats = MutableStateFlow<List<DailyData>>(emptyList())
     val dailyStats: StateFlow<List<DailyData>> = _dailyStats.asStateFlow()
 
+    private val _monthlyCalendarData = MutableStateFlow<List<CalendarDayData>>(emptyList())
+    val monthlyCalendarData: StateFlow<List<CalendarDayData>> = _monthlyCalendarData.asStateFlow()
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
@@ -36,6 +40,10 @@ class StatsViewModel @Inject constructor(
 
     init {
         loadStatistics()
+        // 초기 월간 통계 로드 (현재 월)
+        val calendar = Calendar.getInstance()
+        val currentYearMonth = String.format("%04d-%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1)
+        loadMonthlyStatistics(currentYearMonth)
     }
 
     fun loadStatistics() {
@@ -112,6 +120,28 @@ class StatsViewModel @Inject constructor(
         // 재정렬된 순서대로 데이터 반환 (없는 요일은 count 0으로)
         return reorderedDays.map { day ->
             dataMap[day] ?: DailyData(day = day, count = 0)
+        }
+    }
+
+    fun loadMonthlyStatistics(yearMonth: String) {
+        viewModelScope.launch {
+            statsRepository.getMonthlyStatistics(yearMonth)
+                .onSuccess { response ->
+                    // API 응답의 dailyActivities를 CalendarDayData로 변환
+                    _monthlyCalendarData.value = response.dailyActivities.map { activity ->
+                        // day 형식: "2025-10-01" -> 일자만 추출
+                        val dayNumber = activity.day.split("-").lastOrNull()?.toIntOrNull() ?: 1
+                        CalendarDayData(
+                            day = dayNumber,
+                            hasActivity = activity.count > 0,
+                            activityCount = activity.count
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    // 에러는 로그만 남기고 빈 데이터로 유지
+                    _monthlyCalendarData.value = emptyList()
+                }
         }
     }
 

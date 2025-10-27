@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.archiveandroid.core.ui.components.TopAppBar
-import com.example.archiveandroid.feature.home.stats.data.SampleStatsData
 import com.example.archiveandroid.feature.home.stats.view.StatsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,12 +37,12 @@ import com.example.archiveandroid.feature.home.stats.view.StatsViewModel
 fun StatsScreen(
     viewModel: StatsViewModel = hiltViewModel()
 ) {
-    val statsData = SampleStatsData.getStatsData()
     var isWeekly by remember { mutableStateOf(true) }
     
     val totalActivities by viewModel.totalActivities.collectAsStateWithLifecycle()
     val categoryStats by viewModel.categoryStats.collectAsStateWithLifecycle()
     val dailyStats by viewModel.dailyStats.collectAsStateWithLifecycle()
+    val monthlyCalendarData by viewModel.monthlyCalendarData.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
 
@@ -140,7 +139,12 @@ fun StatsScreen(
                             }
                         }
                     } else {
-                        MonthlyCalendar(calendarData = statsData.calendarData)
+                        MonthlyCalendar(
+                            calendarData = monthlyCalendarData,
+                            onMonthChange = { yearMonth ->
+                                viewModel.loadMonthlyStatistics(yearMonth)
+                            }
+                        )
                     }
                 }
 

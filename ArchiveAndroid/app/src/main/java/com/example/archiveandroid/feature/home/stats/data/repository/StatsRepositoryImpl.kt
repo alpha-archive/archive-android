@@ -2,6 +2,7 @@ package com.example.archiveandroid.feature.home.stats.data.repository
 
 import com.example.archiveandroid.core.repository.BaseRepository
 import com.example.archiveandroid.feature.home.stats.data.remote.StatsApi
+import com.example.archiveandroid.feature.home.stats.data.remote.dto.MonthlyStatisticsResponse
 import com.example.archiveandroid.feature.home.stats.data.remote.dto.OverallStatisticsResponse
 import com.example.archiveandroid.feature.home.stats.data.remote.dto.WeeklyStatisticsResponse
 import javax.inject.Inject
@@ -21,6 +22,12 @@ class StatsRepositoryImpl @Inject constructor(
     override suspend fun getWeeklyStatistics(): Result<WeeklyStatisticsResponse> {
         return handleApiCall {
             statsApi.getWeeklyStatistics()
+        }
+    }
+    
+    override suspend fun getMonthlyStatistics(yearMonth: String): Result<MonthlyStatisticsResponse> {
+        return handleApiCall {
+            statsApi.getMonthlyStatistics(yearMonth)
         }
     }
 }

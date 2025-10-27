@@ -38,3 +38,17 @@ data class DailyStatDto(
     val count: Int
 )
 
+data class MonthlyStatisticsResponse(
+    @SerializedName("yearMonth")
+    val yearMonth: String,
+    @SerializedName("dailyActivities")
+    val dailyActivities: List<MonthlyActivityDto>
+)
+
+data class MonthlyActivityDto(
+    @SerializedName("day")
+    val day: String,
+    @SerializedName("count")
+    val count: Int
+)
+

@@ -1,6 +1,12 @@
 package com.example.archiveandroid.feature.home.stats.view.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -32,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.example.archiveandroid.feature.home.stats.data.CalendarDayData
 import java.util.Calendar
 
@@ -47,6 +55,7 @@ fun MonthlyCalendar(
     
     var currentYear by remember { mutableStateOf(today.get(Calendar.YEAR)) }
     var currentMonth by remember { mutableStateOf(today.get(Calendar.MONTH) + 1) } // Calendar.MONTH는 0부터 시작
+    var selectedDay by remember { mutableStateOf<Int?>(null) }
     
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -66,7 +75,8 @@ fun MonthlyCalendar(
                 } else {
                     currentMonth -= 1
                 }
-                // 월 변경 시 콜백 호출
+                // 월 변경 시 선택 초기화 및 콜백 호출
+                selectedDay = null
                 val yearMonth = String.format("%04d-%02d", currentYear, currentMonth)
                 onMonthChange(yearMonth)
             }) {
@@ -92,7 +102,8 @@ fun MonthlyCalendar(
                 } else {
                     currentMonth += 1
                 }
-                // 월 변경 시 콜백 호출
+                // 월 변경 시 선택 초기화 및 콜백 호출
+                selectedDay = null
                 val yearMonth = String.format("%04d-%02d", currentYear, currentMonth)
                 onMonthChange(yearMonth)
             }) {
@@ -123,7 +134,7 @@ fun MonthlyCalendar(
             }
         }
         
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         
         // 날짜 그리드 (5주 가정)
         val weeks = getWeeksForMonth(currentYear, currentMonth, calendarData)
@@ -138,6 +149,10 @@ fun MonthlyCalendar(
                 week.forEach { dayData ->
                     CalendarDayCell(
                         dayData = dayData,
+                        isSelected = dayData?.day == selectedDay,
+                        onDayClick = { day ->
+                            selectedDay = if (selectedDay == day) null else day
+                        },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -149,6 +164,8 @@ fun MonthlyCalendar(
 @Composable
 fun CalendarDayCell(
     dayData: CalendarDayData?,
+    isSelected: Boolean = false,
+    onDayClick: (Int) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -173,16 +190,59 @@ fun CalendarDayCell(
                     .background(
                         color = backgroundColor,
                         shape = CircleShape
-                    ),
+                    )
+                    .then(
+                        if (isSelected) {
+                            Modifier.border(
+                                width = 2.dp,
+                                color = Color(0xFF6200EA),
+                                shape = CircleShape
+                            )
+                        } else Modifier
+                    )
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        onDayClick(dayData.day)
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = dayData.day.toString(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF333333),
-                    fontWeight = if (dayData.hasActivity) FontWeight.Bold else FontWeight.Normal,
+                    fontWeight = if (dayData.hasActivity || isSelected) FontWeight.Bold else FontWeight.Normal,
                     fontSize = 16.sp
                 )
+            }
+            
+            // 개수 툴팁 (선택 시만 표시) - 절대 위치로 날짜 위에 배치
+            AnimatedVisibility(
+                visible = isSelected && dayData.hasActivity,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = (-28).dp)
+                    .zIndex(10f)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            Color(0xFF333333),
+                            RoundedCornerShape(4.dp)
+                        )
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "${dayData.activityCount}개",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
     }

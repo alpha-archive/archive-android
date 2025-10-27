@@ -1,6 +1,7 @@
 package com.example.archiveandroid.core.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -94,7 +95,9 @@ fun RecommendDetailScreenLayout(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.basicMarquee(),
+                        maxLines = 1
                     )
                 },
                 navigationIcon = {
@@ -148,13 +151,15 @@ fun RecommendDetailScreenLayout(
                             val imageWidth = screenWidth - 32.dp // 좌우 패딩 16dp씩
                             val pagerState = rememberPagerState(pageCount = { state.data.images.size })
                             
-                            Box {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                            ) {
                                 HorizontalPager(
                                     state = pagerState,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .aspectRatio(16f / 9f)
-                                        .clip(RoundedCornerShape(12.dp))
                                         .clickable {
                                             selectedImageIndex = pagerState.currentPage
                                             showImageViewer = true
@@ -167,9 +172,9 @@ fun RecommendDetailScreenLayout(
                                             .build(),
                                         contentDescription = null,
                                         modifier = Modifier
-                                            .fillMaxSize()
+                                            .fillMaxWidth()
                                             .clip(RoundedCornerShape(12.dp)),
-                                        contentScale = ContentScale.Crop
+                                        contentScale = ContentScale.FillWidth
                                     )
                                 }
                                 
@@ -200,25 +205,48 @@ fun RecommendDetailScreenLayout(
                     // 정보 섹션
                     item {
                         RecommendDetailInfoGroup {
-                            RecommendDetailRowInfo(label = "카테고리") {
+                            // 카테고리와 일자를 같은 줄에
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 50.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 CategoryButton(
                                     text = state.data.categoryDisplayName,
                                     backgroundColor = state.data.categoryBg,
                                     textColor = state.data.categoryFg
                                 )
+                                
+                                Text(
+                                    text = state.data.activityDate,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Normal
+                                    )
+                                )
                             }
                             RecommendDetailDivider()
 
-                            RecommendDetailRowInfo(label = "일자", value = state.data.activityDate)
-                            RecommendDetailDivider()
-
-                            RecommendDetailRowInfo(label = "상세 위치", value = state.data.location)
-                            RecommendDetailDivider()
-
-                            RecommendDetailInfoSection(
-                                label = "상세 정보",
-                                info = state.data.detailInfo
+                            // 장소 (label 없이 값만)
+                            Text(
+                                text = state.data.location,
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Normal
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 50.dp)
                             )
+                            
+                            // 상세 정보가 있을 때만 표시
+                            if (state.data.detailInfo.isNotEmpty()) {
+                                RecommendDetailDivider()
+                                RecommendDetailInfoSection(
+                                    label = "상세 정보",
+                                    info = state.data.detailInfo
+                                )
+                            }
                         }
                     }
 

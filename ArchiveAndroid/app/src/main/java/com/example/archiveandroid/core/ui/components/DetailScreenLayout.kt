@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -26,6 +27,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -37,6 +40,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -91,6 +97,11 @@ fun DetailScreenLayout(
     menuItems: List<String> = emptyList(),
     onBack: () -> Unit = {},
     onMenuClick: (String) -> Unit = {},
+    showNavigation: Boolean = false,
+    hasPrevious: Boolean = false,
+    hasNext: Boolean = false,
+    onPreviousClick: () -> Unit = {},
+    onNextClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -186,14 +197,17 @@ fun DetailScreenLayout(
                 }
             }
             state.data != null -> {
-                LazyColumn(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(innerPadding)
-                        .padding(top = 20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                Box(
+                    modifier = Modifier.fillMaxSize()
                 ) {
+                    LazyColumn(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(innerPadding)
+                            .padding(top = 20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
                     // 이미지 섹션
                     if (state.data.images.isNotEmpty()) {
                         item {
@@ -305,9 +319,59 @@ fun DetailScreenLayout(
 
                     // 하단 여백
                     item {
-                        Spacer(modifier = Modifier.padding(bottom = 72.dp))
+                        Spacer(modifier = Modifier.padding(bottom = if (showNavigation) 100.dp else 72.dp))
                     }
                 }
+                
+                // 하단 네비게이션 버튼
+                if (showNavigation && (hasPrevious || hasNext)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter)
+                            .padding(horizontal = 16.dp, vertical = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            onClick = onPreviousClick,
+                            enabled = hasPrevious,
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (hasPrevious) Color(0xFF444444) else Color(0xFFE0E0E0),
+                                contentColor = if (hasPrevious) Color.White else Color(0xFF9E9E9E)
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("이전")
+                        }
+                        
+                        Spacer(modifier = Modifier.width(16.dp))
+                        
+                        Button(
+                            onClick = onNextClick,
+                            enabled = hasNext,
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (hasNext) Color(0xFF444444) else Color(0xFFE0E0E0),
+                                contentColor = if (hasNext) Color.White else Color(0xFF9E9E9E)
+                            )
+                        ) {
+                            Text("다음")
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                }
+            }
             }
             else -> {
                 Box(

@@ -55,7 +55,9 @@ fun LocationPicker(
     
     val uiState by viewModel.uiState.collectAsState()
     
-    val displayText = selectedPlace?.let { "${it.name} (${it.address})" } ?: "장소를 선택하세요"
+    val displayText = selectedPlace?.let { 
+        if (it.address.isNotEmpty()) "${it.name} (${it.address})" else it.name
+    } ?: "장소를 선택하세요"
     
     // 검색어가 변경될 때마다 API 호출
     LaunchedEffect(searchQuery) {

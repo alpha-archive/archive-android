@@ -1,4 +1,4 @@
-package com.example.yourapp.ui.components
+package com.example.archiveandroid.core.ui.components
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons

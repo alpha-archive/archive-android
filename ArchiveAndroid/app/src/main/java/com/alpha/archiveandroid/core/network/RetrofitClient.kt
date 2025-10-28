@@ -43,8 +43,13 @@ object RetrofitClient {
     @Singleton
     @Named("AppRetrofit")
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val normalizedBaseUrl = if (BuildConfig.serverUrl.endsWith("/")) {
+            BuildConfig.serverUrl
+        } else {
+            BuildConfig.serverUrl + "/"
+        }
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.serverUrl)
+            .baseUrl(normalizedBaseUrl)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()

@@ -37,7 +37,9 @@ android {
         buildConfigField("String", "serverUrl", "\"$serverUrl\"")
 
 
-        manifestPlaceholders["kakaoNaitiveAppKey"] = properties.getProperty("kakaoNaitiveAppKey", "www")
+        // Kakao scheme must be like: kakao{native_key_without_prefix}
+        val kakaoNativeKey = properties.getProperty("kakaoNaitiveStringAppKey", "")
+        manifestPlaceholders["kakaoScheme"] = "kakao$kakaoNativeKey"
         buildConfigField("String", "kakaoNativeStringAppKey", properties.getProperty("kakaoNaitiveStringAppKey", "www"))
 
         buildConfigField("String", "kakaoAppKey", properties.getProperty("kakaoAppKeyBuildConfig", "\"\""))
@@ -45,7 +47,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

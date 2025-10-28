@@ -1,21 +1,36 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Kotlin/Coroutines 기본 keep
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+-keepclassmembers class kotlinx.coroutines.** { *; }
+-dontwarn kotlinx.coroutines.**
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Hilt/Dagger (대부분 consumerRules로 해결되지만 안전망)
+-keep class dagger.hilt.** { *; }
+-keep class dagger.hilt.android.internal.managers.** { *; }
+-keep class * extends dagger.hilt.internal.GeneratedComponent { *; }
+-keep class * extends dagger.hilt.internal.GeneratedComponentManager { *; }
+-dontwarn dagger.hilt.**
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Retrofit + OkHttp
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
+}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Gson: 모델은 필드명 유지
+-keep class com.alpha.archiveandroid.**.model.** { *; }
+-keep class com.alpha.archiveandroid.**.dto.** { *; }
+-keepclassmembers class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# Kakao SDK (대개 consumerRules 포함, 그래도 안전망)
+-keep class com.kakao.** { *; }
+-dontwarn com.kakao.**
+
+# Compose(일반적으로 필요없지만 커스텀 리플렉션 시)
+-keep class androidx.compose.** { *; }
+-dontwarn androidx.compose.**

@@ -75,31 +75,43 @@ class IntroViewModel @Inject constructor(
 
     fun tryKakaoAutoLogin() {
         viewModelScope.launch {
-            val ok = introRepository.autoKakaoLogin()
-            _uiState.value = if (ok) UiState.LoggedIn else UiState.NeedLogin
+            try {
+                val ok = introRepository.autoKakaoLogin()
+                _uiState.value = if (ok) UiState.LoggedIn else UiState.NeedLogin
+            } catch (e: Exception) {
+                _uiState.value = UiState.NeedLogin
+            }
         }
     }
 
     fun kakaoLogin(context: Context) {
         _uiState.value = UiState.Loading
         viewModelScope.launch {
-            val r = introRepository.kakaoLogin(context)
-            _uiState.value = if (r.isSuccess) UiState.LoggedIn
-            else UiState.Error(r.exceptionOrNull()?.toUserFriendlyMessage() ?: "로그인에 실패했습니다")
+            try {
+                val r = introRepository.kakaoLogin(context)
+                _uiState.value = if (r.isSuccess) UiState.LoggedIn
+                else UiState.Error(r.exceptionOrNull()?.toUserFriendlyMessage() ?: "로그인에 실패했습니다")
+            } catch (e: Exception) {
+                _uiState.value = UiState.Error(e.message ?: e.toString())
+            }
         }
     }
 
     fun onKakaoLoginSuccess(kakaoAccessToken: String) {
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
-            authRepository.loginWithKakao(kakaoAccessToken)
-                .onSuccess { response ->
-                    tokenStore.save(response.accessToken, response.refreshToken)
-                    _uiState.value = UiState.Success(response.accessToken)
-                }
-                .onFailure { exception ->
-                    _uiState.value = UiState.Error(exception.toUserFriendlyMessage())
-                }
+            try {
+                _uiState.value = UiState.Loading
+                authRepository.loginWithKakao(kakaoAccessToken)
+                    .onSuccess { response ->
+                        tokenStore.save(response.accessToken, response.refreshToken)
+                        _uiState.value = UiState.Success(response.accessToken)
+                    }
+                    .onFailure { exception ->
+                        _uiState.value = UiState.Error(exception.toUserFriendlyMessage())
+                    }
+            } catch (e: Exception) {
+                _uiState.value = UiState.Error(e.message ?: e.toString())
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     id("com.google.dagger.hilt.android")
+    id("com.google.gms.google-services")
     kotlin("kapt")
 }
 
@@ -129,4 +130,9 @@ dependencies {
     // Material Design 3 Date/Time Pickers
     implementation("androidx.compose.material3:material3:1.2.1")
     implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
+    
+    // Firebase BOM
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-config-ktx")
 }

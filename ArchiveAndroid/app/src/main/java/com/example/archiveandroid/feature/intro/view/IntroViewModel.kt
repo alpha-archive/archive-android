@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.archiveandroid.core.storage.TokenStore
+import com.example.archiveandroid.core.version.VersionCheckResult
+import com.example.archiveandroid.core.version.VersionManager
 import com.example.archiveandroid.feature.intro.data.repository.AuthRepository
 import com.example.archiveandroid.feature.intro.data.repository.IntroRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +32,8 @@ import javax.inject.Inject
 class IntroViewModel @Inject constructor(
     private val introRepository: IntroRepository,
     private val authRepository: AuthRepository,
-    private val tokenStore: TokenStore
+    private val tokenStore: TokenStore,
+    private val versionManager: VersionManager
 ) : ViewModel() {
 
     sealed interface UiState {
@@ -43,6 +46,23 @@ class IntroViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<UiState>(UiState.NeedLogin)
     val uiState: StateFlow<UiState> = _uiState
+    
+    private val _versionCheckResult = MutableStateFlow<VersionCheckResult?>(null)
+    val versionCheckResult: StateFlow<VersionCheckResult?> = _versionCheckResult
+    
+    init {
+        checkVersion()
+    }
+    
+    private fun checkVersion() {
+        viewModelScope.launch {
+            try {
+                _versionCheckResult.value = versionManager.checkVersion()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     fun tryKakaoAutoLogin() {
         viewModelScope.launch {

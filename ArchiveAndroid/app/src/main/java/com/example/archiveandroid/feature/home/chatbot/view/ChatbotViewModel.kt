@@ -41,9 +41,9 @@ class ChatbotViewModel @Inject constructor(
     fun sendMessage() {
         val message = _inputText.value.trim()
         if (message.isNotBlank()) {
+            _inputText.value = ""  // 즉시 입력창 비우기
             viewModelScope.launch {
                 repository.sendMessage(message)
-                _inputText.value = ""
             }
         }
     }

@@ -22,6 +22,9 @@ class ChatbotViewModel @Inject constructor(
     private val _inputText = MutableStateFlow("")
     val inputText: StateFlow<String> = _inputText.asStateFlow()
     
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    
     init {
         loadMessages()
     }
@@ -42,15 +45,19 @@ class ChatbotViewModel @Inject constructor(
         val message = _inputText.value.trim()
         if (message.isNotBlank()) {
             _inputText.value = ""  // 즉시 입력창 비우기
+            _isLoading.value = true  // 로딩 시작
             viewModelScope.launch {
                 repository.sendMessage(message)
+                _isLoading.value = false  // 로딩 종료
             }
         }
     }
     
     fun sendSuggestion(suggestionText: String) {
+        _isLoading.value = true  // 로딩 시작
         viewModelScope.launch {
             repository.sendMessage(suggestionText)
+            _isLoading.value = false  // 로딩 종료
         }
     }
 }

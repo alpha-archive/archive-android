@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.archiveandroid.feature.home.chatbot.data.model.MessageType
 import com.example.archiveandroid.feature.home.chatbot.view.ChatbotViewModel
+import com.example.archiveandroid.feature.home.chatbot.view.ui.components.BotLoadingMessage
 import com.example.archiveandroid.feature.home.chatbot.view.ui.components.BotMessage
 import com.example.archiveandroid.feature.home.chatbot.view.ui.components.ChatInputBar
 import com.example.archiveandroid.feature.home.chatbot.view.ui.components.ChatbotHeader
@@ -28,12 +29,14 @@ fun ChatbotScreen(
 ) {
     val messages by viewModel.messages.collectAsState()
     val inputText by viewModel.inputText.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val listState = rememberLazyListState()
 
-    // 메시지가 추가되면 자동으로 스크롤
-    LaunchedEffect(messages.size) {
-        if (messages.isNotEmpty()) {
-            listState.animateScrollToItem(messages.size - 1)
+    // 메시지가 추가되거나 로딩 상태가 변경되면 자동으로 스크롤
+    LaunchedEffect(messages.size, isLoading) {
+        if (messages.isNotEmpty() || isLoading) {
+            val targetIndex = if (isLoading) messages.size else messages.size - 1
+            listState.animateScrollToItem(targetIndex)
         }
     }
 
@@ -45,7 +48,8 @@ fun ChatbotScreen(
             ChatInputBar(
                 value = inputText,
                 onValueChange = viewModel::updateInputText,
-                onSend = viewModel::sendMessage
+                onSend = viewModel::sendMessage,
+                isLoading = isLoading
             )
         }
     ) { paddingValues ->
@@ -69,6 +73,13 @@ fun ChatbotScreen(
                             viewModel.sendSuggestion(text)
                         }
                     )
+                }
+            }
+            
+            // 로딩 중일 때 로딩 인디케이터 표시
+            if (isLoading) {
+                item {
+                    BotLoadingMessage()
                 }
             }
         }

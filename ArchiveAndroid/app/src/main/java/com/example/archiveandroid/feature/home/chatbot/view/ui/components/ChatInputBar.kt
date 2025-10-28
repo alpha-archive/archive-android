@@ -28,7 +28,8 @@ import androidx.compose.ui.unit.dp
 fun ChatInputBar(
     value: String,
     onValueChange: (String) -> Unit,
-    onSend: () -> Unit
+    onSend: () -> Unit,
+    isLoading: Boolean = false
 ) {
     Row(
         modifier = Modifier
@@ -45,7 +46,7 @@ fun ChatInputBar(
                 .clip(RoundedCornerShape(24.dp)),
             placeholder = {
                 Text(
-                    text = "오프라인을 기록해보세요!",
+                    text = if (isLoading) "응답 대기 중..." else "오프라인을 기록해보세요!",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF9C88FF).copy(alpha = 0.6f)
                 )
@@ -58,6 +59,7 @@ fun ChatInputBar(
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent
             ),
+            enabled = !isLoading,
             singleLine = true
         )
         
@@ -65,10 +67,14 @@ fun ChatInputBar(
         
         IconButton(
             onClick = onSend,
+            enabled = !isLoading && value.isNotBlank(),
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF9C88FF))
+                .background(
+                    if (!isLoading && value.isNotBlank()) Color(0xFF9C88FF) 
+                    else Color(0xFF9C88FF).copy(alpha = 0.3f)
+                )
         ) {
             Icon(
                 imageVector = Icons.Default.Send,

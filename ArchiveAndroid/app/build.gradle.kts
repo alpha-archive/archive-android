@@ -21,11 +21,11 @@ configurations.all {
 }
 
 android {
-    namespace = "com.example.archiveandroid"
+    namespace = "com.alpha.archiveandroid"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.archiveandroid"
+        applicationId = "com.alpha.archiveandroid"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

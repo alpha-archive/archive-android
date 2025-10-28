@@ -7,6 +7,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.archiveandroid.core.ui.theme.ArchiveAndroidTheme
 import com.example.archiveandroid.feature.home.recorddetail.view.ui.RecordDetailScreen
@@ -21,15 +25,24 @@ class RecordDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val activityId = intent.getStringExtra("activityId")
+        val initialActivityId = intent.getStringExtra("activityId")
+        val activityIdsList = intent.getStringArrayListExtra("activityIds") ?: arrayListOf()
 
         setContent {
             ArchiveAndroidTheme {
                 val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+                var currentActivityId by remember { mutableStateOf(initialActivityId) }
+                
+                val currentIndex = remember(currentActivityId) {
+                    activityIdsList.indexOf(currentActivityId)
+                }
+                
+                val hasPrevious = currentIndex > 0
+                val hasNext = currentIndex >= 0 && currentIndex < activityIdsList.size - 1
 
-                // activityId가 있으면 해당 기록 로드 (한 번만 실행)
-                LaunchedEffect(activityId) {
-                    if (activityId != null) {
+                // activityId가 있으면 해당 기록 로드
+                LaunchedEffect(currentActivityId) {
+                    currentActivityId?.let { activityId ->
                         viewModel.loadRecordDetail(activityId)
                     }
                 }
@@ -46,7 +59,7 @@ class RecordDetailActivity : ComponentActivity() {
                     uiState = uiState,
                     onBack = { finish() },
                     onEdit = { 
-                        if (activityId != null) {
+                        currentActivityId?.let { activityId ->
                             val intent = Intent(this@RecordDetailActivity, RecordInputActivity::class.java).apply {
                                 putExtra("activityId", activityId)
                             }
@@ -54,8 +67,21 @@ class RecordDetailActivity : ComponentActivity() {
                         }
                     },
                     onDelete = { 
-                        if (activityId != null) {
+                        currentActivityId?.let { activityId ->
                             viewModel.deleteActivity(activityId)
+                        }
+                    },
+                    showNavigation = activityIdsList.isNotEmpty(),
+                    hasPrevious = hasPrevious,
+                    hasNext = hasNext,
+                    onPreviousClick = {
+                        if (hasPrevious) {
+                            currentActivityId = activityIdsList[currentIndex - 1]
+                        }
+                    },
+                    onNextClick = {
+                        if (hasNext) {
+                            currentActivityId = activityIdsList[currentIndex + 1]
                         }
                     }
                 )

@@ -68,12 +68,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.example.archiveandroid.core.ui.components.TopAppBar
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Place
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.example.archiveandroid.feature.home.record.input.view.ui.DateTimePicker
 import com.example.archiveandroid.feature.home.record.input.view.ui.LocationPicker
-import com.example.yourapp.ui.components.TopAppBar
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -109,6 +110,31 @@ fun RecordInputScreen(
     LaunchedEffect(ui.draft) {
         ui.draft?.let { loadedDraft ->
             draft = loadedDraft
+            
+            // 기존 장소 정보 로드
+            if (loadedDraft.location.isNotEmpty()) {
+                selectedPlace = Place(
+                    id = "",
+                    name = loadedDraft.location,
+                    address = "",
+                    roadAddress = "",
+                    category = "",
+                    phone = "",
+                    longitude = "",
+                    latitude = "",
+                    distance = ""
+                )
+            }
+            
+            // 기존 날짜 정보 로드
+            loadedDraft.activityDate?.let { dateStr ->
+                try {
+                    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    selectedDateTime = formatter.parse(dateStr)
+                } catch (e: Exception) {
+                    // 파싱 실패 시 현재 날짜 유지
+                }
+            }
         }
     }
 
@@ -215,11 +241,13 @@ fun RecordInputScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
+        val scrollState = rememberScrollState()
+        
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(top = 20.dp, bottom = 24.dp),
+                .verticalScroll(scrollState)
+                .padding(top = 20.dp, bottom = 400.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             PhotoInput(
@@ -286,39 +314,40 @@ fun RecordInputScreen(
                 .padding(horizontal = 30.dp, vertical = 10.dp))
 
             RowInfoInput(label = "장소") {
-                Column {
-                    LocationPicker(
-                        selectedPlace = selectedPlace,
-                        onPlaceSelected = { place ->
-                            selectedPlace = place
-                            draft = draft.copy(location = place.name)
-                        }
-                    )
-                    if (selectedPlace == null) {
-                        Text(
-                            text = "사진 업로드 시 자동 등록",
-                            color = Color(0xFF898989),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.Light
-                            ),
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
+                LocationPicker(
+                    selectedPlace = selectedPlace,
+                    onPlaceSelected = { place ->
+                        selectedPlace = place
+                        draft = draft.copy(location = place.name)
                     }
-                }
+                )
             }
             Divider(color = Color(0xffD9D9D9), modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 30.dp, vertical = 10.dp))
 
             RowInfoInput(label = "메모") {
+                var previousLength by remember { mutableStateOf(draft.memo.length) }
+                
                 TextField(
                     value = draft.memo,
-                    onValueChange = { draft = draft.copy(memo = it) },
-                    singleLine = true,
+                    onValueChange = { newValue ->
+                        draft = draft.copy(memo = newValue)
+                        // 텍스트가 늘어날 때만 스크롤
+                        if (newValue.length > previousLength) {
+                            scope.launch {
+                                kotlinx.coroutines.delay(50)
+                                scrollState.animateScrollTo(scrollState.maxValue)
+                            }
+                        }
+                        previousLength = newValue.length
+                    },
+                    singleLine = false,
+                    minLines = 3,
                     colors = textfieldColors,
                     modifier = Modifier
                         .widthIn(min = 180.dp, max = 420.dp)
-                        .heightIn(min = 44.dp)
+                        .heightIn(min = 100.dp)
                         .fillMaxWidth()
                 )
             }

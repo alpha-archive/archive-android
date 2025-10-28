@@ -136,8 +136,10 @@ fun RecordScreen(
     }
 
     fun startRecordDetailActivity(activityId: String) {
+        val activityIds = ArrayList(activities.map { it.id })
         val intent = Intent(context, RecordDetailActivity::class.java).apply {
             putExtra("activityId", activityId)
+            putStringArrayListExtra("activityIds", activityIds)
         }
         recordDetailLauncher.launch(intent)
     }

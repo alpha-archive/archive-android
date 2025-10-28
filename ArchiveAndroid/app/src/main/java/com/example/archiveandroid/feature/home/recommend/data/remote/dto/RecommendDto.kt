@@ -9,7 +9,7 @@ data class RecommendActivityDto(
     @SerializedName("title")
     val title: String,
     @SerializedName("description")
-    val description: String,
+    val description: String?,
     @SerializedName("category")
     val category: String, // MUSICAL, THEATER, MOVIE, EXHIBITION 등
     @SerializedName("startAt")
@@ -36,42 +36,40 @@ data class RecommendActivityDto(
     val ingestedAt: String
 )
 
-// 추천 활동 상세용 DTO
+// 추천 활동 상세용 DTO (API 명세서 기준)
 data class RecommendActivityDetailDto(
     @SerializedName("id")
     val id: String,
     @SerializedName("title")
     val title: String,
+    @SerializedName("description")
+    val description: String?,
     @SerializedName("category")
     val category: String,
-    @SerializedName("categoryDisplayName")
-    val categoryDisplayName: String,
-    @SerializedName("location")
-    val location: String,
-    @SerializedName("startDate")
-    val startDate: String,
-    @SerializedName("endDate")
-    val endDate: String,
-    @SerializedName("description")
-    val description: String,
     @SerializedName("thumbnailImageUrl")
     val thumbnailImageUrl: String?,
-    @SerializedName("images")
-    val images: List<RecommendImageDto>,
-    @SerializedName("recommendationReason")
-    val recommendationReason: String,
-    @SerializedName("dDay")
-    val dDay: Int?,
-    @SerializedName("distance")
-    val distance: String?,
-    @SerializedName("isPublicEvent")
-    val isPublicEvent: Boolean,
-    @SerializedName("rating")
-    val rating: Double?,
-    @SerializedName("contactInfo")
-    val contactInfo: String?,
-    @SerializedName("websiteUrl")
-    val websiteUrl: String?
+    @SerializedName("startAt")
+    val startAt: String,
+    @SerializedName("endAt")
+    val endAt: String,
+    @SerializedName("placeName")
+    val placeName: String,
+    @SerializedName("placeAddress")
+    val placeAddress: String,
+    @SerializedName("placeCity")
+    val placeCity: String,
+    @SerializedName("placeDistrict")
+    val placeDistrict: String,
+    @SerializedName("placeLatitude")
+    val placeLatitude: Double,
+    @SerializedName("placeLongitude")
+    val placeLongitude: Double,
+    @SerializedName("placePhone")
+    val placePhone: String?,
+    @SerializedName("placeHomepage")
+    val placeHomepage: String?,
+    @SerializedName("ingestedAt")
+    val ingestedAt: String
 )
 
 // 추천 이미지 정보 DTO

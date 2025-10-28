@@ -27,7 +27,7 @@ fun RecommendScreen() {
 @Composable fun ChatbotScreen() { 
     com.example.archiveandroid.feature.home.chatbot.view.ui.ChatbotScreen()
 }
-@Composable fun StatsScreen() { CenterLabel("통계") }
+@Composable fun StatsScreen() { com.example.archiveandroid.feature.home.stats.view.ui.StatsScreen() }
 @Composable fun UserScreen() { CenterLabel("사용자") }
 
 

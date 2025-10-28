@@ -43,7 +43,7 @@ data class ActivityDetailDto(
     @SerializedName("rating")
     val rating: Int,
     @SerializedName("memo")
-    val memo: String,
+    val memo: String?,
     @SerializedName("isPublicEvent")
     val isPublicEvent: Boolean,
     @SerializedName("publicEventInfo")

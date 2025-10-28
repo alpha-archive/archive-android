@@ -1,21 +1,28 @@
 package com.example.archiveandroid.feature.home.chatbot.data.repository
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
+import com.example.archiveandroid.core.repository.BaseRepository
 import com.example.archiveandroid.feature.home.chatbot.data.model.ChatMessage
 import com.example.archiveandroid.feature.home.chatbot.data.model.MessageType
 import com.example.archiveandroid.feature.home.chatbot.data.model.SuggestionChip
+import com.example.archiveandroid.feature.home.chatbot.data.remote.ChatbotApi
+import com.example.archiveandroid.feature.home.chatbot.data.remote.dto.ChatbotMessageRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
-class ChatbotRepositoryImpl @Inject constructor() : ChatbotRepository {
+class ChatbotRepositoryImpl @Inject constructor(
+    private val chatbotApi: ChatbotApi
+) : ChatbotRepository, BaseRepository() {
     
     private val _messages = MutableStateFlow(getInitialMessages())
     
     override fun getMessages(): Flow<List<ChatMessage>> = _messages.asStateFlow()
     
     override suspend fun sendMessage(message: String) {
+        // 사용자 메시지 추가
         val newMessage = ChatMessage(
             id = _messages.value.size + 1,
             type = MessageType.USER,
@@ -23,14 +30,29 @@ class ChatbotRepositoryImpl @Inject constructor() : ChatbotRepository {
         )
         _messages.value = _messages.value + newMessage
         
-        // TODO: 실제 API 호출로 대체
-        // 임시 봇 응답
-        val botResponse = ChatMessage(
-            id = _messages.value.size + 1,
-            type = MessageType.BOT,
-            content = "메시지를 받았습니다: $message"
-        )
-        _messages.value = _messages.value + botResponse
+        // API 호출
+        val request = ChatbotMessageRequest(message = message)
+        val result = handleApiCall { chatbotApi.sendMessage(request) }
+        
+        result.onSuccess { response ->
+            val botResponse = ChatMessage(
+                id = _messages.value.size + 1,
+                type = MessageType.BOT,
+                content = response.reply
+            )
+            _messages.value = _messages.value + botResponse
+        }
+        
+        result.onFailure { error ->
+            Log.e("ChatbotRepository", "API 호출 실패: ${error.message}")
+            // 에러 시 기본 응답
+            val errorResponse = ChatMessage(
+                id = _messages.value.size + 1,
+                type = MessageType.BOT,
+                content = "죄송합니다. 일시적인 오류가 발생했습니다. 다시 시도해주세요."
+            )
+            _messages.value = _messages.value + errorResponse
+        }
     }
     
     private fun getInitialMessages(): List<ChatMessage> {

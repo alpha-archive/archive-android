@@ -1,11 +1,11 @@
 package com.example.archiveandroid.feature.home.recommend.detail.view
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.archiveandroid.core.network.toUserFriendlyMessage
 import com.example.archiveandroid.core.ui.components.DetailScreenState
+import com.example.archiveandroid.core.util.CategoryColorGenerator
 import com.example.archiveandroid.core.util.DateFormatter
 import com.example.archiveandroid.feature.home.recommend.data.repository.RecommendRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -83,7 +83,7 @@ private fun com.example.archiveandroid.feature.home.recommend.data.remote.dto.Re
     val categoryDisplayName = getCategoryDisplayName(this.category)
     
     // 카테고리 색상
-    val (bgColor, fgColor) = getCategoryColor(categoryDisplayName)
+    val (bgColor, fgColor) = CategoryColorGenerator.getCategoryColors(categoryDisplayName)
     
     // 장소 정보 조합
     val locationText = "${this.placeName} (${this.placeDistrict})"
@@ -145,31 +145,3 @@ private fun getCategoryDisplayName(category: String): String {
     }
 }
 
-/**
- * 카테고리에 따른 색상 반환
- */
-private fun getCategoryColor(category: String): Pair<Color, Color> {
-    return when (category) {
-        "여행" -> Pair(Color(0xFFE8F0FF), Color(0xFF335C99))
-        "독서" -> Pair(Color(0xFFFFEFE6), Color(0xFFB04A17))
-        "스포츠", "스포츠 관람" -> Pair(Color(0xFFEAF5FF), Color(0xFF2C5A8A))
-        "운동" -> Pair(Color(0xFFE7FFF2), Color(0xFF138A52))
-        "전시" -> Pair(Color(0xFFFFF4E5), Color(0xFF9A6B1A))
-        "봉사" -> Pair(Color(0xFFEFF7FF), Color(0xFF2D6AA3))
-        "뮤지컬" -> Pair(Color(0xFFF4E9FF), Color(0xFF6B39A6))
-        "악기 연주" -> Pair(Color(0xFFEFF9FF), Color(0xFF1F6E8C))
-        "연극" -> Pair(Color(0xFFFFF0F5), Color(0xFF8B4067))
-        "영화" -> Pair(Color(0xFFE8E8E8), Color(0xFF4A4A4A))
-        "콘서트" -> Pair(Color(0xFFFFE8F0), Color(0xFF993366))
-        "축제" -> Pair(Color(0xFFFFFBE6), Color(0xFF996600))
-        "체험" -> Pair(Color(0xFFE6F9FF), Color(0xFF006699))
-        "요리" -> Pair(Color(0xFFFFF3E0), Color(0xFFE65100))
-        "워크샵" -> Pair(Color(0xFFF3E5F5), Color(0xFF7B1FA2))
-        "야외활동" -> Pair(Color(0xFFE8F5E9), Color(0xFF2E7D32))
-        "취미" -> Pair(Color(0xFFFCE4EC), Color(0xFFC2185B))
-        "스터디" -> Pair(Color(0xFFE3F2FD), Color(0xFF1565C0))
-        "네트워킹" -> Pair(Color(0xFFFFF9C4), Color(0xFFF57F17))
-        "기타" -> Pair(Color(0xFFECEFF1), Color(0xFF546E7A))
-        else -> Pair(Color(0xFFE0E0E0), Color(0xFF666666))
-    }
-}

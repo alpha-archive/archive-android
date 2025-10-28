@@ -1,9 +1,9 @@
 package com.example.archiveandroid.feature.home.stats.view
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.archiveandroid.core.network.toUserFriendlyMessage
+import com.example.archiveandroid.core.util.CategoryColorGenerator
 import com.example.archiveandroid.feature.home.stats.data.ActivityTypeData
 import com.example.archiveandroid.feature.home.stats.data.CalendarDayData
 import com.example.archiveandroid.feature.home.stats.data.DailyData
@@ -70,10 +70,11 @@ class StatsViewModel @Inject constructor(
                 .onSuccess { response ->
                     _totalActivities.value = response.totalActivities
                     _categoryStats.value = response.categoryStats.map { stat ->
+                        val (_, fgColor) = CategoryColorGenerator.getCategoryColors(stat.displayName)
                         ActivityTypeData(
                             type = stat.displayName,
                             count = stat.count,
-                            color = getCategoryColor(stat.category)
+                            color = fgColor
                         )
                     }
                 }
@@ -157,20 +158,5 @@ class StatsViewModel @Inject constructor(
         }
     }
 
-    private fun getCategoryColor(category: String): Color {
-        // 카테고리 이름을 시드로 사용해서 일관된 랜덤 색상 생성
-        val hash = category.hashCode()
-        
-        // Hue (색상): 0-360도 범위에서 선택
-        val hue = kotlin.math.abs(hash) % 360
-        
-        // Saturation (채도): 60-90% 범위로 제한 (너무 연하지 않게)
-        val saturation = 0.6f + (kotlin.math.abs(hash shr 8) % 31) / 100f
-        
-        // Value (명도): 70-95% 범위로 제한 (너무 어둡지 않게)
-        val value = 0.7f + (kotlin.math.abs(hash shr 16) % 26) / 100f
-        
-        return Color.hsv(hue.toFloat(), saturation, value)
-    }
 }
 

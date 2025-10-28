@@ -320,24 +320,6 @@ fun RecordScreen(
     }
 }
 
-/**
- * 카테고리에 따른 색상 반환
- */
-private fun getCategoryColor(category: String): Pair<Color, Color> {
-    return when (category) {
-        "여행" -> Pair(Color(0xFFE8F0FF), Color(0xFF335C99))
-        "전시" -> Pair(Color(0xFFFFF4E5), Color(0xFF9A6B1A))
-        "운동" -> Pair(Color(0xFFE7FFF2), Color(0xFF138A52))
-        "뮤지컬" -> Pair(Color(0xFFF4E9FF), Color(0xFF6B39A6))
-        "독서" -> Pair(Color(0xFFFFEFE6), Color(0xFFB04A17))
-        "스포츠" -> Pair(Color(0xFFEAF5FF), Color(0xFF2C5A8A))
-        "음악" -> Pair(Color(0xFFEFF9FF), Color(0xFF1F6E8C))
-        "봉사" -> Pair(Color(0xFFEFF7FF), Color(0xFF2D6AA3))
-        "작업" -> Pair(Color(0xFFF0F8FF), Color(0xFF4169E1))
-        "영화" -> Pair(Color(0xFFFFF0F5), Color(0xFFDC143C))
-        else -> Pair(Color(0xFFF5F5F5), Color(0xFF666666))
-    }
-}
 
 
 

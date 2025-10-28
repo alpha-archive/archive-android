@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.archiveandroid.core.util.CategoryColorGenerator
 
 // 필터링을 위한 데이터 클래스
 data class RecommendFilterData(
@@ -541,10 +542,12 @@ private fun CategoryGridItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val (bgColor, fgColor) = CategoryColorGenerator.getCategoryColors(category)
+    
     Box(
         modifier = Modifier
             .background(
-                color = if (isSelected) getCategoryColor(category) else Color(0xFFF0F0F0),
+                color = if (isSelected) bgColor else Color(0xFFF0F0F0),
                 shape = RoundedCornerShape(8.dp)
             )
             .clickable { onClick() }
@@ -553,7 +556,7 @@ private fun CategoryGridItem(
     ) {
         Text(
             text = category,
-            color = if (isSelected) Color.White else Color(0xFF666666),
+            color = if (isSelected) fgColor else Color(0xFF666666),
             style = MaterialTheme.typography.bodySmall.copy(
                 fontWeight = FontWeight.Medium
             )
@@ -613,30 +616,3 @@ private fun getCategoryKoreanValue(englishCategory: String): String {
     }
 }
 
-/**
- * 카테고리에 따른 색상 반환
- */
-private fun getCategoryColor(category: String): Color {
-    return when (category) {
-        "음악" -> Color(0xFFFF5722)
-        "예술" -> Color(0xFF9C27B0)
-        "체험" -> Color(0xFF3F51B5)
-        "전시" -> Color(0xFF2196F3)
-        "뮤지컬" -> Color(0xFF00BCD4)
-        "연극" -> Color(0xFF009688)
-        "영화" -> Color(0xFF4CAF50)
-        "콘서트" -> Color(0xFF8BC34A)
-        "축제" -> Color(0xFFCDDC39)
-        "워크샵" -> Color(0xFFFFEB3B)
-        "스포츠" -> Color(0xFFFFC107)
-        "여행" -> Color(0xFFFF9800)
-        "독서" -> Color(0xFFFF5722)
-        "요리" -> Color(0xFF795548)
-        "봉사" -> Color(0xFF607D8B)
-        "취미" -> Color(0xFFE91E63)
-        "스터디" -> Color(0xFF673AB7)
-        "네트워킹" -> Color(0xFF00BCD4)
-        "기타" -> Color(0xFF9E9E9E)
-        else -> Color(0xFF9E9E9E)
-    }
-}

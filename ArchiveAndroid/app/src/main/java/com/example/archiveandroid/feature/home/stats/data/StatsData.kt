@@ -1,6 +1,7 @@
 package com.example.archiveandroid.feature.home.stats.data
 
 import androidx.compose.ui.graphics.Color
+import com.example.archiveandroid.core.util.CategoryColorGenerator
 
 data class DailyData(
     val day: String,
@@ -95,10 +96,10 @@ object SampleStatsData {
                 CalendarDayData(31, false)
             ),
             activityTypes = listOf(
-                ActivityTypeData("운동", 8, Color(0xFF4CAF50)),
-                ActivityTypeData("문화", 6, Color(0xFF2196F3)),
-                ActivityTypeData("여행", 4, Color(0xFFFF9800)),
-                ActivityTypeData("기타", 6, Color(0xFF9C27B0))
+                ActivityTypeData("운동", 8, CategoryColorGenerator.getCategoryColors("운동").second),
+                ActivityTypeData("문화", 6, CategoryColorGenerator.getCategoryColors("문화").second),
+                ActivityTypeData("여행", 4, CategoryColorGenerator.getCategoryColors("여행").second),
+                ActivityTypeData("기타", 6, CategoryColorGenerator.getCategoryColors("기타").second)
             ),
             recentActivities = listOf(
                 RecentActivityData("운동", "2023-10-26"),

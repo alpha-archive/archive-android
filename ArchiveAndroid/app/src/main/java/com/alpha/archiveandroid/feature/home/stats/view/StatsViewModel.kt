@@ -70,11 +70,11 @@ class StatsViewModel @Inject constructor(
                 .onSuccess { response ->
                     _totalActivities.value = response.totalActivities
                     _categoryStats.value = response.categoryStats.map { stat ->
-                        val (_, fgColor) = CategoryColorGenerator.getCategoryColors(stat.displayName)
+                        val (bgColor, _) = CategoryColorGenerator.getCategoryColors(stat.displayName)
                         ActivityTypeData(
                             type = stat.displayName,
                             count = stat.count,
-                            color = fgColor
+                            color = bgColor
                         )
                     }
                 }

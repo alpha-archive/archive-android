@@ -2,6 +2,7 @@ package com.example.archiveandroid.feature.home.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.archiveandroid.core.network.toUserFriendlyMessage
 import com.example.archiveandroid.feature.home.record.data.repository.ActivityRepository
 import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityDto
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -69,7 +70,7 @@ class RecordViewModel @Inject constructor(
                     _allActivities.value = activities
                 }
                 .onFailure { exception ->
-                    _error.value = exception.message ?: "데이터를 불러올 수 없습니다"
+                    _error.value = exception.toUserFriendlyMessage()
                 }
             
             loadingState.value = false

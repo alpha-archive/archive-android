@@ -2,6 +2,7 @@ package com.example.archiveandroid.feature.home.recorddetail.view
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.archiveandroid.core.network.toUserFriendlyMessage
 import com.example.archiveandroid.feature.home.record.data.repository.ActivityRepository
 import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityDetailDto
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,13 +43,13 @@ class RecordDetailViewModel @Inject constructor(
                     .onFailure { exception ->
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            error = exception.message ?: "로드 실패"
+                            error = exception.toUserFriendlyMessage()
                         )
                     }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = "예외 발생: ${e.message}"
+                    error = e.toUserFriendlyMessage()
                 )
             }
         }
@@ -69,13 +70,13 @@ class RecordDetailViewModel @Inject constructor(
                     .onFailure { exception ->
                         _uiState.value = _uiState.value.copy(
                             isDeleting = false,
-                            error = exception.message ?: "삭제 실패"
+                            error = exception.toUserFriendlyMessage()
                         )
                     }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isDeleting = false,
-                    error = "예외 발생: ${e.message}"
+                    error = e.toUserFriendlyMessage()
                 )
             }
         }

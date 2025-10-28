@@ -49,15 +49,16 @@ class VersionManager @Inject constructor(
         )
     }
     
-    suspend fun checkVersion(): VersionCheckResult {
+    suspend fun checkVersion(): VersionCheckResult? {
         try {
             // Remote Config에서 최신 값 가져오기
             val fetchTask = remoteConfig.fetch(0)
             fetchTask.await()
             remoteConfig.activate().await()
         } catch (e: Exception) {
-            // 네트워크 오류 등으로 실패하면 캐시된 값 사용
+            // 네트워크 오류 시 버전 체크 스킵
             e.printStackTrace()
+            return null
         }
         
         val currentVersion = getCurrentVersionCode()

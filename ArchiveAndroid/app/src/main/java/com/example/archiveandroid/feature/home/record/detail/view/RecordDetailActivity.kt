@@ -71,6 +71,11 @@ class RecordDetailActivity : ComponentActivity() {
                             viewModel.deleteActivity(activityId)
                         }
                     },
+                    onRefresh = {
+                        currentActivityId?.let { activityId ->
+                            viewModel.loadRecordDetail(activityId)
+                        }
+                    },
                     showNavigation = activityIdsList.isNotEmpty(),
                     hasPrevious = hasPrevious,
                     hasNext = hasNext,

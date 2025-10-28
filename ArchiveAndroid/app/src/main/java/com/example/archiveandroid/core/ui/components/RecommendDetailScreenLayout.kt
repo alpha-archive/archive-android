@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -82,6 +83,7 @@ fun RecommendDetailScreenLayout(
     title: String,
     showBack: Boolean = true,
     onBack: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -128,11 +130,19 @@ fun RecommendDetailScreenLayout(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "오류: ${state.error}",
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = state.error ?: "",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Button(onClick = onRefresh) {
+                            Text("다시 시도")
+                        }
+                    }
                 }
             }
             state.data != null -> {

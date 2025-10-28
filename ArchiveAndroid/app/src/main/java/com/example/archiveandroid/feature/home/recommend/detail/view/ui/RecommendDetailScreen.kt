@@ -40,6 +40,7 @@ fun RecommendDetailScreen(
         title = uiState.data?.title ?: "추천 활동 상세",
         showBack = true,
         onBack = onBack,
+        onRefresh = { viewModel.refresh() },
         modifier = modifier
     )
 }

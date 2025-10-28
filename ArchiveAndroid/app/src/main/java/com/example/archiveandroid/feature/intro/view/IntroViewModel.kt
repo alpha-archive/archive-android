@@ -3,6 +3,7 @@ package com.example.archiveandroid.feature.intro.view
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.archiveandroid.core.network.toUserFriendlyMessage
 import com.example.archiveandroid.core.storage.TokenStore
 import com.example.archiveandroid.core.version.VersionCheckResult
 import com.example.archiveandroid.core.version.VersionManager
@@ -57,9 +58,17 @@ class IntroViewModel @Inject constructor(
     private fun checkVersion() {
         viewModelScope.launch {
             try {
-                _versionCheckResult.value = versionManager.checkVersion()
+                val result = versionManager.checkVersion()
+                if (result != null) {
+                    _versionCheckResult.value = result
+                } else {
+                    // 네트워크 오류로 버전 체크 실패 시 자동 로그인 진행
+                    tryKakaoAutoLogin()
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
+                // 예외 발생 시에도 자동 로그인 진행
+                tryKakaoAutoLogin()
             }
         }
     }
@@ -76,7 +85,7 @@ class IntroViewModel @Inject constructor(
         viewModelScope.launch {
             val r = introRepository.kakaoLogin(context)
             _uiState.value = if (r.isSuccess) UiState.LoggedIn
-            else UiState.Error(r.exceptionOrNull()?.message ?: "Login failed")
+            else UiState.Error(r.exceptionOrNull()?.toUserFriendlyMessage() ?: "로그인에 실패했습니다")
         }
     }
 
@@ -89,7 +98,7 @@ class IntroViewModel @Inject constructor(
                     _uiState.value = UiState.Success(response.accessToken)
                 }
                 .onFailure { exception ->
-                    _uiState.value = UiState.Error(exception.message ?: "로그인 실패")
+                    _uiState.value = UiState.Error(exception.toUserFriendlyMessage())
                 }
         }
     }

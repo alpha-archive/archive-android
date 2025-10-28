@@ -14,6 +14,7 @@ fun RecordDetailScreen(
     onBack: () -> Unit = {},
     onEdit: () -> Unit = {},
     onDelete: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     showNavigation: Boolean = false,
     hasPrevious: Boolean = false,
     hasNext: Boolean = false,
@@ -46,6 +47,7 @@ fun RecordDetailScreen(
         hasNext = hasNext,
         onPreviousClick = onPreviousClick,
         onNextClick = onNextClick,
+        onRefresh = onRefresh,
         modifier = modifier
     )
 }

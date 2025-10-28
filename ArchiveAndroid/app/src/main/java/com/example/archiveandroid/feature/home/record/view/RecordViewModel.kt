@@ -2,6 +2,7 @@ package com.example.archiveandroid.feature.home.record
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.archiveandroid.core.network.toUserFriendlyMessage
 import com.example.archiveandroid.feature.home.record.data.repository.ActivityRepository
 import com.example.archiveandroid.feature.home.record.data.remote.dto.ActivityDto
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +30,7 @@ class RecordViewModel @Inject constructor(
         _allActivities,
         _selectedFilters
     ) { allActivities, selectedFilters ->
-        if (selectedFilters.isEmpty()) {
+        val filtered = if (selectedFilters.isEmpty()) {
             allActivities
         } else {
             allActivities.filter { activity ->
@@ -38,6 +39,8 @@ class RecordViewModel @Inject constructor(
                 selectedFilters.contains(activity.category)
             }
         }
+        // 날짜 기준 내림차순 정렬 (최신순)
+        filtered.sortedByDescending { it.activityDate }
     }.stateIn(
         scope = viewModelScope,
         started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
@@ -67,7 +70,7 @@ class RecordViewModel @Inject constructor(
                     _allActivities.value = activities
                 }
                 .onFailure { exception ->
-                    _error.value = exception.message ?: "데이터를 불러올 수 없습니다"
+                    _error.value = exception.toUserFriendlyMessage()
                 }
             
             loadingState.value = false

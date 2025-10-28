@@ -3,15 +3,20 @@ package com.example.archiveandroid.feature.intro.view
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.archiveandroid.core.ui.components.UpdateDialog
 import com.example.archiveandroid.core.ui.theme.ArchiveAndroidTheme
+import com.example.archiveandroid.core.version.UpdateType
 import com.example.archiveandroid.feature.home.HomeActivity
 import com.example.archiveandroid.feature.intro.view.ui.IntroScreen
 import com.kakao.sdk.auth.TokenManagerProvider
@@ -37,22 +42,48 @@ class IntroActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.tryKakaoAutoLogin()
 
         setContent {
             ArchiveAndroidTheme {
                 val ui = viewModel.uiState.collectAsStateWithLifecycle().value
-                Log.d("IntroActivity", "Current UI State: $ui")
-                when (ui) {
-                    IntroViewModel.UiState.Loading -> IntroScreen.SplashScreen()
-                    IntroViewModel.UiState.NeedLogin -> IntroScreen.LoginScreen(
-                        onClickKakao = { viewModel.kakaoLogin(this) }
-                    )
-                    IntroViewModel.UiState.LoggedIn ->
-                        viewModel.onKakaoLoginSuccess(TokenManagerProvider.instance.manager.getToken()?.accessToken!!)
-                    is IntroViewModel.UiState.Success -> NavigateToHomeAndFinish()
-                    is IntroViewModel.UiState.Error -> IntroScreen.LoginScreen(
-                        error = ui.msg, onClickKakao = { viewModel.kakaoLogin(this) }
+                val versionCheckResult = viewModel.versionCheckResult.collectAsStateWithLifecycle().value
+                var showUpdateDialog by remember { mutableStateOf(false) }
+                
+                // 버전 체크 완료되면 자동 로그인 시도
+                LaunchedEffect(versionCheckResult) {
+                    if (versionCheckResult != null) {
+                        if (versionCheckResult.updateType != UpdateType.NONE) {
+                            showUpdateDialog = true
+                        } else {
+                            viewModel.tryKakaoAutoLogin()
+                        }
+                    }
+                }
+                
+                // 필수 업데이트가 있으면 로그인 플로우 진행 안함
+                if (versionCheckResult?.updateType == UpdateType.REQUIRED) {
+                    IntroScreen.SplashScreen()
+                } else {
+                    when (ui) {
+                        IntroViewModel.UiState.Loading -> IntroScreen.SplashScreen()
+                        IntroViewModel.UiState.NeedLogin -> IntroScreen.LoginScreen(
+                            onClickKakao = { viewModel.kakaoLogin(this) }
+                        )
+                        IntroViewModel.UiState.LoggedIn ->
+                            viewModel.onKakaoLoginSuccess(TokenManagerProvider.instance.manager.getToken()?.accessToken!!)
+                        is IntroViewModel.UiState.Success -> NavigateToHomeAndFinish()
+                        is IntroViewModel.UiState.Error -> IntroScreen.LoginScreen(
+                            error = ui.msg, onClickKakao = { viewModel.kakaoLogin(this) }
+                        )
+                    }
+                }
+                
+                // 업데이트 다이얼로그
+                if (showUpdateDialog && versionCheckResult != null) {
+                    UpdateDialog(
+                        updateType = versionCheckResult.updateType,
+                        playStoreUrl = versionCheckResult.playStoreUrl,
+                        onDismiss = { showUpdateDialog = false }
                     )
                 }
             }

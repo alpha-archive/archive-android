@@ -2,6 +2,7 @@ package com.example.archiveandroid.feature.home.recommend.view
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.archiveandroid.core.network.toUserFriendlyMessage
 import com.example.archiveandroid.feature.home.recommend.data.repository.RecommendRepository
 import com.example.archiveandroid.feature.home.recommend.data.remote.dto.RecommendActivityDto
 import com.example.archiveandroid.feature.home.recommend.filter.RecommendFilterData
@@ -87,7 +88,7 @@ class RecommendViewModel @Inject constructor(
                     }
                 }
                 .onFailure { exception ->
-                    _error.value = exception.message ?: "추천 데이터를 불러올 수 없습니다"
+                    _error.value = exception.toUserFriendlyMessage()
                 }
             
             loadingState.value = false
@@ -152,7 +153,7 @@ class RecommendViewModel @Inject constructor(
                     }
                 }
                 .onFailure { exception ->
-                    _error.value = exception.message ?: "추천 데이터를 불러올 수 없습니다"
+                    _error.value = exception.toUserFriendlyMessage()
                 }
             
             _isLoading.value = false

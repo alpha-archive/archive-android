@@ -3,6 +3,7 @@ package com.example.archiveandroid.feature.home.stats.view
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.archiveandroid.core.network.toUserFriendlyMessage
 import com.example.archiveandroid.feature.home.stats.data.ActivityTypeData
 import com.example.archiveandroid.feature.home.stats.data.CalendarDayData
 import com.example.archiveandroid.feature.home.stats.data.DailyData
@@ -77,7 +78,7 @@ class StatsViewModel @Inject constructor(
                     }
                 }
                 .onFailure { throwable ->
-                    _error.value = throwable.message ?: "통계를 불러오는데 실패했습니다."
+                    _error.value = throwable.toUserFriendlyMessage()
                 }
 
             weeklyResult
@@ -92,7 +93,7 @@ class StatsViewModel @Inject constructor(
                 }
                 .onFailure { throwable ->
                     if (_error.value == null) {
-                        _error.value = throwable.message ?: "주간 통계를 불러오는데 실패했습니다."
+                        _error.value = throwable.toUserFriendlyMessage()
                     }
                 }
 

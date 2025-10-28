@@ -2,6 +2,7 @@ package com.example.archiveandroid.feature.home.record.input
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.archiveandroid.core.network.toUserFriendlyMessage
 import com.example.archiveandroid.core.util.DateFormatter
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.ImageUploadData
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.RecordInputRequest
@@ -79,7 +80,7 @@ class RecordInputViewModel @Inject constructor(
                 .onFailure { exception ->
                     _uiState.value = _uiState.value.copy(
                         isLoadingActivity = false,
-                        errorMessage = "기존 데이터를 불러올 수 없습니다: ${exception.message}"
+                        errorMessage = exception.toUserFriendlyMessage()
                     )
                 }
         }
@@ -100,7 +101,7 @@ class RecordInputViewModel @Inject constructor(
                 .onFailure { exception ->
                     _uiState.value = _uiState.value.copy(
                         isUploadingImage = false,
-                        errorMessage = "이미지 업로드 실패: ${exception.localizedMessage}"
+                        errorMessage = "이미지 업로드 중 오류가 발생했습니다"
                     )
                 }
         }
@@ -159,7 +160,7 @@ class RecordInputViewModel @Inject constructor(
                     .onFailure { exception ->
                         _uiState.value = currentState.copy(
                             submitting = false,
-                            errorMessage = exception.message ?: "수정 실패"
+                            errorMessage = exception.toUserFriendlyMessage()
                         )
                     }
             } else {
@@ -178,7 +179,7 @@ class RecordInputViewModel @Inject constructor(
                     .onFailure { exception ->
                         _uiState.value = currentState.copy(
                             submitting = false,
-                            errorMessage = exception.message ?: "저장 실패"
+                            errorMessage = exception.toUserFriendlyMessage()
                         )
                     }
             }

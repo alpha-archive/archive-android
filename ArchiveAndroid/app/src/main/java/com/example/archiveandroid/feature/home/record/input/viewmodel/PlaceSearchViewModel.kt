@@ -2,6 +2,7 @@ package com.example.archiveandroid.feature.home.record.input.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.archiveandroid.core.network.toUserFriendlyMessage
 import com.example.archiveandroid.feature.home.record.input.data.repository.PlaceSearchRepository
 import com.example.archiveandroid.feature.home.record.input.data.remote.dto.Place
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,7 +52,7 @@ class PlaceSearchViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     _uiState.value = _uiState.value.copy(
-                        error = exception.message ?: "검색 중 오류가 발생했습니다.",
+                        error = exception.toUserFriendlyMessage(),
                         searchResults = emptyList(),
                         isLoading = false
                     )

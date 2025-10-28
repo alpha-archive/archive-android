@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.archiveandroid.core.network.toUserFriendlyMessage
 import com.example.archiveandroid.core.ui.components.DetailScreenState
 import com.example.archiveandroid.core.util.DateFormatter
 import com.example.archiveandroid.feature.home.recommend.data.repository.RecommendRepository
@@ -51,7 +52,7 @@ class RecommendDetailViewModel @Inject constructor(
                 .onFailure { exception ->
                     _uiState.value = DetailScreenState(
                         isLoading = false,
-                        error = exception.message ?: "활동 정보를 불러올 수 없습니다"
+                        error = exception.toUserFriendlyMessage()
                     )
                 }
         }

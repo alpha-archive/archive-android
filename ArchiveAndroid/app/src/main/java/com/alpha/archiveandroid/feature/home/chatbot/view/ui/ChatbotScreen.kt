@@ -1,0 +1,87 @@
+package com.alpha.archiveandroid.feature.home.chatbot.view.ui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.alpha.archiveandroid.feature.home.chatbot.data.model.MessageType
+import com.alpha.archiveandroid.feature.home.chatbot.view.ChatbotViewModel
+import com.alpha.archiveandroid.feature.home.chatbot.view.ui.components.BotLoadingMessage
+import com.alpha.archiveandroid.feature.home.chatbot.view.ui.components.BotMessage
+import com.alpha.archiveandroid.feature.home.chatbot.view.ui.components.ChatInputBar
+import com.alpha.archiveandroid.feature.home.chatbot.view.ui.components.ChatbotHeader
+import com.alpha.archiveandroid.feature.home.chatbot.view.ui.components.SuggestionButtons
+import com.alpha.archiveandroid.feature.home.chatbot.view.ui.components.UserMessage
+
+@Composable
+fun ChatbotScreen(
+    viewModel: ChatbotViewModel = hiltViewModel()
+) {
+    val messages by viewModel.messages.collectAsState()
+    val inputText by viewModel.inputText.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val listState = rememberLazyListState()
+
+    // 메시지가 추가되거나 로딩 상태가 변경되면 자동으로 스크롤
+    LaunchedEffect(messages.size, isLoading) {
+        if (messages.isNotEmpty() || isLoading) {
+            val targetIndex = if (isLoading) messages.size else messages.size - 1
+            listState.animateScrollToItem(targetIndex)
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            ChatbotHeader()
+        },
+        bottomBar = {
+            ChatInputBar(
+                value = inputText,
+                onValueChange = viewModel::updateInputText,
+                onSend = viewModel::sendMessage,
+                isLoading = isLoading
+            )
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(messages) { message ->
+                when (message.type) {
+                    MessageType.BOT -> BotMessage(message.content)
+                    MessageType.USER -> UserMessage(message.content)
+                    MessageType.SUGGESTION -> SuggestionButtons(
+                        suggestions = message.suggestions,
+                        onSuggestionClick = { chip ->
+                            // 제안 칩의 텍스트에서 이모지 제거
+                            val text = chip.text.replace(Regex("[🏃✈️🏛️]\\s*"), "")
+                            viewModel.sendSuggestion(text)
+                        }
+                    )
+                }
+            }
+            
+            // 로딩 중일 때 로딩 인디케이터 표시
+            if (isLoading) {
+                item {
+                    BotLoadingMessage()
+                }
+            }
+        }
+    }
+}

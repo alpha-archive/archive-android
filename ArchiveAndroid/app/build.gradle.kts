@@ -21,15 +21,15 @@ configurations.all {
 }
 
 android {
-    namespace = "com.example.archiveandroid"
+    namespace = "com.alpha.archiveandroid"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.archiveandroid"
+        applicationId = "com.alpha.archiveandroid"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

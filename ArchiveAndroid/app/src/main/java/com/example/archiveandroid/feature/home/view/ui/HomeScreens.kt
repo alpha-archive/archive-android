@@ -24,7 +24,9 @@ fun CenterLabel(text: String) {
 fun RecommendScreen() { 
     com.example.archiveandroid.feature.home.recommend.view.ui.RecommendScreen()
 }
-@Composable fun ChatbotScreen() { CenterLabel("챗봇") }
+@Composable fun ChatbotScreen() { 
+    com.example.archiveandroid.feature.home.chatbot.view.ui.ChatbotScreen()
+}
 @Composable fun StatsScreen() { com.example.archiveandroid.feature.home.stats.view.ui.StatsScreen() }
 @Composable fun UserScreen() { CenterLabel("사용자") }
 

@@ -1,5 +1,6 @@
 package com.example.archiveandroid.core.network
 
+import com.example.archiveandroid.feature.home.chatbot.data.remote.ChatbotApi
 import com.example.archiveandroid.feature.home.record.data.remote.ActivityApi
 import com.example.archiveandroid.feature.home.record.input.data.remote.RecordInputApi
 import com.example.archiveandroid.feature.home.recorddetail.data.remote.RecordDetailApi
@@ -50,6 +51,14 @@ object NetworkModule {
         return retrofit.create(RecommendApi::class.java)
     }
     
+    @Provides
+    @Singleton
+    fun provideChatbotApi(
+        @Named("AppRetrofit") retrofit: Retrofit
+    ): ChatbotApi {
+        return retrofit.create(ChatbotApi::class.java)
+    }
+       
     @Provides
     @Singleton
     fun provideStatsApi(

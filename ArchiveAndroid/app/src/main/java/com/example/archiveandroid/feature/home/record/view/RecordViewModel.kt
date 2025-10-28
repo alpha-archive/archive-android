@@ -29,7 +29,7 @@ class RecordViewModel @Inject constructor(
         _allActivities,
         _selectedFilters
     ) { allActivities, selectedFilters ->
-        if (selectedFilters.isEmpty()) {
+        val filtered = if (selectedFilters.isEmpty()) {
             allActivities
         } else {
             allActivities.filter { activity ->
@@ -38,6 +38,8 @@ class RecordViewModel @Inject constructor(
                 selectedFilters.contains(activity.category)
             }
         }
+        // 날짜 기준 내림차순 정렬 (최신순)
+        filtered.sortedByDescending { it.activityDate }
     }.stateIn(
         scope = viewModelScope,
         started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),

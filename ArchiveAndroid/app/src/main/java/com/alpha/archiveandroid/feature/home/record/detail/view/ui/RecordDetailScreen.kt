@@ -62,7 +62,7 @@ private fun com.alpha.archiveandroid.feature.home.record.data.remote.dto.Activit
         title = this.title,
         categoryDisplayName = this.categoryDisplayName,
         activityDate = DateFormatter.formatToDateString(this.activityDate),
-        location = this.location,
+        location = this.location ?: "",
         memo = this.memo ?: "",
         images = this.images.map { it.imageUrl },
         categoryBg = bgColor,

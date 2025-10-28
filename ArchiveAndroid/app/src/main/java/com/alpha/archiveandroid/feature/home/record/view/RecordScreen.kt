@@ -112,6 +112,10 @@ fun RecordScreen(
     val error by viewModel.error.collectAsStateWithLifecycle()
     val selectedFilters by viewModel.selectedFilters.collectAsStateWithLifecycle()
     
+    // 화면이 포커스될 때마다 API 요청 (기존 리스트와 병합)
+    LaunchedEffect(Unit) {
+        viewModel.loadActivitiesWithMerge()
+    }
 
     // Activity Result Launcher
     val recordInputLauncher = rememberLauncherForActivityResult(

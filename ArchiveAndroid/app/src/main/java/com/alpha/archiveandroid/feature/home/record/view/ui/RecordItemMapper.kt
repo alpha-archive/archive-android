@@ -11,7 +11,7 @@ object RecordItemMapper {
         return RecordItem(
             id = id,
             title = title,
-            location = location,
+            location = location ?: "",
             categoryLabel = categoryDisplayName,
             categoryBg = bgColor,
             categoryFg = fgColor,

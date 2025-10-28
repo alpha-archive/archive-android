@@ -13,7 +13,7 @@ data class ActivityListItemDto(
     @SerializedName("categoryDisplayName")
     val categoryDisplayName: String,
     @SerializedName("location")
-    val location: String,
+    val location: String?,
     @SerializedName("activityDate")
     val activityDate: String,
     @SerializedName("rating")
@@ -37,7 +37,7 @@ data class ActivityDetailDto(
     @SerializedName("categoryDisplayName")
     val categoryDisplayName: String,
     @SerializedName("location")
-    val location: String,
+    val location: String?,
     @SerializedName("activityDate")
     val activityDate: String,
     @SerializedName("rating")

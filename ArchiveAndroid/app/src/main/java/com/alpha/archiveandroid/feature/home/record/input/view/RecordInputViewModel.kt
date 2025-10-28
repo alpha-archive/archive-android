@@ -52,7 +52,7 @@ class RecordInputViewModel @Inject constructor(
                         category = activityDetail.category,
                         title = activityDetail.title,
                         memo = activityDetail.memo ?: "",
-                        location = activityDetail.location,
+                        location = activityDetail.location ?: "",
                         activityDate = DateFormatter.extractDateOnly(activityDetail.activityDate), // T 이후 시간 부분 제거
                         rating = activityDetail.rating,
                         imageIds = activityDetail.images.map { it.id }

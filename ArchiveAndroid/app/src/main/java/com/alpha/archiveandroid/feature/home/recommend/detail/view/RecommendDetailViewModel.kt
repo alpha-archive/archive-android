@@ -84,8 +84,13 @@ private fun com.alpha.archiveandroid.feature.home.recommend.data.remote.dto.Reco
     // 카테고리 색상
     val (bgColor, fgColor) = CategoryColorGenerator.getCategoryColors(categoryDisplayName)
     
-    // 장소 정보 조합
-    val locationText = "${this.placeName} (${this.placeDistrict})"
+    // 장소 정보 조합 (null 처리)
+    val locationText = when {
+        placeName != null && placeDistrict != null -> "$placeName ($placeDistrict)"
+        placeName != null -> placeName
+        placeDistrict != null -> placeDistrict
+        else -> "위치 미정"
+    }
     
     // 상세 정보 조합 (description이 없으면 상세정보 전체를 띄우지 않음)
     val memoText = if (this.description.isNullOrEmpty()) {
@@ -94,7 +99,9 @@ private fun com.alpha.archiveandroid.feature.home.recommend.data.remote.dto.Reco
         buildString {
             append(this@toDetailScreenData.description)
             append("\n\n")
-            append("📍 주소: ${this@toDetailScreenData.placeAddress}\n")
+            if (!this@toDetailScreenData.placeAddress.isNullOrEmpty()) {
+                append("📍 주소: ${this@toDetailScreenData.placeAddress}\n")
+            }
             if (!this@toDetailScreenData.placePhone.isNullOrEmpty()) {
                 append("📞 전화: ${this@toDetailScreenData.placePhone}\n")
             }

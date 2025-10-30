@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
@@ -21,7 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -29,10 +33,11 @@ fun ChatInputBar(
     value: String,
     onValueChange: (String) -> Unit,
     onSend: () -> Unit,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(Color.White)
             .padding(horizontal = 16.dp, vertical = 12.dp),
@@ -40,7 +45,7 @@ fun ChatInputBar(
     ) {
         TextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { if (!isLoading) onValueChange(it) },
             modifier = Modifier
                 .weight(1f)
                 .clip(RoundedCornerShape(24.dp)),
@@ -54,19 +59,18 @@ fun ChatInputBar(
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color(0xFFF5F3FF),
                 unfocusedContainerColor = Color(0xFFF5F3FF),
-                disabledContainerColor = Color(0xFFF5F3FF),
                 focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
+                unfocusedIndicatorColor = Color.Transparent
             ),
-            enabled = !isLoading,
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+            keyboardActions = KeyboardActions(
+                onSend = { if (value.isNotBlank() && !isLoading) onSend() }
+            )
         )
-        
         Spacer(modifier = Modifier.width(8.dp))
-        
         IconButton(
-            onClick = onSend,
+            onClick = { if (!isLoading && value.isNotBlank()) onSend() },
             enabled = !isLoading && value.isNotBlank(),
             modifier = Modifier
                 .size(48.dp)
@@ -75,6 +79,7 @@ fun ChatInputBar(
                     if (!isLoading && value.isNotBlank()) Color(0xFF9C88FF) 
                     else Color(0xFF9C88FF).copy(alpha = 0.3f)
                 )
+                .focusProperties { canFocus = false }
         ) {
             Icon(
                 imageVector = Icons.Default.Send,

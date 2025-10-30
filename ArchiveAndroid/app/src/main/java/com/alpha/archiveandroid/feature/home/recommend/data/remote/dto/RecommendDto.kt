@@ -17,17 +17,17 @@ data class RecommendActivityDto(
     @SerializedName("endAt")
     val endAt: String,
     @SerializedName("placeName")
-    val placeName: String,
+    val placeName: String?,
     @SerializedName("placeAddress")
-    val placeAddress: String,
+    val placeAddress: String?,
     @SerializedName("placeCity")
-    val placeCity: String,
+    val placeCity: String?,
     @SerializedName("placeDistrict")
-    val placeDistrict: String,
+    val placeDistrict: String?,
     @SerializedName("placeLatitude")
-    val placeLatitude: Double,
+    val placeLatitude: Double?,
     @SerializedName("placeLongitude")
-    val placeLongitude: Double,
+    val placeLongitude: Double?,
     @SerializedName("placePhone")
     val placePhone: String?,
     @SerializedName("placeHomepage")
@@ -53,17 +53,17 @@ data class RecommendActivityDetailDto(
     @SerializedName("endAt")
     val endAt: String,
     @SerializedName("placeName")
-    val placeName: String,
+    val placeName: String?,
     @SerializedName("placeAddress")
-    val placeAddress: String,
+    val placeAddress: String?,
     @SerializedName("placeCity")
-    val placeCity: String,
+    val placeCity: String?,
     @SerializedName("placeDistrict")
-    val placeDistrict: String,
+    val placeDistrict: String?,
     @SerializedName("placeLatitude")
-    val placeLatitude: Double,
+    val placeLatitude: Double?,
     @SerializedName("placeLongitude")
-    val placeLongitude: Double,
+    val placeLongitude: Double?,
     @SerializedName("placePhone")
     val placePhone: String?,
     @SerializedName("placeHomepage")

@@ -19,6 +19,7 @@
         <activity
             android:name=".feature.home.HomeActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustNothing"
             android:theme="@style/Theme.ArchiveAndroid" />
         <activity
             android:name=".feature.intro.view.IntroActivity"

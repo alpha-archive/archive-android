@@ -314,8 +314,13 @@ private fun com.alpha.archiveandroid.feature.home.recommend.data.remote.dto.Reco
     // 날짜 포맷팅
     val dateText = DateFormatter.formatDateRange(this.startAt, this.endAt)
     
-    // 위치 정보 생성
-    val locationText = "$placeName ($placeDistrict)"
+    // 위치 정보 생성 (null 처리)
+    val locationText = when {
+        placeName != null && placeDistrict != null -> "$placeName ($placeDistrict)"
+        placeName != null -> placeName
+        placeDistrict != null -> placeDistrict
+        else -> "위치 미정"
+    }
     
     return ListItem(
         id = this.id,

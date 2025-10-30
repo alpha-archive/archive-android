@@ -30,8 +30,8 @@
 }
 
 # Gson: 모델은 필드명 유지
--keep class com.alpha.archiveandroid.**.model.** { *; }
--keep class com.alpha.archiveandroid.**.dto.** { *; }
+-keep class com.alpha.archive.**.model.** { *; }
+-keep class com.alpha.archive.**.dto.** { *; }
 -keep class com.google.gson.** { *; }
 -dontwarn com.google.gson.**
 -keepclassmembers class * {

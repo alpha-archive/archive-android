@@ -87,6 +87,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.benchmark.common)
     implementation(libs.androidx.compose.material3.material3)
+    implementation(libs.androidx.foundation.layout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

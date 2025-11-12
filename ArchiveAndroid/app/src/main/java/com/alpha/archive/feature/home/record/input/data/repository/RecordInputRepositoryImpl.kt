@@ -1,9 +1,9 @@
 package com.alpha.archive.feature.home.record.input.data.repository
 
 import com.alpha.archive.core.repository.BaseRepository
+import com.alpha.archive.feature.home.record.data.remote.ActivityApi
 import com.alpha.archive.feature.home.record.data.remote.dto.ActivityDetailDto
 import com.alpha.archive.feature.home.record.data.remote.dto.UpdateActivityRequest
-import com.alpha.archive.feature.home.record.data.repository.ActivityRepository
 import com.alpha.archive.feature.home.record.input.data.remote.RecordInputApi
 import com.alpha.archive.feature.home.record.input.data.remote.dto.ImageUploadData
 import com.alpha.archive.feature.home.record.input.data.remote.dto.RecordInputRequest
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 @Singleton
 class RecordInputRepositoryImpl @Inject constructor(
     private val api: RecordInputApi,
-    private val activityRepository: ActivityRepository
+    private val activityApi: ActivityApi
 ) : BaseRepository(), RecordInputRepository {
 
     override suspend fun createRecord(request: RecordInputRequest): Result<Unit> {
@@ -37,11 +37,11 @@ class RecordInputRepositoryImpl @Inject constructor(
             addImageIds = addImageIds,
             removeImageIds = removeImageIds
         )
-        return activityRepository.updateActivity(activityId, updateRequest).map { }
+        return handleApiCall { activityApi.updateActivity(activityId, updateRequest) }.map { }
     }
 
     override suspend fun getActivityForEdit(activityId: String): Result<ActivityDetailDto> {
-        return activityRepository.getActivity(activityId)
+        return handleApiCall { activityApi.getActivity(activityId) }
     }
 
     override suspend fun uploadImage(file: File): Result<ImageUploadData> {

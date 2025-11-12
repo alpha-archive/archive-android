@@ -7,6 +7,7 @@ import com.alpha.archive.core.util.DateFormatter
 import com.alpha.archive.feature.home.record.input.data.remote.dto.ImageUploadData
 import com.alpha.archive.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.alpha.archive.feature.home.record.input.data.repository.RecordInputRepository
+import com.alpha.archive.feature.home.record.input.domain.RecordInputUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +31,8 @@ data class RecordInputUiState(
 
 @HiltViewModel
 class RecordInputViewModel @Inject constructor(
-    private val repository: RecordInputRepository
+    private val repository: RecordInputRepository,
+    private val inputUseCase: RecordInputUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecordInputUiState())
@@ -149,7 +151,7 @@ class RecordInputViewModel @Inject constructor(
                     imageIds = currentImageIds
                 )
                 
-                repository.updateRecord(currentState.activityId, requestWithImages, addImageIds, removeImageIds)
+                inputUseCase.updateRecord(currentState.activityId, requestWithImages, addImageIds, removeImageIds)
                     .onSuccess { 
                         _uiState.value = currentState.copy(
                             submitting = false,
@@ -168,7 +170,7 @@ class RecordInputViewModel @Inject constructor(
                     imageIds = currentState.uploadedImages.map { it.id }
                 )
                 
-                repository.createRecord(requestWithImages)
+                inputUseCase.createRecord(requestWithImages)
                     .onSuccess { 
                         _uiState.value = currentState.copy(
                             submitting = false,

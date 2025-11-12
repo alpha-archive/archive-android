@@ -11,6 +11,7 @@ import javax.inject.Inject
 class RecordInputUseCase @Inject constructor(
     private val repository: RecordInputRepository
 ) {
+
     suspend fun createRecord(request: RecordInputRequest): Result<Unit> {
         return repository.createRecord(request)
     }

@@ -7,6 +7,8 @@ import com.alpha.archive.core.util.DateFormatter
 import com.alpha.archive.feature.home.record.input.data.remote.dto.ImageUploadData
 import com.alpha.archive.feature.home.record.input.data.remote.dto.RecordInputRequest
 import com.alpha.archive.feature.home.record.input.data.repository.RecordInputRepository
+import com.alpha.archive.feature.home.record.input.domain.ImageUploadManager
+import com.alpha.archive.feature.home.record.input.domain.RecordFormValidator
 import com.alpha.archive.feature.home.record.input.domain.RecordInputUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +34,8 @@ data class RecordInputUiState(
 @HiltViewModel
 class RecordInputViewModel @Inject constructor(
     private val repository: RecordInputRepository,
-    private val inputUseCase: RecordInputUseCase
+    private val inputUseCase: RecordInputUseCase,
+    private val imageUploadManager: ImageUploadManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecordInputUiState())
@@ -91,7 +94,7 @@ class RecordInputViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isUploadingImage = true, errorMessage = null)
 
-            repository.uploadImage(file)
+            imageUploadManager.uploadImage(file)
                 .onSuccess { imageData ->
                     val currentImages = _uiState.value.uploadedImages
                     _uiState.value = _uiState.value.copy(
@@ -119,17 +122,11 @@ class RecordInputViewModel @Inject constructor(
         val currentState = _uiState.value
         if (currentState.submitting) return
 
-        if (req.title.isBlank()) {
+        val validationError = RecordFormValidator.validate(req)
+        if (validationError != null) {
             _uiState.value = currentState.copy(
                 submitting = false,
-                errorMessage = "활동명을 입력해주세요!"
-            )
-            return
-        }
-        if (req.category.isBlank()) {
-            _uiState.value = currentState.copy(
-                submitting = false,
-                errorMessage = "카테고리를 선택해주세요!"
+                errorMessage = validationError
             )
             return
         }

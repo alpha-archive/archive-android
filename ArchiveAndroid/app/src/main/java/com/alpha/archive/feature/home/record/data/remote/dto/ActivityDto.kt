@@ -82,9 +82,6 @@ data class ImageInfo(
     val contentType: String
 )
 
-// 기존 호환성을 위한 타입 별칭
-typealias ActivityDto = ActivityListItemDto
-
 data class CreateActivityRequest(
     @SerializedName("title")
     val title: String,

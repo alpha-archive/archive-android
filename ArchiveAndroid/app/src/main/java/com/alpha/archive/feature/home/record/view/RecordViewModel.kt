@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alpha.archive.core.network.toUserFriendlyMessage
 import com.alpha.archive.feature.home.record.data.repository.ActivityRepository
-import com.alpha.archive.feature.home.record.data.remote.dto.ActivityDto
+import com.alpha.archive.feature.home.record.data.remote.dto.ActivityListItemDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class RecordUiState(
-    val allActivities: List<ActivityDto> = emptyList(),  // 전체 데이터
-    val activities: List<ActivityDto> = emptyList(),     // 필터링된 데이터
+    val allActivities: List<ActivityListItemDto> = emptyList(),  // 전체 데이터
+    val activities: List<ActivityListItemDto> = emptyList(),     // 필터링된 데이터
     val selectedFilters: Set<String> = emptySet(),
 
     val isLoading: Boolean = false,
@@ -35,9 +35,9 @@ class RecordViewModel @Inject constructor(
     }
 
     private fun applyFilters(
-        all: List<ActivityDto>,
+        all: List<ActivityListItemDto>,
         selected: Set<String>
-    ): List<ActivityDto> {
+    ): List<ActivityListItemDto> {
         val filtered = if (selected.isEmpty()) {
             all
         } else {

@@ -127,7 +127,7 @@ class RecordInputViewModel @Inject constructor(
 
         val validationError = RecordFormValidator.validate(req)
         if (validationError != null) {
-            _uiState.value = currentState.copy(
+            _uiState.value = _uiState.value.copy(
                 submitting = false,
                 errorMessage = validationError
             )

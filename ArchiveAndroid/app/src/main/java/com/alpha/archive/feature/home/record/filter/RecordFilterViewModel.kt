@@ -4,11 +4,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alpha.archive.core.util.CategoryColorGenerator
-import com.alpha.archive.feature.home.record.data.repository.ActivityRepository
+import com.alpha.archive.feature.home.record.RecordViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,7 +28,7 @@ data class RecordFilterUiState(
 
 @HiltViewModel
 class RecordFilterViewModel @Inject constructor(
-    private val activityRepository: ActivityRepository
+    private val recordViewModel: RecordViewModel
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(
         RecordFilterUiState(
@@ -37,48 +38,42 @@ class RecordFilterViewModel @Inject constructor(
     val uiState: StateFlow<RecordFilterUiState> = _uiState.asStateFlow()
 
     init {
-        loadCategories()
+        observeCategoriesFromRecordViewModel()
     }
 
     // 공개 함수로 변경하여 외부에서 호출 가능하도록
-    fun loadCategories() {
+    private fun observeCategoriesFromRecordViewModel() {
         viewModelScope.launch {
-            activityRepository.getActivities()
-                .onSuccess { activities ->
-                    // 현재 선택된 필터들을 저장
-                    val currentSelectedIds = _uiState.value.options
-                        .filter { it.selected }
-                        .map { it.id }
-                        .toSet()
-                    
-                    // 실제 데이터에서 사용된 카테고리들을 추출
-                    val uniqueCategories = activities
-                        .map { it.categoryDisplayName }
-                        .distinct()
-                        .sorted()
-                    
-                    // 카테고리를 FilterOption으로 변환 (기존 선택 상태 유지)
-                    val options = uniqueCategories.map { category ->
-                        val (bgColor, fgColor) = CategoryColorGenerator.getCategoryColors(category)
-                        FilterOption(
-                            id = category, // 한글 카테고리명을 ID로 사용
-                            label = category,
-                            bgColor = bgColor,
-                            textColor = fgColor,
-                            selected = currentSelectedIds.contains(category)
-                        )
-                    }
-                    
-                    _uiState.update { state ->
-                        state.copy(options = options)
-                    }
+            recordViewModel.uiState.collectLatest { recordState ->
+
+                val activities = recordState.allActivities
+
+                // 현재 선택된 필터들을 저장
+                val currentSelectedIds = _uiState.value.options
+                    .filter { it.selected }
+                    .map { it.id }
+                    .toSet()
+
+                // 실제 데이터에서 사용된 카테고리들을 추출
+                val uniqueCategories = activities
+                    .map { it.categoryDisplayName }
+                    .distinct()
+                    .sorted()
+
+                // 카테고리를 FilterOption으로 변환 (기존 선택 상태 유지)
+                val options = uniqueCategories.map { category ->
+                    val (bg, fg) = CategoryColorGenerator.getCategoryColors(category)
+                    FilterOption(
+                        id = category, // 한글 카테고리명을 ID로 사용
+                        label = category,
+                        bgColor = bg,
+                        textColor = fg,
+                        selected = currentSelectedIds.contains(category)
+                    )
                 }
-                .onFailure {
-                    // 실패 시 기본 카테고리 사용
-                    _uiState.update { state ->
-                        state.copy(options = defaultCategoryOptions())
-                    }
-                }
+
+                _uiState.value = _uiState.value.copy(options = options)
+            }
         }
     }
 

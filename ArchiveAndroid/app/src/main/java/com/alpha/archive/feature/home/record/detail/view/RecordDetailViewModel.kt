@@ -1,8 +1,8 @@
 package com.alpha.archive.feature.home.recorddetail.view
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alpha.archive.core.network.toUserFriendlyMessage
+import com.alpha.archive.core.ui.BaseViewModel
 import com.alpha.archive.feature.home.record.data.repository.ActivityRepository
 import com.alpha.archive.feature.home.record.data.remote.dto.ActivityDetailDto
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,62 +23,58 @@ data class RecordDetailUiState(
 @HiltViewModel
 class RecordDetailViewModel @Inject constructor(
     private val repository: ActivityRepository
-) : ViewModel() {
+) : BaseViewModel<RecordDetailUiState>() {
 
     private val _uiState = MutableStateFlow(RecordDetailUiState())
     val uiState: StateFlow<RecordDetailUiState> = _uiState.asStateFlow()
 
     fun loadRecordDetail(recordId: String) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            
-            try {
-                repository.getActivity(recordId)
-                    .onSuccess { record ->
-                        _uiState.value = _uiState.value.copy(
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                error = null
+            )
+
+            repository.getActivity(recordId)
+                .onSuccess { record ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        recordData = record
+                    )
+                }
+                .onFailure { e ->
+                    _uiState.updateError(e) { msg ->
+                        copy(
                             isLoading = false,
-                            recordData = record
+                            error = msg
                         )
                     }
-                    .onFailure { exception ->
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            error = exception.toUserFriendlyMessage()
-                        )
-                    }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = e.toUserFriendlyMessage()
-                )
-            }
+                }
         }
     }
 
     fun deleteActivity(activityId: String) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isDeleting = true, error = null)
-            
-            try {
-                repository.deleteActivity(activityId)
-                    .onSuccess {
-                        _uiState.value = _uiState.value.copy(
+            _uiState.value = _uiState.value.copy(
+                isDeleting = true,
+                error = null
+            )
+
+            repository.deleteActivity(activityId)
+                .onSuccess {
+                    _uiState.value = _uiState.value.copy(
+                        isDeleting = false,
+                        isDeleted = true
+                    )
+                }
+                .onFailure { e ->
+                    _uiState.updateError(e) { msg ->
+                        copy(
                             isDeleting = false,
-                            isDeleted = true
+                            error = msg
                         )
                     }
-                    .onFailure { exception ->
-                        _uiState.value = _uiState.value.copy(
-                            isDeleting = false,
-                            error = exception.toUserFriendlyMessage()
-                        )
-                    }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isDeleting = false,
-                    error = e.toUserFriendlyMessage()
-                )
-            }
+                }
         }
     }
 }

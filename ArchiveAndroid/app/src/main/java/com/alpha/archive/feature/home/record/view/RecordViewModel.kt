@@ -1,8 +1,7 @@
 package com.alpha.archive.feature.home.record
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alpha.archive.core.network.toUserFriendlyMessage
+import com.alpha.archive.core.ui.BaseViewModel
 import com.alpha.archive.feature.home.record.data.repository.ActivityRepository
 import com.alpha.archive.feature.home.record.data.remote.dto.ActivityListItemDto
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +24,7 @@ data class RecordUiState(
 @HiltViewModel
 class RecordViewModel @Inject constructor(
     private val activityRepository: ActivityRepository
-) : ViewModel() {
+) : BaseViewModel<RecordUiState>() {
 
     private val _uiState = MutableStateFlow(RecordUiState())
     val uiState: StateFlow<RecordUiState> = _uiState.asStateFlow()
@@ -53,26 +52,17 @@ class RecordViewModel @Inject constructor(
 
     fun loadActivities() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                isLoading = true,
-                errorMessage = null
-            )
-
             activityRepository.getActivities()
-                .onSuccess { newActivities ->
-                    val filtered = applyFilters(newActivities, _uiState.value.selectedFilters)
-
+                .onSuccess { list ->
                     _uiState.value = _uiState.value.copy(
-                        allActivities = newActivities,
-                        activities = filtered,
-                        isLoading = false
+                        allActivities = list,
+                        activities = applyFilters(list, _uiState.value.selectedFilters)
                     )
                 }
-                .onFailure { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = exception.toUserFriendlyMessage()
-                    )
+                .onFailure { e ->
+                    _uiState.updateError(e) { msg ->
+                        copy(errorMessage = msg)
+                    }
                 }
         }
     }
@@ -85,20 +75,22 @@ class RecordViewModel @Inject constructor(
             )
 
             activityRepository.getActivities()
-                .onSuccess { newActivities ->
-                    val filtered = applyFilters(newActivities, _uiState.value.selectedFilters)
+                .onSuccess { newList ->
+                    val filtered = applyFilters(newList, _uiState.value.selectedFilters)
 
                     _uiState.value = _uiState.value.copy(
-                        allActivities = newActivities,
+                        allActivities = newList,
                         activities = filtered,
                         isRefreshing = false
                     )
                 }
-                .onFailure { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isRefreshing = false,
-                        errorMessage = exception.toUserFriendlyMessage()
-                    )
+                .onFailure { e ->
+                    _uiState.updateError(e) { msg ->
+                        copy(
+                            isRefreshing = false,
+                            errorMessage = msg
+                        )
+                    }
                 }
         }
     }

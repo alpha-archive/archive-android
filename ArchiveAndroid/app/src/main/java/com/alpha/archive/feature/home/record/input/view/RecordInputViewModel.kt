@@ -1,8 +1,8 @@
 package com.alpha.archive.feature.home.record.input
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alpha.archive.core.network.toUserFriendlyMessage
+import com.alpha.archive.core.ui.BaseViewModel
 import com.alpha.archive.core.util.DateFormatter
 import com.alpha.archive.feature.home.record.input.data.remote.dto.ImageUploadData
 import com.alpha.archive.feature.home.record.input.data.remote.dto.RecordInputRequest
@@ -36,7 +36,7 @@ class RecordInputViewModel @Inject constructor(
     private val repository: RecordInputRepository,
     private val inputUseCase: RecordInputUseCase,
     private val imageUploadManager: ImageUploadManager
-) : ViewModel() {
+) : BaseViewModel<RecordInputUiState>() {
 
     private val _uiState = MutableStateFlow(RecordInputUiState())
     val uiState: StateFlow<RecordInputUiState> = _uiState.asStateFlow()
@@ -81,11 +81,13 @@ class RecordInputViewModel @Inject constructor(
                         }
                     )
                 }
-                .onFailure { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoadingActivity = false,
-                        errorMessage = exception.toUserFriendlyMessage()
-                    )
+                .onFailure { e ->
+                    _uiState.updateError(e) { msg ->
+                        copy(
+                            isLoadingActivity = false,
+                            errorMessage = msg
+                        )
+                    }
                 }
         }
     }
@@ -102,19 +104,20 @@ class RecordInputViewModel @Inject constructor(
                         isUploadingImage = false
                     )
                 }
-                .onFailure { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isUploadingImage = false,
-                        errorMessage = "이미지 업로드 중 오류가 발생했습니다"
-                    )
+                .onFailure { e ->
+                    _uiState.updateError(e) { msg ->
+                        copy(
+                            isUploadingImage = false,
+                            errorMessage = msg
+                        )
+                    }
                 }
         }
     }
 
     fun removeImage(imageId: String) {
-        val currentImages = _uiState.value.uploadedImages
         _uiState.value = _uiState.value.copy(
-            uploadedImages = currentImages.filter { it.id != imageId }
+            uploadedImages = _uiState.value.uploadedImages.filter { it.id != imageId }
         )
     }
 
@@ -155,11 +158,13 @@ class RecordInputViewModel @Inject constructor(
                             isSuccess = true
                         )
                     }
-                    .onFailure { exception ->
-                        _uiState.value = currentState.copy(
-                            submitting = false,
-                            errorMessage = exception.toUserFriendlyMessage()
-                        )
+                    .onFailure { e ->
+                        _uiState.updateError(e) { msg ->
+                            copy(
+                                submitting = false,
+                                errorMessage = msg
+                            )
+                        }
                     }
             } else {
                 // 생성 모드: POST API 호출
@@ -174,11 +179,13 @@ class RecordInputViewModel @Inject constructor(
                             isSuccess = true
                         )
                     }
-                    .onFailure { exception ->
-                        _uiState.value = currentState.copy(
-                            submitting = false,
-                            errorMessage = exception.toUserFriendlyMessage()
-                        )
+                    .onFailure { e ->
+                        _uiState.updateError(e) { msg ->
+                            copy(
+                                submitting = false,
+                                errorMessage = msg
+                            )
+                        }
                     }
             }
         }

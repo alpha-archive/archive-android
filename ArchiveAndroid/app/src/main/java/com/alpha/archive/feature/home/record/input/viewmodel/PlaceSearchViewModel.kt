@@ -1,8 +1,8 @@
 package com.alpha.archive.feature.home.record.input.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alpha.archive.core.network.toUserFriendlyMessage
+import com.alpha.archive.core.ui.BaseViewModel
 import com.alpha.archive.feature.home.record.input.data.repository.PlaceSearchRepository
 import com.alpha.archive.feature.home.record.input.data.remote.dto.Place
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +22,7 @@ data class PlaceSearchUiState(
 @HiltViewModel
 class PlaceSearchViewModel @Inject constructor(
     private val placeSearchRepository: PlaceSearchRepository
-) : ViewModel() {
+) : BaseViewModel<PlaceSearchUiState>() {
     
     private val _uiState = MutableStateFlow(PlaceSearchUiState())
     val uiState: StateFlow<PlaceSearchUiState> = _uiState.asStateFlow()
@@ -50,12 +50,14 @@ class PlaceSearchViewModel @Inject constructor(
                         isLoading = false
                     )
                 }
-                .onFailure { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        error = exception.toUserFriendlyMessage(),
-                        searchResults = emptyList(),
-                        isLoading = false
-                    )
+                .onFailure { e ->
+                    _uiState.updateError(e) { msg ->
+                        copy(
+                            error = msg,
+                            searchResults = emptyList(),
+                            isLoading = false
+                        )
+                    }
                 }
         }
     }

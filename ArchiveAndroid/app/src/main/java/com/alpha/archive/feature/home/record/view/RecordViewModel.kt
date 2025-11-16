@@ -51,44 +51,10 @@ class RecordViewModel @Inject constructor(
         return filtered.sortedByDescending { it.activityDate }
     }
 
-    private fun mergeActivities(currentActivities: List<ActivityDto>, newActivities: List<ActivityDto>): List<ActivityDto> {
-        // 현재 리스트를 Map으로 변환 (id를 키로)
-        val currentMap = currentActivities.associateBy { it.id }
-
-        // 새 리스트에서 기존에 없던 아이템들만 필터링
-        val newItems = newActivities.filter { newItem ->
-            val currentItem = currentMap[newItem.id]
-            // 아이템이 없거나 내용이 변경된 경우
-            currentItem == null || hasItemChanged(currentItem, newItem)
-        }
-
-        // 기존 아이템들 중 새 리스트에 없는 것들은 유지하고, 새 아이템들을 추가
-        val existingItems = currentActivities.filter { currentItem ->
-            newActivities.any { newItem -> newItem.id == currentItem.id }
-        }
-
-        // 기존 아이템들을 새 데이터로 업데이트
-        val updatedExistingItems = existingItems.map { currentItem ->
-            newActivities.find { it.id == currentItem.id } ?: currentItem
-        }
-
-        // 새 아이템들과 업데이트된 기존 아이템들을 합치고 날짜순으로 정렬
-        return (updatedExistingItems + newItems).sortedByDescending { it.activityDate }
-    }
-
-    private fun hasItemChanged(currentItem: ActivityDto, newItem: ActivityDto): Boolean {
-        return currentItem.title != newItem.title ||
-                currentItem.category != newItem.category ||
-                (currentItem.location ?: "") != (newItem.location ?: "") ||
-                currentItem.activityDate != newItem.activityDate ||
-                currentItem.rating != newItem.rating
-    }
-
-    private fun loadActivitiesInternal(isLoading: Boolean) {
+    fun loadActivities() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
-                isLoading = if (isLoading) true else _uiState.value.isLoading,
-                isRefreshing = if (!isLoading) true else _uiState.value.isRefreshing,
+                isLoading = true,
                 errorMessage = null
             )
 
@@ -98,40 +64,6 @@ class RecordViewModel @Inject constructor(
 
                     _uiState.value = _uiState.value.copy(
                         allActivities = newActivities,
-                        activities = filtered,
-                        isLoading = false,
-                        isRefreshing = false
-                    )
-                }
-                .onFailure { exception ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        isRefreshing = false,
-                        errorMessage = exception.toUserFriendlyMessage()
-                    )
-                }
-        }
-    }
-
-    fun loadActivities() {
-        loadActivitiesInternal(true)
-    }
-
-    fun refreshActivities() {
-        loadActivitiesInternal(false)
-    }
-
-    fun loadActivitiesWithMerge() {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-
-            activityRepository.getActivities()
-                .onSuccess { newActivities ->
-                    val merged = mergeActivities(_uiState.value.allActivities, newActivities)
-                    val filtered = applyFilters(merged, _uiState.value.selectedFilters)
-
-                    _uiState.value = _uiState.value.copy(
-                        allActivities = merged,
                         activities = filtered,
                         isLoading = false
                     )
@@ -145,17 +77,19 @@ class RecordViewModel @Inject constructor(
         }
     }
 
-    fun refreshActivitiesWithMerge() {
+    fun refreshActivities() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isRefreshing = true, errorMessage = null)
+            _uiState.value = _uiState.value.copy(
+                isRefreshing = true,
+                errorMessage = null
+            )
 
             activityRepository.getActivities()
                 .onSuccess { newActivities ->
-                    val merged = mergeActivities(_uiState.value.allActivities, newActivities)
-                    val filtered = applyFilters(merged, _uiState.value.selectedFilters)
+                    val filtered = applyFilters(newActivities, _uiState.value.selectedFilters)
 
                     _uiState.value = _uiState.value.copy(
-                        allActivities = merged,
+                        allActivities = newActivities,
                         activities = filtered,
                         isRefreshing = false
                     )
@@ -167,6 +101,16 @@ class RecordViewModel @Inject constructor(
                     )
                 }
         }
+    }
+
+    // merge 기반 로드 대신 replace로 통일
+    fun loadActivitiesWithMerge() {
+        loadActivities()
+    }
+
+    // merge 기반 새로고침 대신 replace로 통일
+    fun refreshActivitiesWithMerge() {
+        refreshActivities()
     }
 
     fun updateFilters(selectedCategoryIds: Set<String>) {

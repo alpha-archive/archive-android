@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.core.content.IntentCompat
 import com.alpha.archive.core.ui.theme.ArchiveAndroidTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,8 +24,11 @@ class RecommendFilterActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         // Intent에서 현재 필터 상태 가져오기
-        val currentFilters = intent.getSerializableExtra("current_filters") as? RecommendFilterData 
-            ?: RecommendFilterData()
+        val currentFilters = IntentCompat.getParcelableExtra(
+            intent, 
+            "current_filters", 
+            RecommendFilterData::class.java
+        ) ?: RecommendFilterData()
         
         setContent {
             // ViewModel 초기화

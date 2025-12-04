@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.IntentCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alpha.archive.core.ui.components.ListItemCard
@@ -69,10 +70,15 @@ fun RecommendScreen(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val filterData = result.data?.getSerializableExtra("filter_data") as? RecommendFilterData
-            if (filterData != null) {
-                currentFilters = filterData
-                viewModel.applyFilters(filterData)
+            result.data?.let { intent ->
+                IntentCompat.getParcelableExtra(
+                    intent,
+                    "filter_data",
+                    RecommendFilterData::class.java
+                )?.let { filterData ->
+                    currentFilters = filterData
+                    viewModel.applyFilters(filterData)
+                }
             }
         }
     }
@@ -234,7 +240,10 @@ fun RecommendScreen(
                             ListItemCard(
                                 item = listItem,
                                 onClick = { 
-                                    val intent = Intent(context, RecommendDetailActivity::class.java).apply {
+                                    val intent = Intent(
+                                        context,
+                                        RecommendDetailActivity::class.java
+                                    ).apply {
                                         putExtra("activityId", recommendation.id)
                                     }
                                     recommendDetailLauncher.launch(intent)

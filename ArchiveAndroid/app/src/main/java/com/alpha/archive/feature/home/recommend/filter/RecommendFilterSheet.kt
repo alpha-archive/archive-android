@@ -1,5 +1,6 @@
 package com.alpha.archive.feature.home.recommend.filter
 
+import android.os.Parcelable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,8 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alpha.archive.core.util.CategoryColorGenerator
 import com.alpha.archive.core.util.CategoryMapper
+import kotlinx.parcelize.Parcelize
 
 // 필터링을 위한 데이터 클래스
+@Parcelize
 data class RecommendFilterData(
     val selectedCategory: String = "",
     val startYear: String = "",
@@ -53,7 +56,7 @@ data class RecommendFilterData(
     val endDay: String = "",
     val city: String = "",
     val district: String = ""
-) : java.io.Serializable {
+) : Parcelable {
     /**
      * 필터가 적용되어 있는지 확인
      */

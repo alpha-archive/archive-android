@@ -31,18 +31,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alpha.archive.core.util.CategoryColorGenerator
 import com.alpha.archive.core.util.CategoryMapper
 
@@ -57,42 +53,48 @@ data class RecommendFilterData(
     val endDay: String = "",
     val city: String = "",
     val district: String = ""
-) : java.io.Serializable
+) : java.io.Serializable {
+    /**
+     * 필터가 적용되어 있는지 확인
+     */
+    fun hasActiveFilters(): Boolean {
+        return selectedCategory.isNotEmpty() ||
+                startYear.isNotEmpty() ||
+                startMonth.isNotEmpty() ||
+                startDay.isNotEmpty() ||
+                endYear.isNotEmpty() ||
+                endMonth.isNotEmpty() ||
+                endDay.isNotEmpty() ||
+                city.isNotEmpty() ||
+                district.isNotEmpty()
+    }
+}
+
+// TextField 공통 색상
+private object FilterTextFieldColors {
+    val focusedIndicator = Color(0xFF2196F3)
+    val unfocusedIndicator = Color(0xFFE0E0E0)
+    val container = Color.White
+    val cursor = Color(0xFF2196F3)
+    val placeholder = Color(0xFF999999)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecommendFilterScreen(
+    viewModel: RecommendFilterViewModel,
     onDismiss: () -> Unit,
-    onFiltersApplied: (RecommendFilterData) -> Unit,
-    initialFilters: RecommendFilterData = RecommendFilterData()
+    onFiltersApplied: (RecommendFilterData) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState()
-    var selectedCategory by remember { mutableStateOf("") }
-    var startYear by remember { mutableStateOf("") }
-    var startMonth by remember { mutableStateOf("") }
-    var startDay by remember { mutableStateOf("") }
-    var endYear by remember { mutableStateOf("") }
-    var endMonth by remember { mutableStateOf("") }
-    var endDay by remember { mutableStateOf("") }
-    var city by remember { mutableStateOf("") }
-    var district by remember { mutableStateOf("") }
-    var searchText by remember { mutableStateOf("") }
-    
-    // initialFilters가 변경될 때 상태 초기화
-    LaunchedEffect(initialFilters) {
-        selectedCategory = CategoryMapper.toKorean(initialFilters.selectedCategory)
-        startYear = initialFilters.startYear
-        startMonth = initialFilters.startMonth
-        startDay = initialFilters.startDay
-        endYear = initialFilters.endYear
-        endMonth = initialFilters.endMonth
-        endDay = initialFilters.endDay
-        city = initialFilters.city
-        district = initialFilters.district
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
     // 카테고리 목록
     val allCategories = CategoryMapper.allCategories
+    
+    // 카테고리 그리드 - 검색어에 맞는 카테고리들만 표시
+    val filteredCategories = allCategories.filter { 
+        it.contains(uiState.searchText, ignoreCase = true)
+    }
     
     Box(
         modifier = Modifier.fillMaxSize()
@@ -117,18 +119,7 @@ fun RecommendFilterScreen(
                             color = Color.Gray,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier
-                                .clickable {
-                                    selectedCategory = ""
-                                    startYear = ""
-                                    startMonth = ""
-                                    startDay = ""
-                                    endYear = ""
-                                    endMonth = ""
-                                    endDay = ""
-                                    city = ""
-                                    district = ""
-                                    searchText = ""
-                                }
+                                .clickable { viewModel.resetFilters() }
                                 .padding(end = 8.dp)
                         )
                     },
@@ -138,335 +129,116 @@ fun RecommendFilterScreen(
                 )
             }
         ) { paddingValues ->
-        // 컨텐츠 영역
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(24.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            // 카테고리 섹션
-            Text(
-                text = "카테고리",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                ),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-            
-            // 카테고리 검색
-            OutlinedTextField(
-                value = searchText,
-                onValueChange = { searchText = it },
-                placeholder = { 
-                    Text(
-                        text = "카테고리 검색",
-                        color = Color(0xFF999999),
-                        style = MaterialTheme.typography.bodyMedium
-                    ) 
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "검색",
-                        tint = Color(0xFF999999),
-                        modifier = Modifier.size(20.dp)
-                    )
-                },
+            // 컨텐츠 영역
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color(0xFF2196F3),
-                    unfocusedIndicatorColor = Color(0xFFE0E0E0),
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    cursorColor = Color(0xFF2196F3)
-                ),
-                shape = RoundedCornerShape(8.dp),
-                singleLine = true
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            
-            // 카테고리 선택
-            Text(
-                text = "카테고리 선택",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontWeight = FontWeight.Medium
-                ),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            
-            // 카테고리 그리드 - 검색어에 맞는 카테고리들만 표시
-            val filteredCategories = allCategories.filter { 
-                it.contains(searchText, ignoreCase = true)
-            }
-            
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Adaptive(80.dp),
-                modifier = Modifier.height(200.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalItemSpacing = 8.dp
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(24.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                items(filteredCategories) { category ->
-                    CategoryGridItem(
-                        category = category,
-                        isSelected = selectedCategory == category,
-                        onClick = { 
-                            selectedCategory = if (selectedCategory == category) "" else category
-                        }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // 카테고리 섹션
+                FilterSectionTitle(text = "카테고리")
+                
+                // 카테고리 검색
+                FilterTextField(
+                    value = uiState.searchText,
+                    onValueChange = { viewModel.updateSearchText(it) },
+                    placeholder = "카테고리 검색",
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "검색",
+                            tint = FilterTextFieldColors.placeholder,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // 카테고리 선택
+                Text(
+                    text = "카테고리 선택",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Medium
+                    ),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Adaptive(80.dp),
+                    modifier = Modifier.height(200.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalItemSpacing = 8.dp
+                ) {
+                    items(filteredCategories) { category ->
+                        CategoryGridItem(
+                            category = category,
+                            isSelected = uiState.selectedCategory == category,
+                            onClick = { viewModel.toggleCategory(category) }
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                // 일자 섹션
+                FilterSectionTitle(text = "일자")
+                
+                // 시작 날짜
+                DateInputRow(
+                    year = uiState.startYear,
+                    month = uiState.startMonth,
+                    day = uiState.startDay,
+                    onYearChange = { viewModel.updateStartYear(it) },
+                    onMonthChange = { viewModel.updateStartMonth(it) },
+                    onDayChange = { viewModel.updateStartDay(it) },
+                    suffix = "부터"
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // 종료 날짜
+                DateInputRow(
+                    year = uiState.endYear,
+                    month = uiState.endMonth,
+                    day = uiState.endDay,
+                    onYearChange = { viewModel.updateEndYear(it) },
+                    onMonthChange = { viewModel.updateEndMonth(it) },
+                    onDayChange = { viewModel.updateEndDay(it) },
+                    suffix = "까지"
+                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                // 위치 섹션
+                FilterSectionTitle(text = "위치")
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FilterTextField(
+                        value = uiState.city,
+                        onValueChange = { viewModel.updateCity(it) },
+                        placeholder = "시",
+                        modifier = Modifier.weight(1f)
+                    )
+                    FilterTextField(
+                        value = uiState.district,
+                        onValueChange = { viewModel.updateDistrict(it) },
+                        placeholder = "구",
+                        modifier = Modifier.weight(1f)
                     )
                 }
+                
+                Spacer(modifier = Modifier.height(16.dp))
             }
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            // 일자 섹션
-            Text(
-                text = "일자",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                ),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-            
-            // 시작 날짜
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = startYear,
-                    onValueChange = { startYear = it },
-                    placeholder = { 
-                        Text(
-                            text = "년",
-                            color = Color(0xFF999999),
-                            style = MaterialTheme.typography.bodySmall
-                        ) 
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color(0xFF2196F3),
-                        unfocusedIndicatorColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color(0xFF2196F3)
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = startMonth,
-                    onValueChange = { startMonth = it },
-                    placeholder = { 
-                        Text(
-                            text = "월",
-                            color = Color(0xFF999999),
-                            style = MaterialTheme.typography.bodySmall
-                        ) 
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color(0xFF2196F3),
-                        unfocusedIndicatorColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color(0xFF2196F3)
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = startDay,
-                    onValueChange = { startDay = it },
-                    placeholder = { 
-                        Text(
-                            text = "일",
-                            color = Color(0xFF999999),
-                            style = MaterialTheme.typography.bodySmall
-                        ) 
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color(0xFF2196F3),
-                        unfocusedIndicatorColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color(0xFF2196F3)
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    singleLine = true
-                )
-                Text(
-                    text = "부터",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            // 종료 날짜
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = endYear,
-                    onValueChange = { endYear = it },
-                    placeholder = { 
-                        Text(
-                            text = "년",
-                            color = Color(0xFF999999),
-                            style = MaterialTheme.typography.bodySmall
-                        ) 
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color(0xFF2196F3),
-                        unfocusedIndicatorColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color(0xFF2196F3)
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = endMonth,
-                    onValueChange = { endMonth = it },
-                    placeholder = { 
-                        Text(
-                            text = "월",
-                            color = Color(0xFF999999),
-                            style = MaterialTheme.typography.bodySmall
-                        ) 
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color(0xFF2196F3),
-                        unfocusedIndicatorColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color(0xFF2196F3)
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = endDay,
-                    onValueChange = { endDay = it },
-                    placeholder = { 
-                        Text(
-                            text = "일",
-                            color = Color(0xFF999999),
-                            style = MaterialTheme.typography.bodySmall
-                        ) 
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color(0xFF2196F3),
-                        unfocusedIndicatorColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color(0xFF2196F3)
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    singleLine = true
-                )
-                Text(
-                    text = "까지",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            // 위치 섹션
-            Text(
-                text = "위치",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                ),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = city,
-                    onValueChange = { city = it },
-                    placeholder = { 
-                        Text(
-                            text = "시",
-                            color = Color(0xFF999999),
-                            style = MaterialTheme.typography.bodySmall
-                        ) 
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color(0xFF2196F3),
-                        unfocusedIndicatorColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color(0xFF2196F3)
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = district,
-                    onValueChange = { district = it },
-                    placeholder = { 
-                        Text(
-                            text = "구",
-                            color = Color(0xFF999999),
-                            style = MaterialTheme.typography.bodySmall
-                        ) 
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color(0xFF2196F3),
-                        unfocusedIndicatorColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color(0xFF2196F3)
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    singleLine = true
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-        }
         }
         
         // 하단 버튼 오버레이
@@ -479,59 +251,130 @@ fun RecommendFilterScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // 취소 버튼
-            Button(
+            FilterButton(
+                text = "취소",
                 onClick = onDismiss,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                ),
-                shape = RoundedCornerShape(8.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
-            ) {
-                Text(
-                    text = "취소",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+                modifier = Modifier.weight(1f)
+            )
             
             // 적용 버튼
-            Button(
-                onClick = {
-                    val filterData = RecommendFilterData(
-                        selectedCategory = CategoryMapper.toEnglish(selectedCategory),
-                        startYear = startYear,
-                        startMonth = startMonth,
-                        startDay = startDay,
-                        endYear = endYear,
-                        endMonth = endMonth,
-                        endDay = endDay,
-                        city = city,
-                        district = district
-                    )
-                    onFiltersApplied(filterData)
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                ),
-                shape = RoundedCornerShape(8.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
-            ) {
-                Text(
-                    text = "적용",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            FilterButton(
+                text = "적용",
+                onClick = { onFiltersApplied(uiState.toFilterData()) },
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
 
+@Composable
+private fun FilterSectionTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium.copy(
+            fontWeight = FontWeight.SemiBold,
+        ),
+        modifier = Modifier.padding(bottom = 12.dp)
+    )
+}
+
+@Composable
+private fun FilterTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    leadingIcon: @Composable (() -> Unit)? = null
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = { 
+            Text(
+                text = placeholder,
+                color = FilterTextFieldColors.placeholder,
+                style = MaterialTheme.typography.bodySmall
+            ) 
+        },
+        leadingIcon = leadingIcon,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = FilterTextFieldColors.focusedIndicator,
+            unfocusedIndicatorColor = FilterTextFieldColors.unfocusedIndicator,
+            focusedContainerColor = FilterTextFieldColors.container,
+            unfocusedContainerColor = FilterTextFieldColors.container,
+            cursorColor = FilterTextFieldColors.cursor
+        ),
+        shape = RoundedCornerShape(8.dp),
+        singleLine = true
+    )
+}
+
+@Composable
+private fun DateInputRow(
+    year: String,
+    month: String,
+    day: String,
+    onYearChange: (String) -> Unit,
+    onMonthChange: (String) -> Unit,
+    onDayChange: (String) -> Unit,
+    suffix: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FilterTextField(
+            value = year,
+            onValueChange = onYearChange,
+            placeholder = "년",
+            modifier = Modifier.weight(1f)
+        )
+        FilterTextField(
+            value = month,
+            onValueChange = onMonthChange,
+            placeholder = "월",
+            modifier = Modifier.weight(1f)
+        )
+        FilterTextField(
+            value = day,
+            onValueChange = onDayChange,
+            placeholder = "일",
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = suffix,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
+
+@Composable
+private fun FilterButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.height(48.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White,
+            contentColor = Color.Black
+        ),
+        shape = RoundedCornerShape(8.dp),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
 
 @Composable
 private fun CategoryGridItem(
@@ -560,5 +403,3 @@ private fun CategoryGridItem(
         )
     }
 }
-
-

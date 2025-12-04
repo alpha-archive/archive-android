@@ -139,15 +139,7 @@ fun RecommendScreen(
                         onFilterClick() 
                     }) {
                         Box {
-                            val hasActiveFilters = currentFilters.selectedCategory.isNotEmpty() || 
-                                                   currentFilters.startYear.isNotEmpty() || 
-                                                   currentFilters.startMonth.isNotEmpty() ||
-                                                   currentFilters.startDay.isNotEmpty() ||
-                                                   currentFilters.endYear.isNotEmpty() ||
-                                                   currentFilters.endMonth.isNotEmpty() ||
-                                                   currentFilters.endDay.isNotEmpty() ||
-                                                   currentFilters.city.isNotEmpty() ||
-                                                   currentFilters.district.isNotEmpty()
+                            val hasActiveFilters = currentFilters.hasActiveFilters()
                             
                             Icon(
                                 imageVector = Icons.Default.FilterList,

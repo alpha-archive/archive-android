@@ -3,6 +3,7 @@ package com.alpha.archive.feature.home.record.input
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alpha.archive.core.network.toUserFriendlyMessage
+import com.alpha.archive.core.util.CrashlyticsLogger
 import com.alpha.archive.core.util.DateFormatter
 import com.alpha.archive.feature.home.record.input.data.remote.dto.ImageUploadData
 import com.alpha.archive.feature.home.record.input.data.remote.dto.RecordInputRequest
@@ -98,6 +99,7 @@ class RecordInputViewModel @Inject constructor(
                     )
                 }
                 .onFailure { exception ->
+                    CrashlyticsLogger.logException(exception, "이미지 업로드 실패")
                     _uiState.value = _uiState.value.copy(
                         isUploadingImage = false,
                         errorMessage = "이미지 업로드 중 오류가 발생했습니다"

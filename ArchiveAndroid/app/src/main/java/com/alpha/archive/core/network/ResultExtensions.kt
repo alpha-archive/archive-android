@@ -1,5 +1,7 @@
 package com.alpha.archive.core.network
 
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import kotlin.Result
 
 /**
@@ -47,8 +49,15 @@ inline fun <reified T : AppError> Result<*>.isAppErrorOf(): Boolean {
 /**
  * Exception을 사용자 친화적인 메시지로 변환
  * 배포 환경에서 상세 로그가 노출되는 것을 방지
+ * 
+ * @param logToCrashlytics Crashlytics에 non-fatal 에러로 기록할지 여부 (기본값: true)
  */
-fun Throwable.toUserFriendlyMessage(): String {
+fun Throwable.toUserFriendlyMessage(logToCrashlytics: Boolean = true): String {
+    // Crashlytics에 non-fatal 에러 기록
+    if (logToCrashlytics) {
+        Firebase.crashlytics.recordException(this)
+    }
+    
     return when (this) {
         is AppError.Network -> "인터넷 연결이 불안정합니다"
         is AppError.Unauthorized -> "로그인이 필요합니다"

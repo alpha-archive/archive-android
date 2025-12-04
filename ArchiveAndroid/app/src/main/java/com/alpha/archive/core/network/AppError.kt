@@ -3,11 +3,13 @@ package com.alpha.archive.core.network
 /**
  * 앱 전체에서 사용하는 통일된 에러 타입
  * HTTP 코드를 도메인 에러로 매핑
+ * 
+ * originalException을 cause로 전달하여 Crashlytics에서 원본 에러 스택트레이스 확인 가능
  */
 sealed class AppError(
     override val message: String,
     open val originalException: Throwable? = null
-) : Throwable(message) {
+) : Throwable(message, originalException) {
     data class Network(
         override val message: String,
         override val originalException: Throwable? = null

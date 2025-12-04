@@ -22,7 +22,8 @@ class RecommendViewModel @Inject constructor(
     private val _allRecommendations = MutableStateFlow<List<RecommendActivityDto>>(emptyList())
     
     // 현재 적용된 필터
-    private val _currentFilters = MutableStateFlow<RecommendFilterData>(RecommendFilterData())
+    private val _currentFilters = MutableStateFlow(RecommendFilterData())
+    val currentFilters: StateFlow<RecommendFilterData> = _currentFilters.asStateFlow()
     
     // 페이지네이션 상태
     private val _currentCursor = MutableStateFlow<String?>(null)
@@ -108,9 +109,6 @@ class RecommendViewModel @Inject constructor(
         loadRecommendations(_isLoading, cursor = null, append = false)
     }
     
-    fun getCurrentFilters(): RecommendFilterData {
-        return _currentFilters.value
-    }
     
     fun loadMoreRecommendations() {
         if (!_hasNextPage.value || _isLoadingMore.value) return

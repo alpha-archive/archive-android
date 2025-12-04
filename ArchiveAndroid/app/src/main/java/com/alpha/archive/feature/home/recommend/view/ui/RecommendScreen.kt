@@ -35,9 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -63,7 +61,9 @@ fun RecommendScreen(
 ) {
     val context = LocalContext.current
     val listState = rememberLazyListState()
-    var currentFilters by remember { mutableStateOf(RecommendFilterData()) }
+    
+    // ViewModel에서 필터 상태 collect (단일 소스)
+    val currentFilters by viewModel.currentFilters.collectAsStateWithLifecycle()
     
     // 필터 Activity 런처
     val filterLauncher = rememberLauncherForActivityResult(
@@ -76,7 +76,6 @@ fun RecommendScreen(
                     "filter_data",
                     RecommendFilterData::class.java
                 )?.let { filterData ->
-                    currentFilters = filterData
                     viewModel.applyFilters(filterData)
                 }
             }
@@ -136,7 +135,6 @@ fun RecommendScreen(
                 },
                 actions = {
                     IconButton(onClick = { 
-                        val currentFilters = viewModel.getCurrentFilters()
                         val intent = RecommendFilterActivity.createIntent(context, currentFilters)
                         filterLauncher.launch(intent)
                         onFilterClick() 

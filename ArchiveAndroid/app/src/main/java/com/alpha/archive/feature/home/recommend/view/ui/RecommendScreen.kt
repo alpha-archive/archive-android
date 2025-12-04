@@ -46,11 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.alpha.archive.core.ui.components.ListItem
 import com.alpha.archive.core.ui.components.ListItemCard
-import com.alpha.archive.core.util.CategoryColorGenerator
-import com.alpha.archive.core.util.CategoryMapper
-import com.alpha.archive.core.util.DateFormatter
+import com.alpha.archive.feature.home.recommend.data.mapper.RecommendMapper.toListItem
 import com.alpha.archive.feature.home.recommend.detail.view.RecommendDetailActivity
 import com.alpha.archive.feature.home.recommend.filter.RecommendFilterActivity
 import com.alpha.archive.feature.home.recommend.filter.RecommendFilterData
@@ -268,37 +265,4 @@ fun RecommendScreen(
         }
     }
 
-}
-
-/**
- * 추천 활동을 ListItem으로 변환
- */
-private fun com.alpha.archive.feature.home.recommend.data.remote.dto.RecommendActivityDto.toListItem(): ListItem {
-    val categoryDisplayName = CategoryMapper.toKorean(this.category)
-    val (bgColor, fgColor) = CategoryColorGenerator.getCategoryColors(categoryDisplayName)
-    
-    // 날짜 포맷팅
-    val dateText = DateFormatter.formatDateRange(this.startAt, this.endAt)
-    
-    // 위치 정보 생성 (null 처리)
-    val locationText = when {
-        placeName != null && placeDistrict != null -> "$placeName ($placeDistrict)"
-        placeName != null -> placeName
-        placeDistrict != null -> placeDistrict
-        else -> "위치 미정"
-    }
-    
-    return ListItem(
-        id = this.id,
-        title = this.title,
-        location = locationText,
-        categoryLabel = categoryDisplayName,
-        categoryBg = bgColor,
-        categoryFg = fgColor,
-        thumbnailImageUrl = null, // API에서 이미지 URL이 없으므로 null
-        date = dateText,
-        recommendationReason = null, // API에서 추천 이유가 없으므로 null
-        startAt = this.startAt,
-        endAt = this.endAt
-    )
 }

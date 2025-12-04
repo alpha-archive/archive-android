@@ -49,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alpha.archive.core.ui.components.ListItem
 import com.alpha.archive.core.ui.components.ListItemCard
 import com.alpha.archive.core.util.CategoryColorGenerator
+import com.alpha.archive.core.util.CategoryMapper
 import com.alpha.archive.core.util.DateFormatter
 import com.alpha.archive.feature.home.recommend.detail.view.RecommendDetailActivity
 import com.alpha.archive.feature.home.recommend.filter.RecommendFilterActivity
@@ -277,38 +278,11 @@ fun RecommendScreen(
 
 }
 
-
-/**
- * 카테고리 enum을 한글로 변환
- */
-private fun getCategoryDisplayName(category: String): String {
-    return when (category) {
-        "MUSICAL" -> "뮤지컬"
-        "THEATER" -> "연극"
-        "MOVIE" -> "영화"
-        "EXHIBITION" -> "전시"
-        "COOKING" -> "요리"
-        "VOLUNTEER" -> "봉사"
-        "READING" -> "독서"
-        "CONCERT" -> "콘서트"
-        "FESTIVAL" -> "축제"
-        "WORKSHOP" -> "워크샵"
-        "SPORTS" -> "스포츠"
-        "TRAVEL" -> "여행"
-        "OUTDOOR" -> "야외활동"
-        "HOBBY" -> "취미"
-        "STUDY" -> "스터디"
-        "NETWORKING" -> "네트워킹"
-        "OTHER" -> "기타"
-        else -> category
-    }
-}
-
 /**
  * 추천 활동을 ListItem으로 변환
  */
 private fun com.alpha.archive.feature.home.recommend.data.remote.dto.RecommendActivityDto.toListItem(): ListItem {
-    val categoryDisplayName = getCategoryDisplayName(this.category)
+    val categoryDisplayName = CategoryMapper.toKorean(this.category)
     val (bgColor, fgColor) = CategoryColorGenerator.getCategoryColors(categoryDisplayName)
     
     // 날짜 포맷팅

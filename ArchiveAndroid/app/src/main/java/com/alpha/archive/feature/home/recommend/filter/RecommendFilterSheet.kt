@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.alpha.archive.core.util.CategoryColorGenerator
+import com.alpha.archive.core.util.CategoryMapper
 
 // 필터링을 위한 데이터 클래스
 data class RecommendFilterData(
@@ -79,7 +80,7 @@ fun RecommendFilterScreen(
     
     // initialFilters가 변경될 때 상태 초기화
     LaunchedEffect(initialFilters) {
-        selectedCategory = getCategoryKoreanValue(initialFilters.selectedCategory)
+        selectedCategory = CategoryMapper.toKorean(initialFilters.selectedCategory)
         startYear = initialFilters.startYear
         startMonth = initialFilters.startMonth
         startDay = initialFilters.startDay
@@ -91,11 +92,7 @@ fun RecommendFilterScreen(
     }
     
     // 카테고리 목록
-    val allCategories = listOf(
-        "체험", "전시", "뮤지컬", "연극", "영화", "콘서트", 
-        "축제", "워크샵", "스포츠", "여행", "독서", "요리",
-        "봉사", "취미", "스터디", "네트워킹", "기타"
-    )
+    val allCategories = CategoryMapper.allCategories
     
     Box(
         modifier = Modifier.fillMaxSize()
@@ -504,7 +501,7 @@ fun RecommendFilterScreen(
             Button(
                 onClick = {
                     val filterData = RecommendFilterData(
-                        selectedCategory = getCategoryEnglishValue(selectedCategory),
+                        selectedCategory = CategoryMapper.toEnglish(selectedCategory),
                         startYear = startYear,
                         startMonth = startMonth,
                         startDay = startDay,
@@ -564,55 +561,4 @@ private fun CategoryGridItem(
     }
 }
 
-/**
- * 한글 카테고리를 영어 enum으로 변환
- */
-private fun getCategoryEnglishValue(koreanCategory: String): String {
-    return when (koreanCategory) {
-        "뮤지컬" -> "MUSICAL"
-        "연극" -> "THEATER"
-        "영화" -> "MOVIE"
-        "전시" -> "EXHIBITION"
-        "요리" -> "COOKING"
-        "봉사" -> "VOLUNTEER"
-        "독서" -> "READING"
-        "콘서트" -> "CONCERT"
-        "축제" -> "FESTIVAL"
-        "워크샵" -> "WORKSHOP"
-        "스포츠" -> "SPORTS"
-        "여행" -> "TRAVEL"
-        "체험" -> "OUTDOOR"
-        "취미" -> "HOBBY"
-        "스터디" -> "STUDY"
-        "네트워킹" -> "NETWORKING"
-        "기타" -> "OTHER"
-        else -> ""
-    }
-}
-
-/**
- * 영어 enum을 한글 카테고리로 변환
- */
-private fun getCategoryKoreanValue(englishCategory: String): String {
-    return when (englishCategory) {
-        "MUSICAL" -> "뮤지컬"
-        "THEATER" -> "연극"
-        "MOVIE" -> "영화"
-        "EXHIBITION" -> "전시"
-        "COOKING" -> "요리"
-        "VOLUNTEER" -> "봉사"
-        "READING" -> "독서"
-        "CONCERT" -> "콘서트"
-        "FESTIVAL" -> "축제"
-        "WORKSHOP" -> "워크샵"
-        "SPORTS" -> "스포츠"
-        "TRAVEL" -> "여행"
-        "OUTDOOR" -> "체험"
-        "HOBBY" -> "취미"
-        "STUDY" -> "스터디"
-        "NETWORKING" -> "네트워킹"
-        "OTHER" -> "기타"
-        else -> ""
-    }
-}
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.alpha.archive.core.network.toUserFriendlyMessage
 import com.alpha.archive.core.ui.components.DetailScreenState
 import com.alpha.archive.core.util.CategoryColorGenerator
+import com.alpha.archive.core.util.CategoryMapper
 import com.alpha.archive.core.util.DateFormatter
 import com.alpha.archive.feature.home.recommend.data.repository.RecommendRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -79,7 +80,7 @@ private fun com.alpha.archive.feature.home.recommend.data.remote.dto.RecommendAc
     }
     
     // 카테고리 표시명 (영문 카테고리를 한글로 변환)
-    val categoryDisplayName = getCategoryDisplayName(this.category)
+    val categoryDisplayName = CategoryMapper.toKorean(this.category)
     
     // 카테고리 색상
     val (bgColor, fgColor) = CategoryColorGenerator.getCategoryColors(categoryDisplayName)
@@ -122,32 +123,5 @@ private fun com.alpha.archive.feature.home.recommend.data.remote.dto.RecommendAc
         categoryBg = bgColor,
         categoryFg = fgColor
     )
-}
-
-/**
- * 영문 카테고리를 한글 표시명으로 변환
- */
-private fun getCategoryDisplayName(category: String): String {
-    return when (category.uppercase()) {
-        "MUSICAL" -> "뮤지컬"
-        "THEATER" -> "연극"
-        "MOVIE" -> "영화"
-        "EXHIBITION" -> "전시"
-        "COOKING" -> "요리"
-        "VOLUNTEER" -> "봉사"
-        "READING" -> "독서"
-        "CONCERT" -> "콘서트"
-        "FESTIVAL" -> "축제"
-        "WORKSHOP" -> "워크샵"
-        "SPORTS" -> "스포츠"
-        "TRAVEL" -> "여행"
-        "OUTDOOR" -> "야외활동"
-        "HOBBY" -> "취미"
-        "STUDY" -> "스터디"
-        "NETWORKING" -> "네트워킹"
-        "EXPERIENCE" -> "체험"
-        "OTHER" -> "기타"
-        else -> category
-    }
 }
 
